@@ -77,7 +77,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </span>
             </div>
             <p className="text-[#86868B] leading-relaxed">
-              Designed with Apple’s macOS Calendar philosophy: focused calm, subtle borders,
+              Designed with Dayli’s design philosophy: focused calm, subtle borders,
               precise typography, and local-first persistence.
             </p>
           </div>

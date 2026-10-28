@@ -5,3 +5,4 @@ export interface UserProfile {
   avatarUrl?: string;
   provider?: 'google' | 'email';
 }
+

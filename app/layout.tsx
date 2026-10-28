@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dayli — Apple-Inspired Personal Calendar",
-  description: "A premium, minimalist personal calendar and task manager inspired by macOS design.",
+  title: "Dayli — Personal Calendar & Tasks",
+  description: "A premium, minimalist personal calendar and task manager.",
 };
 
 export default function RootLayout({

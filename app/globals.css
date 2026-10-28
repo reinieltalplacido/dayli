@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-apple-blue: #0A84FF;
-  --color-apple-blue-hover: #0071E3;
-  --color-apple-bg: #F5F5F7;
-  --color-apple-surface: #FFFFFF;
-  --color-apple-text: #1D1D1F;
-  --color-apple-secondary: #86868B;
-  --color-apple-border: #E5E5EA;
+  --color-dayli-blue: #0A84FF;
+  --color-dayli-blue-hover: #0071E3;
+  --color-dayli-bg: #F5F5F7;
+  --color-dayli-surface: #FFFFFF;
+  --color-dayli-text: #1D1D1F;
+  --color-dayli-secondary: #86868B;
+  --color-dayli-border: #E5E5EA;
 
   --color-cat-personal: #0A84FF;
   --color-cat-school: #34C759;
@@ -15,7 +15,7 @@
   --color-cat-meetings: #AF52DE;
   --color-cat-important: #FF3B30;
 
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
@@ -32,7 +32,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom delicate Apple-like scrollbars */
+/* Custom delicate scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
