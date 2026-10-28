@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Plus,
   CheckSquare,
@@ -10,6 +10,9 @@ import {
   Cloud,
   LogOut,
   User,
+  Moon,
+  HelpCircle,
+  ChevronRight,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { CalendarCategory, CalendarEvent, TaskItem } from '@/types/calendar';
@@ -29,7 +32,7 @@ interface SidebarProps {
   tasks: TaskItem[];
   isTasksOpen: boolean;
   onToggleTasks: () => void;
-  onOpenSettings: () => void;
+  onOpenSettings: (tab?: 'general' | 'data' | 'shortcuts') => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
   user: UserProfile | null;
@@ -57,7 +60,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const pendingTasksCount = tasks.filter((t) => !t.completed).length;
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   return (
     <>
@@ -232,14 +255,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Sidebar Footer: Account Sync & Preferences */}
+        {/* Sidebar Footer: Account Sync & Integrated Settings */}
         <div className="p-3 border-t border-[#E5E5EA] space-y-2 bg-[#F5F5F7]">
-          {/* User Account / Sync Capsule */}
+          {/* User Account Capsule */}
           {user ? (
-            <div className="relative">
+            <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setShowUserMenu((p) => !p)}
-                className="w-full flex items-center justify-between p-2 rounded-lg bg-white border border-[#E5E5EA] hover:border-[#0A84FF]/40 text-left transition-all shadow-xs group"
+                className={`w-full flex items-center justify-between p-2 rounded-lg bg-white border text-left transition-all shadow-xs group ${
+                  showUserMenu
+                    ? 'border-[#0A84FF] ring-2 ring-[#0A84FF]/10'
+                    : 'border-[#E5E5EA] hover:border-[#0A84FF]/40'
+                }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="w-7 h-7 rounded-full bg-[#0A84FF] text-white flex items-center justify-center font-semibold text-xs shrink-0">
@@ -260,27 +287,115 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <User className="w-3.5 h-3.5 text-[#86868B] group-hover:text-[#1D1D1F] shrink-0" />
               </button>
 
-              {/* User Dropdown Menu */}
+              {/* Integrated Account & Settings Dropdown Menu */}
               {showUserMenu && (
-                <div className="absolute bottom-full left-0 right-0 mb-1.5 bg-white rounded-xl shadow-xl border border-[#E5E5EA] overflow-hidden p-1 z-30 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-3 py-2 border-b border-[#E5E5EA]">
-                    <p className="text-[11px] font-semibold text-[#1D1D1F] truncate">
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-2xl shadow-2xl border border-[#E5E5EA] overflow-hidden p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-[#1D1D1F]">
+                  {/* Account Header */}
+                  <div className="px-3 py-2 border-b border-[#E5E5EA]/70">
+                    <p className="text-xs font-semibold text-[#1D1D1F] truncate">
                       {user.name}
                     </p>
-                    <p className="text-[10px] text-[#86868B] truncate">
+                    <p className="text-[11px] text-[#86868B] truncate">
                       {user.email}
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      onSignOut();
-                    }}
-                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium text-[#FF3B30] hover:bg-[#FF3B30]/10 transition-colors mt-0.5"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>Sign Out</span>
-                  </button>
+
+                  {/* Add Account Option */}
+                  <div className="py-1 border-b border-[#E5E5EA]/70">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenAuth();
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-[#86868B]" />
+                      <span>Add account</span>
+                    </button>
+                  </div>
+
+                  {/* Settings & Preferences Group */}
+                  <div className="py-1 border-b border-[#E5E5EA]/70 space-y-0.5">
+                    {/* Appearance */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenSettings('general');
+                      }}
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Moon className="w-3.5 h-3.5 text-[#86868B]" />
+                        <div>
+                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                            Appearance
+                          </p>
+                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
+                            Light
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Preferences & Data */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenSettings('data');
+                      }}
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Settings className="w-3.5 h-3.5 text-[#86868B]" />
+                        <div>
+                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                            Preferences & Data
+                          </p>
+                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
+                            Backup & Storage
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Help & Shortcuts */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenSettings('shortcuts');
+                      }}
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <HelpCircle className="w-3.5 h-3.5 text-[#86868B]" />
+                        <p className="text-xs font-medium text-[#1D1D1F]">
+                          Help & Shortcuts
+                        </p>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  </div>
+
+                  {/* Sign Out Action */}
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onSignOut();
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#FF3B30] hover:bg-[#FF3B30]/10 transition-colors"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -308,13 +423,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
 
-          {/* Preferences Button */}
+          {/* Quick Settings Shortcut (Available in all states) */}
           <button
-            onClick={onOpenSettings}
+            onClick={() => onOpenSettings('general')}
             className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#86868B] hover:text-[#1D1D1F] hover:bg-white transition-colors"
           >
             <Settings className="w-3.5 h-3.5" />
-            <span>Preferences & Data</span>
+            <span>Preferences & Settings</span>
           </button>
         </div>
 

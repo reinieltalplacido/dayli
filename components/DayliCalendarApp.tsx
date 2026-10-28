@@ -66,6 +66,7 @@ export function DayliCalendarApp() {
   const [modalDefaultHour, setModalDefaultHour] = useState<number | undefined>(undefined);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'general' | 'data' | 'shortcuts'>('general');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
@@ -245,6 +246,11 @@ export function DayliCalendarApp() {
     addToast('Signed out. Local storage mode active.', 'info');
   }, [addToast]);
 
+  const handleOpenSettings = useCallback((tab: 'general' | 'data' | 'shortcuts' = 'general') => {
+    setSettingsTab(tab);
+    setIsSettingsOpen(true);
+  }, []);
+
   // Settings & Data actions
   const handleResetData = useCallback(() => {
     eventService.resetToSample();
@@ -332,7 +338,7 @@ export function DayliCalendarApp() {
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
-      {/* macOS-style Sidebar */}
+      {/* Sidebar */}
       <Sidebar
         currentDate={currentDate}
         onSelectDate={setCurrentDate}
@@ -344,7 +350,7 @@ export function DayliCalendarApp() {
         tasks={tasks}
         isTasksOpen={isTasksOpen}
         onToggleTasks={() => setIsTasksOpen((prev) => !prev)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSettings={handleOpenSettings}
         isOpenMobile={isSidebarMobileOpen}
         onCloseMobile={() => setIsSidebarMobileOpen(false)}
         user={user}
@@ -428,7 +434,7 @@ export function DayliCalendarApp() {
         />
       )}
 
-      {/* Settings Modal */}
+      {/* Settings Modal with Tabs */}
       {isSettingsOpen && (
         <SettingsModal
           isOpen={isSettingsOpen}
@@ -437,6 +443,7 @@ export function DayliCalendarApp() {
           onClearData={handleClearData}
           onExportData={handleExportData}
           onImportData={handleImportData}
+          initialTab={settingsTab}
         />
       )}
     </div>
