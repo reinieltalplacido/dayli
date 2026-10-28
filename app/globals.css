@@ -15,8 +15,7 @@
   --color-cat-meetings: #AF52DE;
   --color-cat-important: #FF3B30;
 
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 :root {
@@ -30,6 +29,14 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure form controls, buttons, and inputs strictly inherit Inter typography */
+input,
+button,
+textarea,
+select {
+  font-family: inherit;
 }
 
 /* Custom delicate scrollbars */
