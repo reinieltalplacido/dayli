@@ -57,6 +57,20 @@ export function getMonthDays(currentDate: Date, weekStartsOn: 0 | 1 = 0): Date[]
 }
 
 /**
+ * Returns continuous days across a range of months from pastMonths before baseDate to futureMonths after baseDate
+ */
+export function getContinuousDays(
+  baseDate: Date,
+  pastMonths: number = 4,
+  futureMonths: number = 8,
+  weekStartsOn: 0 | 1 = 0
+): Date[] {
+  const start = startOfWeek(startOfMonth(subMonths(baseDate, pastMonths)), { weekStartsOn });
+  const end = endOfWeek(endOfMonth(addMonths(baseDate, futureMonths)), { weekStartsOn });
+  return eachDayOfInterval({ start, end });
+}
+
+/**
  * Returns the 7 days of the week containing currentDate
  */
 export function getWeekDays(currentDate: Date, weekStartsOn: 0 | 1 = 0): Date[] {

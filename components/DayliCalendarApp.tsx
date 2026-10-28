@@ -108,6 +108,15 @@ export function DayliCalendarApp() {
     setCurrentDate(new Date());
   }, []);
 
+  const handleVisibleMonthChange = useCallback((date: Date) => {
+    setCurrentDate((prev) => {
+      if (prev.getFullYear() === date.getFullYear() && prev.getMonth() === date.getMonth()) {
+        return prev;
+      }
+      return date;
+    });
+  }, []);
+
   // Event modal openers
   const handleOpenCreateEvent = useCallback(() => {
     setSelectedEvent(null);
@@ -385,6 +394,7 @@ export function DayliCalendarApp() {
             onSelectEvent={handleSelectEvent}
             onCreateEventOnDate={handleCreateOnDate}
             onCreateEventOnDateTime={handleCreateOnDateTime}
+            onVisibleMonthChange={handleVisibleMonthChange}
           />
 
           {/* Tasks & Reminders Drawer */}

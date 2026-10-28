@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   format,
   isToday,
-  isSameMonth,
 } from 'date-fns';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
-import { getMonthDays, toInputDateString } from '@/lib/dateUtils';
+import { getContinuousDays, toInputDateString } from '@/lib/dateUtils';
 import { EventCard } from './EventCard';
 import { Plus, X } from 'lucide-react';
 
@@ -17,6 +16,7 @@ interface MonthViewProps {
   categories: CalendarCategory[];
   onSelectEvent: (event: CalendarEvent) => void;
   onCreateEventOnDate: (date: Date) => void;
+  onVisibleMonthChange?: (date: Date) => void;
 }
 
 export const MonthView: React.FC<MonthViewProps> = ({
@@ -25,21 +25,31 @@ export const MonthView: React.FC<MonthViewProps> = ({
   categories,
   onSelectEvent,
   onCreateEventOnDate,
+  onVisibleMonthChange,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScrollRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Month ranges for continuous window
+  const [range, setRange] = useState({ pastMonths: 3, futureMonths: 8 });
   const [overflowDate, setOverflowDate] = useState<Date | null>(null);
 
-  const days = React.useMemo(() => {
-    return getMonthDays(currentDate, 0);
-  }, [currentDate]);
+  // Base anchor date for range calculation
+  const anchorDate = useMemo(() => new Date(2026, 9, 1), []);
 
-  const categoryMap = React.useMemo(() => {
+  const days = useMemo(() => {
+    return getContinuousDays(anchorDate, range.pastMonths, range.futureMonths, 0);
+  }, [anchorDate, range.pastMonths, range.futureMonths]);
+
+  const categoryMap = useMemo(() => {
     const map = new Map<string, CalendarCategory>();
     categories.forEach((cat) => map.set(cat.id, cat));
     return map;
   }, [categories]);
 
   // Group events by YYYY-MM-DD
-  const eventsByDate = React.useMemo(() => {
+  const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
     events.forEach((evt) => {
       const list = map.get(evt.startDate) || [];
@@ -51,94 +61,185 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
   const weekDayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
+  // Scroll to a specific date smoothly
+  const scrollToDate = useCallback((date: Date, behavior: ScrollBehavior = 'smooth') => {
+    const dateStr = toInputDateString(date);
+    const element = document.getElementById(`day-cell-${dateStr}`);
+    if (element && containerRef.current) {
+      isProgrammaticScrollRef.current = true;
+      element.scrollIntoView({ behavior, block: 'start' });
+
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 700);
+    }
+  }, []);
+
+  // Initial scroll to currentDate on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      scrollToDate(currentDate, 'auto');
+    }, 50);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync scroll when currentDate changes from toolbar navigation
+  const prevDateStrRef = useRef(toInputDateString(currentDate));
+  useEffect(() => {
+    const currentStr = toInputDateString(currentDate);
+    if (prevDateStrRef.current !== currentStr) {
+      prevDateStrRef.current = currentStr;
+      if (!isProgrammaticScrollRef.current) {
+        scrollToDate(currentDate, 'smooth');
+      }
+    }
+  }, [currentDate, scrollToDate]);
+
+  // Handle scroll events: continuous loading and active month detection
+  const handleScroll = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+
+    // Infinite load upwards (past months)
+    if (scrollTop < 180) {
+      const previousScrollHeight = scrollHeight;
+      setRange((prev) => ({ ...prev, pastMonths: prev.pastMonths + 3 }));
+      // Adjust scroll position after prepending
+      requestAnimationFrame(() => {
+        if (container) {
+          const heightDiff = container.scrollHeight - previousScrollHeight;
+          container.scrollTop = scrollTop + heightDiff;
+        }
+      });
+    }
+
+    // Infinite load downwards (future months)
+    if (scrollTop + clientHeight > scrollHeight - 300) {
+      setRange((prev) => ({ ...prev, futureMonths: prev.futureMonths + 4 }));
+    }
+
+    // Detect currently visible month at the top of viewport (approx 70px below sticky header)
+    if (!isProgrammaticScrollRef.current && onVisibleMonthChange) {
+      const checkY = container.getBoundingClientRect().top + 75;
+      const checkX = container.getBoundingClientRect().left + 80;
+      const element = document.elementFromPoint(checkX, checkY);
+      const cell = element?.closest('[data-date]') as HTMLElement | null;
+      if (cell && cell.dataset.date) {
+        const [year, month] = cell.dataset.date.split('-').map(Number);
+        const cellMonth = new Date(year, month - 1, 1);
+        onVisibleMonthChange(cellMonth);
+      }
+    }
+  }, [onVisibleMonthChange]);
+
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden relative">
-      {/* Weekday Header Row */}
-      <div className="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#F5F5F7]/40 shrink-0">
+    <div className="flex-1 flex flex-col bg-white overflow-hidden relative h-full">
+      {/* Sticky Weekday Header Row */}
+      <div className="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#F5F5F7]/90 backdrop-blur-md shrink-0 sticky top-0 z-20">
         {weekDayNames.map((name, idx) => (
           <div
             key={idx}
-            className="py-2 text-center text-[11px] font-semibold tracking-wider text-[#86868B]"
+            className="py-2.5 text-center text-[11px] font-semibold tracking-wider text-[#86868B]"
           >
             {name}
           </div>
         ))}
       </div>
 
-      {/* Month Days Grid */}
-      <div className="flex-1 grid grid-cols-7 grid-rows-5 sm:grid-rows-6 border-b border-[#E5E5EA] divide-y divide-[#E5E5EA] overflow-hidden">
-        {days.map((day, idx) => {
-          const dateStr = toInputDateString(day);
-          const dayEvents = eventsByDate.get(dateStr) || [];
-          const isCurrentDay = isToday(day);
-          const isCurrentMonth = isSameMonth(day, currentDate);
-          const maxVisible = 3;
-          const visibleEvents = dayEvents.slice(0, maxVisible);
-          const overflowCount = dayEvents.length - maxVisible;
+      {/* Continuous Scrollable Months Grid */}
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto relative divide-y divide-[#E5E5EA] select-none"
+      >
+        <div className="grid grid-cols-7 divide-x divide-[#E5E5EA]">
+          {days.map((day, idx) => {
+            const dateStr = toInputDateString(day);
+            const dayEvents = eventsByDate.get(dateStr) || [];
+            const isCurrentDay = isToday(day);
+            const isFirstOfMonth = day.getDate() === 1;
+            const maxVisible = 3;
+            const visibleEvents = dayEvents.slice(0, maxVisible);
+            const overflowCount = dayEvents.length - maxVisible;
 
-          return (
-            <div
-              key={idx}
-              onClick={() => onCreateEventOnDate(day)}
-              className={`group min-h-[85px] sm:min-h-[100px] p-1.5 flex flex-col border-r border-[#E5E5EA] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/60 ${
-                !isCurrentMonth ? 'bg-[#F5F5F7]/30' : 'bg-white'
-              }`}
-            >
-              {/* Day Number Header */}
-              <div className="flex items-center justify-between mb-1">
-                <span
-                  className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
-                    isCurrentDay
-                      ? 'bg-[#0A84FF] text-white shadow-xs'
-                      : isCurrentMonth
-                      ? 'text-[#1D1D1F]'
-                      : 'text-[#86868B]/50'
-                  }`}
-                >
-                  {format(day, 'd')}
-                </span>
+            return (
+              <div
+                key={idx}
+                id={`day-cell-${dateStr}`}
+                data-date={dateStr}
+                onClick={() => onCreateEventOnDate(day)}
+                className={`group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 ${
+                  isFirstOfMonth ? 'bg-[#0A84FF]/[0.015]' : 'bg-white'
+                }`}
+              >
+                {/* Day Header (Includes prominent month name on 1st of month) */}
+                <div className="flex items-center justify-between mb-1.5 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    {isFirstOfMonth && (
+                      <span className="text-[11px] font-bold text-[#0A84FF] tracking-tight">
+                        {format(day, 'MMM')}
+                      </span>
+                    )}
+                    <span
+                      className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
+                        isCurrentDay
+                          ? 'bg-[#0A84FF] text-white shadow-xs'
+                          : isFirstOfMonth
+                          ? 'text-[#0A84FF] font-bold'
+                          : 'text-[#1D1D1F]'
+                      }`}
+                    >
+                      {format(day, 'd')}
+                    </span>
+                  </div>
 
-                {/* Quick Add Event Hover Button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCreateEventOnDate(day);
-                  }}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] hover:text-[#0A84FF] hover:bg-white transition-all"
-                  title="Add event"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Event Cards List */}
-              <div className="flex-1 overflow-hidden space-y-0.5">
-                {visibleEvents.map((evt) => (
-                  <EventCard
-                    key={evt.id}
-                    event={evt}
-                    category={categoryMap.get(evt.categoryId)}
-                    view="month"
-                    onClick={onSelectEvent}
-                  />
-                ))}
-
-                {overflowCount > 0 && (
+                  {/* Quick Add Event Hover Button */}
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setOverflowDate(day);
+                      onCreateEventOnDate(day);
                     }}
-                    className="w-full text-left text-[10px] font-medium text-[#0A84FF] hover:underline px-1 py-0.5"
+                    className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] hover:text-[#0A84FF] hover:bg-white transition-all shadow-2xs"
+                    title="Add event"
                   >
-                    +{overflowCount} more
+                    <Plus className="w-3.5 h-3.5" />
                   </button>
-                )}
+                </div>
+
+                {/* Event Cards List */}
+                <div className="flex-1 space-y-1 overflow-hidden">
+                  {visibleEvents.map((evt) => (
+                    <EventCard
+                      key={evt.id}
+                      event={evt}
+                      category={categoryMap.get(evt.categoryId)}
+                      view="month"
+                      onClick={onSelectEvent}
+                    />
+                  ))}
+
+                  {overflowCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOverflowDate(day);
+                      }}
+                      className="w-full text-left text-[10px] font-medium text-[#0A84FF] hover:underline px-1 py-0.5"
+                    >
+                      +{overflowCount} more
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Overflow Date Popover Modal */}
