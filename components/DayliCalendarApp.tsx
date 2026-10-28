@@ -17,6 +17,7 @@ import {
 import { eventService } from '@/services/eventService';
 import { taskService } from '@/services/taskService';
 import { categoryService } from '@/services/categoryService';
+import { authService } from '@/services/authService';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { HeaderToolbar } from '@/components/layout/HeaderToolbar';
 import { CalendarWorkspace } from '@/components/calendar/CalendarWorkspace';
@@ -24,6 +25,7 @@ import { TasksPanel } from '@/components/tasks/TasksPanel';
 import { EventModal } from '@/components/events/EventModal';
 import { SearchDialog } from '@/components/search/SearchDialog';
 import { SettingsModal } from '@/components/settings/SettingsModal';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { ToastContainer } from '@/components/ui/Toast';
 
 export function DayliCalendarApp() {
@@ -49,6 +51,12 @@ export function DayliCalendarApp() {
     categoryService.getServerSnapshot
   );
 
+  const user = useSyncExternalStore(
+    authService.subscribe,
+    authService.getSnapshot,
+    authService.getServerSnapshot
+  );
+
   // UI Panels state
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
@@ -58,6 +66,7 @@ export function DayliCalendarApp() {
   const [modalDefaultHour, setModalDefaultHour] = useState<number | undefined>(undefined);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
   // Toast feedback helper
@@ -222,6 +231,20 @@ export function DayliCalendarApp() {
     [addToast]
   );
 
+  // Auth actions
+  const handleAuthSuccess = useCallback(
+    (email: string, name?: string, provider?: 'google' | 'email') => {
+      const loggedUser = authService.signIn(email, name, provider);
+      addToast(`Welcome, ${loggedUser.name}! Cloud sync is now active.`, 'success');
+    },
+    [addToast]
+  );
+
+  const handleSignOut = useCallback(() => {
+    authService.signOut();
+    addToast('Signed out. Local storage mode active.', 'info');
+  }, [addToast]);
+
   // Settings & Data actions
   const handleResetData = useCallback(() => {
     eventService.resetToSample();
@@ -296,6 +319,7 @@ export function DayliCalendarApp() {
         setIsEventModalOpen(false);
         setIsSearchOpen(false);
         setIsSettingsOpen(false);
+        setIsAuthModalOpen(false);
       }
     };
 
@@ -323,6 +347,9 @@ export function DayliCalendarApp() {
         onOpenSettings={() => setIsSettingsOpen(true)}
         isOpenMobile={isSidebarMobileOpen}
         onCloseMobile={() => setIsSidebarMobileOpen(false)}
+        user={user}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onSignOut={handleSignOut}
       />
 
       {/* Main Area: Top Toolbar + Calendar Workspace + Tasks Panel */}
@@ -367,6 +394,13 @@ export function DayliCalendarApp() {
         </div>
       </div>
 
+      {/* Auth Modal (Sign In / Sign Up) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+      />
+
       {/* Event Creation & Edit Modal */}
       {isEventModalOpen && (
         <EventModal
@@ -408,4 +442,3 @@ export function DayliCalendarApp() {
     </div>
   );
 }
-

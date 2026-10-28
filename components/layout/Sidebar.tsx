@@ -7,9 +7,13 @@ import {
   Settings,
   CalendarDays,
   X,
+  Cloud,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { CalendarCategory, CalendarEvent, TaskItem } from '@/types/calendar';
+import { UserProfile } from '@/types/auth';
 import { MiniCalendar } from '../calendar/MiniCalendar';
 import { DayliLogo } from '../ui/DayliLogo';
 import { AddCategoryModal } from '../categories/AddCategoryModal';
@@ -28,6 +32,9 @@ interface SidebarProps {
   onOpenSettings: () => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
+  user: UserProfile | null;
+  onOpenAuth: () => void;
+  onSignOut: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -44,8 +51,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenSettings,
   isOpenMobile,
   onCloseMobile,
+  user,
+  onOpenAuth,
+  onSignOut,
 }) => {
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const pendingTasksCount = tasks.filter((t) => !t.completed).length;
 
   return (
@@ -221,8 +232,83 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Sidebar Footer: Settings & Info */}
-        <div className="p-3 border-t border-[#E5E5EA]">
+        {/* Sidebar Footer: Account Sync & Preferences */}
+        <div className="p-3 border-t border-[#E5E5EA] space-y-2 bg-[#F5F5F7]">
+          {/* User Account / Sync Capsule */}
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu((p) => !p)}
+                className="w-full flex items-center justify-between p-2 rounded-lg bg-white border border-[#E5E5EA] hover:border-[#0A84FF]/40 text-left transition-all shadow-xs group"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-full bg-[#0A84FF] text-white flex items-center justify-center font-semibold text-xs shrink-0">
+                    {user.name.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-[#1D1D1F] truncate leading-tight">
+                      {user.name}
+                    </p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
+                      <span className="text-[10px] text-[#86868B] leading-none">
+                        Cloud Synced
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <User className="w-3.5 h-3.5 text-[#86868B] group-hover:text-[#1D1D1F] shrink-0" />
+              </button>
+
+              {/* User Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute bottom-full left-0 right-0 mb-1.5 bg-white rounded-xl shadow-xl border border-[#E5E5EA] overflow-hidden p-1 z-30 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-2 border-b border-[#E5E5EA]">
+                    <p className="text-[11px] font-semibold text-[#1D1D1F] truncate">
+                      {user.name}
+                    </p>
+                    <p className="text-[10px] text-[#86868B] truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      onSignOut();
+                    }}
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium text-[#FF3B30] hover:bg-[#FF3B30]/10 transition-colors mt-0.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="w-full flex items-center justify-between p-2 rounded-lg bg-white/80 hover:bg-white border border-[#E5E5EA] hover:border-[#0A84FF]/40 text-left transition-all shadow-xs group"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-7 h-7 rounded-md bg-[#0A84FF]/10 text-[#0A84FF] flex items-center justify-center shrink-0 group-hover:bg-[#0A84FF] group-hover:text-white transition-colors">
+                  <Cloud className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[#1D1D1F] leading-tight">
+                    Sign in to Sync
+                  </p>
+                  <p className="text-[10px] text-[#86868B] leading-none mt-0.5">
+                    Local Storage
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-medium text-[#0A84FF] group-hover:translate-x-0.5 transition-transform">
+                Sign In
+              </span>
+            </button>
+          )}
+
+          {/* Preferences Button */}
           <button
             onClick={onOpenSettings}
             className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#86868B] hover:text-[#1D1D1F] hover:bg-white transition-colors"
