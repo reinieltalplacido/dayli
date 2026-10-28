@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
-import { DM_Sans, Newsreader } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400", "500"],
-  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
-  title: "Dayli — A little more clarity, every day",
-  description: "An AI-powered daily planner that helps people organize tasks, manage time, and make realistic plans for their day.",
+  title: "Dayli — Apple-Inspired Personal Calendar",
+  description: "A premium, minimalist personal calendar and task manager inspired by macOS design.",
 };
 
 export default function RootLayout({
@@ -28,9 +25,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${newsreader.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="h-full bg-[#F5F5F7] text-[#1D1D1F] overflow-hidden select-none">
+        {children}
+      </body>
     </html>
   );
 }

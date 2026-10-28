@@ -1,70 +1,52 @@
 @import "tailwindcss";
 
-:root {
-  --background: #F7F8FC;
-  --surface: #FFFFFF;
-  --surface-muted: #F0F3F9;
-  --primary: #3457D5;
-  --primary-hover: #263C9A;
-  --primary-tint: #E8EDFF;
-  --primary-text: #202536;
-  --secondary-text: #697386;
-  --border: #E4E8F0;
-  --border-strong: #D3D8E2;
-  --success: #247A52;
-  --success-bg: #E5F5EC;
-  --foreground: #202536;
+@theme {
+  --color-apple-blue: #0A84FF;
+  --color-apple-blue-hover: #0071E3;
+  --color-apple-bg: #F5F5F7;
+  --color-apple-surface: #FFFFFF;
+  --color-apple-text: #1D1D1F;
+  --color-apple-secondary: #86868B;
+  --color-apple-border: #E5E5EA;
+
+  --color-cat-personal: #0A84FF;
+  --color-cat-school: #34C759;
+  --color-cat-deadlines: #FF9500;
+  --color-cat-meetings: #AF52DE;
+  --color-cat-important: #FF3B30;
+
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-tint: var(--primary-tint);
-  --color-primary-text: var(--primary-text);
-  --color-secondary-text: var(--secondary-text);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-success: var(--success);
-  --color-success-bg: var(--success-bg);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-serif: var(--font-newsreader), "Charter", "Georgia", serif;
+:root {
+  --background: #F5F5F7;
+  --foreground: #1D1D1F;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--primary-text);
+  background-color: #F5F5F7;
+  color: #1D1D1F;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Editorial Serif utility */
-.font-editorial {
-  font-family: var(--font-serif);
-}
-
-/* Custom subtle scrollbar */
+/* Custom delicate Apple-like scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #D3D8E2;
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 9999px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #B6BDCE;
-}
 
-/* Focus styling */
-*:focus-visible {
-  outline: 2px solid #3457D5;
-  outline-offset: 2px;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
 }
