@@ -200,12 +200,11 @@ export const MonthView: React.FC<MonthViewProps> = ({
             {/* New Month Divider Header */}
             <div
               id={`month-divider-${section.monthKey}`}
-              className="flex items-center gap-3 px-4 py-2.5 bg-[#F5F5F7] border-y border-[#E5E5EA] sticky top-0 z-20 select-none shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
+              className="px-4 py-2 bg-[#F5F5F7] border-y border-[#E5E5EA] sticky top-0 z-20 select-none shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
             >
               <span className="text-xs font-semibold text-[#1D1D1F] tracking-tight">
                 {section.label}
               </span>
-              <div className="flex-1 h-[1px] bg-[#E5E5EA]" />
             </div>
 
             {/* Month Days Grid */}
@@ -223,7 +222,6 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 const dateStr = toInputDateString(day);
                 const dayEvents = eventsByDate.get(dateStr) || [];
                 const isCurrentDay = isToday(day);
-                const isFirstOfMonth = day.getDate() === 1;
                 const maxVisible = 3;
                 const visibleEvents = dayEvents.slice(0, maxVisible);
                 const overflowCount = dayEvents.length - maxVisible;
@@ -234,30 +232,19 @@ export const MonthView: React.FC<MonthViewProps> = ({
                     id={`day-cell-${dateStr}`}
                     data-date={dateStr}
                     onClick={() => onCreateEventOnDate(day)}
-                    className={`group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 ${
-                      isFirstOfMonth ? 'bg-[#0A84FF]/[0.015]' : 'bg-white'
-                    }`}
+                    className="group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 bg-white"
                   >
                     {/* Day Header */}
                     <div className="flex items-center justify-between mb-1.5 shrink-0">
-                      <div className="flex items-center gap-1.5">
-                        {isFirstOfMonth && (
-                          <span className="text-[11px] font-bold text-[#0A84FF] tracking-tight">
-                            {format(day, 'MMM')}
-                          </span>
-                        )}
-                        <span
-                          className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
-                            isCurrentDay
-                              ? 'bg-[#0A84FF] text-white shadow-xs'
-                              : isFirstOfMonth
-                              ? 'text-[#0A84FF] font-bold'
-                              : 'text-[#1D1D1F]'
-                          }`}
-                        >
-                          {format(day, 'd')}
-                        </span>
-                      </div>
+                      <span
+                        className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
+                          isCurrentDay
+                            ? 'bg-[#0A84FF] text-white shadow-xs'
+                            : 'text-[#1D1D1F]'
+                        }`}
+                      >
+                        {format(day, 'd')}
+                      </span>
 
                       {/* Quick Add Event Hover Button */}
                       <button
