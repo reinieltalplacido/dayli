@@ -74,6 +74,14 @@ export const taskService = {
     return EMPTY_TASKS;
   },
 
+  setTasks(tasks: TaskItem[]): void {
+    cachedTasks = tasks;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+    }
+    notifyListeners();
+  },
+
   getAll(): TaskItem[] {
     if (typeof window === 'undefined') return EMPTY_TASKS;
     try {
@@ -98,24 +106,47 @@ export const taskService = {
     }
   },
 
-  create(data: Omit<TaskItem, 'id' | 'createdAt'>): TaskItem {
-    const tasks = this.getAll();
+  async create(data: Omit<TaskItem, 'id' | 'createdAt'>): Promise<TaskItem> {
+    const tempId = `task-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     const newTask: TaskItem = {
       ...data,
-      id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      id: tempId,
       createdAt: new Date().toISOString(),
     };
 
+    const tasks = this.getAll();
     const updated = [newTask, ...tasks];
     cachedTasks = updated;
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(updated));
     }
     notifyListeners();
+
+    try {
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        const persisted: TaskItem = await res.json();
+        const current = this.getAll().map((t) => (t.id === tempId ? persisted : t));
+        cachedTasks = current;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(current));
+        }
+        notifyListeners();
+        return persisted;
+      }
+    } catch {
+      // Fallback preserves optimistic update
+    }
+
     return newTask;
   },
 
-  toggle(id: string): TaskItem {
+  async toggle(id: string): Promise<TaskItem> {
     const tasks = this.getAll();
     const index = tasks.findIndex((t) => t.id === id);
     if (index === -1) {
@@ -134,10 +165,21 @@ export const taskService = {
       localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(nextTasks));
     }
     notifyListeners();
+
+    try {
+      await fetch(`/api/tasks/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toggle: true }),
+      });
+    } catch {
+      // Fallback
+    }
+
     return updatedTask;
   },
 
-  delete(id: string): boolean {
+  async delete(id: string): Promise<boolean> {
     const tasks = this.getAll();
     const filtered = tasks.filter((t) => t.id !== id);
     if (filtered.length !== tasks.length) {
@@ -146,6 +188,15 @@ export const taskService = {
         localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(filtered));
       }
       notifyListeners();
+
+      try {
+        await fetch(`/api/tasks/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+      } catch {
+        // Fallback
+      }
+
       return true;
     }
     return false;

@@ -24,6 +24,8 @@ interface SettingsModalProps {
   onClearData: () => void;
   onExportData: () => void;
   onImportData: (jsonStr: string) => boolean;
+  onMigrateData?: () => void;
+  isUserSignedIn?: boolean;
   initialTab?: 'general' | 'data' | 'shortcuts';
 }
 
@@ -34,6 +36,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClearData,
   onExportData,
   onImportData,
+  onMigrateData,
+  isUserSignedIn = false,
   initialTab = 'general',
 }) => {
   const [activeTab, setActiveTab] = useState<'general' | 'data' | 'shortcuts'>(initialTab);
@@ -283,6 +287,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   Data Management
                 </h4>
                 <div className="space-y-2">
+                  {isUserSignedIn && onMigrateData && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onMigrateData();
+                      }}
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg border border-[#0A84FF]/40 bg-[#0A84FF]/5 hover:bg-[#0A84FF]/10 text-left transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Upload className="w-4 h-4 text-[#0A84FF]" />
+                        <div>
+                          <p className="font-medium text-[#0A84FF]">Sync Local Data to Cloud</p>
+                          <p className="text-[11px] text-[#86868B]">
+                            Transfer any offline schedule data into your cloud account
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-medium text-[#0A84FF] px-2 py-0.5 rounded-full bg-white border border-[#0A84FF]/20">
+                        Sync
+                      </span>
+                    </button>
+                  )}
+
                   <button
                     onClick={() => {
                       onResetData();

@@ -166,6 +166,14 @@ export const eventService = {
     return EMPTY_EVENTS;
   },
 
+  setEvents(events: CalendarEvent[]): void {
+    cachedEvents = events;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
+    }
+    notifyListeners();
+  },
+
   getAll(): CalendarEvent[] {
     if (typeof window === 'undefined') return EMPTY_EVENTS;
     try {
@@ -195,25 +203,48 @@ export const eventService = {
     return events.find((evt) => evt.id === id) || null;
   },
 
-  create(eventData: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): CalendarEvent {
-    const events = this.getAll();
+  async create(eventData: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>): Promise<CalendarEvent> {
+    const tempId = `evt-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const newEvent: CalendarEvent = {
       ...eventData,
-      id: `evt-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: tempId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
+    const events = this.getAll();
     const updated = [...events, newEvent];
     cachedEvents = updated;
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(updated));
     }
     notifyListeners();
+
+    try {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData),
+      });
+
+      if (res.ok) {
+        const persisted: CalendarEvent = await res.json();
+        const current = this.getAll().map((e) => (e.id === tempId ? persisted : e));
+        cachedEvents = current;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(current));
+        }
+        notifyListeners();
+        return persisted;
+      }
+    } catch {
+      // Offline / guest fallback preserves local change
+    }
+
     return newEvent;
   },
 
-  update(id: string, updates: Partial<CalendarEvent>): CalendarEvent {
+  async update(id: string, updates: Partial<CalendarEvent>): Promise<CalendarEvent> {
     const events = this.getAll();
     const index = events.findIndex((e) => e.id === id);
     if (index === -1) {
@@ -234,10 +265,32 @@ export const eventService = {
       localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(nextEvents));
     }
     notifyListeners();
+
+    try {
+      const res = await fetch(`/api/events/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      if (res.ok) {
+        const persisted: CalendarEvent = await res.json();
+        const current = this.getAll().map((e) => (e.id === id ? persisted : e));
+        cachedEvents = current;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(current));
+        }
+        notifyListeners();
+        return persisted;
+      }
+    } catch {
+      // Offline / guest fallback preserves local change
+    }
+
     return updatedEvent;
   },
 
-  delete(id: string): boolean {
+  async delete(id: string): Promise<boolean> {
     const events = this.getAll();
     const filtered = events.filter((e) => e.id !== id);
     if (filtered.length !== events.length) {
@@ -246,6 +299,14 @@ export const eventService = {
         localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(filtered));
       }
       notifyListeners();
+
+      try {
+        await fetch(`/api/events/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+      } catch {
+        // Offline / guest fallback preserves local change
+      }
       return true;
     }
     return false;

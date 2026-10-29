@@ -19,6 +19,7 @@ import { taskService } from '@/services/taskService';
 import { categoryService } from '@/services/categoryService';
 import { authService } from '@/services/authService';
 import { authClient } from '@/lib/auth-client';
+import { syncService } from '@/services/syncService';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { HeaderToolbar } from '@/components/layout/HeaderToolbar';
 import { CalendarWorkspace } from '@/components/calendar/CalendarWorkspace';
@@ -56,6 +57,12 @@ export function DayliCalendarApp() {
     authService.subscribe,
     authService.getSnapshot,
     authService.getServerSnapshot
+  );
+
+  const syncState = useSyncExternalStore(
+    syncService.subscribe,
+    syncService.getSnapshot,
+    syncService.getServerSnapshot
   );
 
   const { data: authSession } = authClient.useSession();
@@ -98,6 +105,21 @@ export function DayliCalendarApp() {
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
+  // Sync data with backend when user is authenticated
+  useEffect(() => {
+    if (user) {
+      syncService.syncFromServer();
+      syncService.migrateLocalData().then((migrated) => {
+        if (migrated && (migrated.migratedEventsCount > 0 || migrated.migratedTasksCount > 0)) {
+          addToast(
+            `Transferred ${migrated.migratedEventsCount + migrated.migratedTasksCount} items from local storage to your cloud account!`,
+            'success'
+          );
+        }
+      });
+    }
+  }, [user, addToast]);
 
   // Navigation handlers
   const handlePrev = useCallback(() => {
@@ -164,9 +186,9 @@ export function DayliCalendarApp() {
 
   // Event mutations
   const handleSaveEvent = useCallback(
-    (eventData: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>) => {
+    async (eventData: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
-        const created = eventService.create(eventData);
+        const created = await eventService.create(eventData);
         addToast(`Event "${created.title}" created`, 'success');
       } catch {
         addToast('Failed to create event', 'error');
@@ -176,9 +198,9 @@ export function DayliCalendarApp() {
   );
 
   const handleUpdateEvent = useCallback(
-    (id: string, updates: Partial<CalendarEvent>) => {
+    async (id: string, updates: Partial<CalendarEvent>) => {
       try {
-        const updated = eventService.update(id, updates);
+        const updated = await eventService.update(id, updates);
         addToast(`Updated "${updated.title}"`, 'success');
       } catch {
         addToast('Failed to update event', 'error');
@@ -188,10 +210,10 @@ export function DayliCalendarApp() {
   );
 
   const handleDeleteEvent = useCallback(
-    (id: string) => {
+    async (id: string) => {
       try {
         const target = events.find((e) => e.id === id);
-        const success = eventService.delete(id);
+        const success = await eventService.delete(id);
         if (success) {
           addToast(target ? `Deleted "${target.title}"` : 'Event deleted', 'info');
         }
@@ -204,9 +226,9 @@ export function DayliCalendarApp() {
 
   // Task mutations
   const handleAddTask = useCallback(
-    (title: string, dueDate?: string, categoryId?: string) => {
+    async (title: string, dueDate?: string, categoryId?: string) => {
       try {
-        taskService.create({
+        await taskService.create({
           title,
           completed: false,
           dueDate,
@@ -220,18 +242,18 @@ export function DayliCalendarApp() {
     [addToast]
   );
 
-  const handleToggleTask = useCallback((id: string) => {
+  const handleToggleTask = useCallback(async (id: string) => {
     try {
-      taskService.toggle(id);
+      await taskService.toggle(id);
     } catch {
       // ignore
     }
   }, []);
 
   const handleDeleteTask = useCallback(
-    (id: string) => {
+    async (id: string) => {
       try {
-        taskService.delete(id);
+        await taskService.delete(id);
         addToast('Task deleted', 'info');
       } catch {
         addToast('Failed to delete task', 'error');
@@ -241,14 +263,14 @@ export function DayliCalendarApp() {
   );
 
   // Category mutations
-  const handleToggleCategory = useCallback((id: string) => {
-    categoryService.toggle(id);
+  const handleToggleCategory = useCallback(async (id: string) => {
+    await categoryService.toggle(id);
   }, []);
 
   const handleAddCategory = useCallback(
-    (name: string, color: string, lightBg: string) => {
+    async (name: string, color: string, lightBg: string) => {
       try {
-        const newCat = categoryService.create(name, color, lightBg);
+        const newCat = await categoryService.create(name, color, lightBg);
         addToast(`Added calendar "${newCat.name}"`, 'success');
       } catch {
         addToast('Failed to add calendar', 'error');
@@ -293,6 +315,16 @@ export function DayliCalendarApp() {
     eventService.clearAll();
     taskService.clearAll();
     addToast('All calendar and task data cleared', 'info');
+  }, [addToast]);
+
+  const handleMigrateData = useCallback(async () => {
+    addToast('Syncing local data to cloud...', 'info');
+    const success = await syncService.forceMigration();
+    if (success) {
+      addToast('Local data synced to cloud account successfully', 'success');
+    } else {
+      addToast('Unable to sync to cloud. Ensure database is connected.', 'error');
+    }
   }, [addToast]);
 
   const handleExportData = useCallback(() => {
@@ -384,6 +416,7 @@ export function DayliCalendarApp() {
         isOpenMobile={isSidebarMobileOpen}
         onCloseMobile={() => setIsSidebarMobileOpen(false)}
         user={user}
+        isSyncing={syncState.isSyncing}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onSignOut={handleSignOut}
       />
@@ -474,6 +507,8 @@ export function DayliCalendarApp() {
           onClearData={handleClearData}
           onExportData={handleExportData}
           onImportData={handleImportData}
+          onMigrateData={handleMigrateData}
+          isUserSignedIn={Boolean(user)}
           initialTab={settingsTab}
         />
       )}

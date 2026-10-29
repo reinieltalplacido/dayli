@@ -27,6 +27,14 @@ export const categoryService = {
     return DEFAULT_CATEGORIES;
   },
 
+  setCategories(categories: CalendarCategory[]): void {
+    cachedCategories = categories;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+    }
+    notifyListeners();
+  },
+
   getAll(): CalendarCategory[] {
     if (typeof window === 'undefined') return DEFAULT_CATEGORIES;
     try {
@@ -50,7 +58,7 @@ export const categoryService = {
     }
   },
 
-  toggle(id: string): CalendarCategory[] {
+  async toggle(id: string): Promise<CalendarCategory[]> {
     const categories = this.getAll();
     const updated = categories.map((cat) =>
       cat.id === id ? { ...cat, enabled: !cat.enabled } : cat
@@ -60,13 +68,27 @@ export const categoryService = {
       localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(updated));
     }
     notifyListeners();
+
+    const target = updated.find((c) => c.id === id);
+    if (target) {
+      try {
+        await fetch(`/api/calendars/${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: target.enabled }),
+        });
+      } catch {
+        // Fallback
+      }
+    }
+
     return updated;
   },
 
-  create(name: string, color: string, lightBg: string): CalendarCategory {
-    const categories = this.getAll();
+  async create(name: string, color: string, lightBg: string): Promise<CalendarCategory> {
+    const tempId = `cat-${Date.now()}-${name.toLowerCase().replace(/\s+/g, '-')}`;
     const newCategory: CalendarCategory = {
-      id: `cat-${Date.now()}-${name.toLowerCase().replace(/\s+/g, '-')}`,
+      id: tempId,
       name: name.trim(),
       color,
       lightBg,
@@ -74,12 +96,35 @@ export const categoryService = {
       isDefault: false,
     };
 
+    const categories = this.getAll();
     const updated = [...categories, newCategory];
     cachedCategories = updated;
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(updated));
     }
     notifyListeners();
+
+    try {
+      const res = await fetch('/api/calendars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, color, lightBg }),
+      });
+
+      if (res.ok) {
+        const persisted: CalendarCategory = await res.json();
+        const current = this.getAll().map((c) => (c.id === tempId ? persisted : c));
+        cachedCategories = current;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(current));
+        }
+        notifyListeners();
+        return persisted;
+      }
+    } catch {
+      // Fallback preserves optimistic category
+    }
+
     return newCategory;
   },
 

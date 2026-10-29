@@ -36,6 +36,7 @@ interface SidebarProps {
   isOpenMobile: boolean;
   onCloseMobile: () => void;
   user: UserProfile | null;
+  isSyncing?: boolean;
   onOpenAuth: () => void;
   onSignOut: () => void;
 }
@@ -55,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenMobile,
   onCloseMobile,
   user,
+  isSyncing = false,
   onOpenAuth,
   onSignOut,
 }) => {
@@ -277,9 +279,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {user.name}
                     </p>
                     <div className="flex items-center gap-1 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          isSyncing ? 'bg-[#0A84FF] animate-pulse' : 'bg-[#34C759]'
+                        }`}
+                      />
                       <span className="text-[10px] text-[#86868B] leading-none">
-                        Cloud Synced
+                        {isSyncing ? 'Syncing...' : 'Cloud Synced'}
                       </span>
                     </div>
                   </div>
