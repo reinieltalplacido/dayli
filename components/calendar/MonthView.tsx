@@ -127,10 +127,18 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
   // Sync scroll when currentDate changes from toolbar navigation
   const prevDateStrRef = useRef(toInputDateString(currentDate));
+  const lastReportedMonthRef = useRef<string | null>(null);
+
   useEffect(() => {
     const currentStr = toInputDateString(currentDate);
+    const currentMonthStr = format(currentDate, 'yyyy-MM');
     if (prevDateStrRef.current !== currentStr) {
       prevDateStrRef.current = currentStr;
+      // If this month change came from the user's continuous scroll, don't jerk/anchor the scroll position
+      if (lastReportedMonthRef.current === currentMonthStr) {
+        lastReportedMonthRef.current = null;
+        return;
+      }
       if (!isProgrammaticScrollRef.current) {
         scrollToDate(currentDate, 'smooth');
       }
@@ -161,7 +169,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
       setRange((prev) => ({ ...prev, futureMonths: prev.futureMonths + 4 }));
     }
 
-    // Detect currently visible month at the top of viewport (approx 75px below sticky header)
+    // Detect currently visible month without forcing anchor scroll
     if (!isProgrammaticScrollRef.current && onVisibleMonthChange) {
       const checkY = container.getBoundingClientRect().top + 75;
       const checkX = container.getBoundingClientRect().left + 80;
@@ -170,7 +178,11 @@ export const MonthView: React.FC<MonthViewProps> = ({
       if (cell && cell.dataset.date) {
         const [year, month] = cell.dataset.date.split('-').map(Number);
         const cellMonth = new Date(year, month - 1, 1);
-        onVisibleMonthChange(cellMonth);
+        const monthStr = format(cellMonth, 'yyyy-MM');
+        if (lastReportedMonthRef.current !== monthStr) {
+          lastReportedMonthRef.current = monthStr;
+          onVisibleMonthChange(cellMonth);
+        }
       }
     }
   }, [onVisibleMonthChange]);
@@ -200,7 +212,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
             {/* New Month Divider Header */}
             <div
               id={`month-divider-${section.monthKey}`}
-              className="px-4 py-2 bg-[#F5F5F7] border-y border-[#E5E5EA] sticky top-0 z-20 select-none shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+              className="px-4 py-2 bg-[#F5F5F7] border-y border-[#E5E5EA] select-none"
             >
               <span className="text-xs font-semibold text-[#1D1D1F] tracking-tight">
                 {section.label}
