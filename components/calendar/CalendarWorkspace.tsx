@@ -15,6 +15,7 @@ interface CalendarWorkspaceProps {
   onCreateEventOnDate: (date: Date) => void;
   onCreateEventOnDateTime: (date: Date, hour: number) => void;
   onVisibleMonthChange?: (date: Date) => void;
+  weekStartsOn?: 0 | 1;
 }
 
 export const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({
@@ -26,6 +27,7 @@ export const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({
   onCreateEventOnDate,
   onCreateEventOnDateTime,
   onVisibleMonthChange,
+  weekStartsOn = 0,
 }) => {
   // Only show events whose category is currently enabled
   const enabledCategoryIds = React.useMemo(() => {
@@ -46,6 +48,7 @@ export const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({
           onSelectEvent={onSelectEvent}
           onCreateEventOnDate={onCreateEventOnDate}
           onVisibleMonthChange={onVisibleMonthChange}
+          weekStartsOn={weekStartsOn}
         />
       )}
 
@@ -56,6 +59,7 @@ export const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({
           categories={categories}
           onSelectEvent={onSelectEvent}
           onCreateEventOnDateTime={onCreateEventOnDateTime}
+          weekStartsOn={weekStartsOn}
         />
       )}
 

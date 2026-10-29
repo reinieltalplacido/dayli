@@ -26,7 +26,8 @@ import { CalendarWorkspace } from '@/components/calendar/CalendarWorkspace';
 import { TasksPanel } from '@/components/tasks/TasksPanel';
 import { EventModal } from '@/components/events/EventModal';
 import { SearchDialog } from '@/components/search/SearchDialog';
-import { SettingsModal } from '@/components/settings/SettingsModal';
+import { SettingsModal, SettingsTab } from '@/components/settings/SettingsModal';
+import { useSettings } from '@/services/settingsService';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { ToastContainer } from '@/components/ui/Toast';
 
@@ -58,6 +59,8 @@ export function DayliCalendarApp() {
     authService.getSnapshot,
     authService.getServerSnapshot
   );
+
+  const settings = useSettings();
 
   const syncState = useSyncExternalStore(
     syncService.subscribe,
@@ -95,7 +98,7 @@ export function DayliCalendarApp() {
   const [modalDefaultHour, setModalDefaultHour] = useState<number | undefined>(undefined);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<'general' | 'data' | 'shortcuts'>('general');
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('general');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
@@ -304,18 +307,10 @@ export function DayliCalendarApp() {
     addToast('Signed out. Local storage mode active.', 'info');
   }, [addToast]);
 
-  const handleOpenSettings = useCallback((tab: 'general' | 'data' | 'shortcuts' = 'general') => {
+  const handleOpenSettings = useCallback((tab: SettingsTab = 'general') => {
     setSettingsTab(tab);
     setIsSettingsOpen(true);
   }, []);
-
-  // Settings & Data actions
-  const handleResetData = useCallback(() => {
-    eventService.resetToSample();
-    taskService.resetToSample();
-    categoryService.reset();
-    addToast('Sample calendar & tasks restored', 'info');
-  }, [addToast]);
 
   const handleClearData = useCallback(() => {
     eventService.clearAll();
@@ -323,29 +318,14 @@ export function DayliCalendarApp() {
     addToast('All calendar and task data cleared', 'info');
   }, [addToast]);
 
-  const handleMigrateData = useCallback(async () => {
-    addToast('Syncing local data to cloud...', 'info');
-    const success = await syncService.forceMigration();
-    if (success) {
-      addToast('Local data synced to cloud account successfully', 'success');
-    } else {
-      addToast('Unable to sync to cloud. Ensure database is connected.', 'error');
-    }
-  }, [addToast]);
-
-  const handleExportData = useCallback(() => {
-    const dataStr = eventService.exportJSON();
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `dayli-calendar-export-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    addToast('Calendar exported to JSON', 'success');
-  }, [addToast]);
+  const handleImportEvents = useCallback(
+    (newEvents: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+      const count = eventService.importMultiple(newEvents);
+      addToast(`Successfully imported ${count} events`, 'success');
+      return count;
+    },
+    [addToast]
+  );
 
   const handleImportData = useCallback(
     (jsonStr: string) => {
@@ -425,6 +405,7 @@ export function DayliCalendarApp() {
         isSyncing={syncState.isSyncing}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onSignOut={handleSignOut}
+        weekStartsOn={settings.weekStartsOn}
       />
 
       {/* Main Area: Top Toolbar + Calendar Workspace + Tasks Panel */}
@@ -455,6 +436,7 @@ export function DayliCalendarApp() {
             onCreateEventOnDate={handleCreateOnDate}
             onCreateEventOnDateTime={handleCreateOnDateTime}
             onVisibleMonthChange={handleVisibleMonthChange}
+            weekStartsOn={settings.weekStartsOn}
           />
 
           {/* Tasks & Reminders Drawer */}
@@ -509,11 +491,11 @@ export function DayliCalendarApp() {
         <SettingsModal
           isOpen={isSettingsOpen}
           onClose={() => setIsSettingsOpen(false)}
-          onResetData={handleResetData}
-          onClearData={handleClearData}
-          onExportData={handleExportData}
-          onImportData={handleImportData}
-          onMigrateData={handleMigrateData}
+          events={events}
+          onImportEvents={handleImportEvents}
+          onImportJSON={handleImportData}
+          onClearAllData={handleClearData}
+          onSignOut={handleSignOut}
           isUserSignedIn={Boolean(user)}
           initialTab={settingsTab}
         />

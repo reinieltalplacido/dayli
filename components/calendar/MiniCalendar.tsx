@@ -17,12 +17,14 @@ interface MiniCalendarProps {
   currentDate: Date;
   onSelectDate: (date: Date) => void;
   events: CalendarEvent[];
+  weekStartsOn?: 0 | 1;
 }
 
 export const MiniCalendar: React.FC<MiniCalendarProps> = ({
   currentDate,
   onSelectDate,
   events,
+  weekStartsOn = 0,
 }) => {
   const [displayMonth, setDisplayMonth] = useState<Date>(currentDate);
   const [prevCurrentDate, setPrevCurrentDate] = useState<Date>(currentDate);
@@ -34,8 +36,8 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
   }
 
   const days = React.useMemo(() => {
-    return getMonthDays(displayMonth, 0);
-  }, [displayMonth]);
+    return getMonthDays(displayMonth, weekStartsOn);
+  }, [displayMonth, weekStartsOn]);
 
   // Set of dates with events
   const eventDateSet = React.useMemo(() => {
@@ -46,7 +48,11 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
     return set;
   }, [events]);
 
-  const weekHeaders = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const weekHeaders = React.useMemo(() => {
+    return weekStartsOn === 1
+      ? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+      : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  }, [weekStartsOn]);
 
   return (
     <div className="w-full select-none">

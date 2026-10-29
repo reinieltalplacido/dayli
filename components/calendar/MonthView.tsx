@@ -21,6 +21,7 @@ interface MonthViewProps {
   onSelectEvent: (event: CalendarEvent) => void;
   onCreateEventOnDate: (date: Date) => void;
   onVisibleMonthChange?: (date: Date) => void;
+  weekStartsOn?: 0 | 1;
 }
 
 interface MonthSection {
@@ -37,6 +38,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
   onSelectEvent,
   onCreateEventOnDate,
   onVisibleMonthChange,
+  weekStartsOn = 0,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScrollRef = useRef(false);
@@ -61,7 +63,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
       const monthEnd = endOfMonth(monthDate);
       const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-      const leadingBlanks = monthStart.getDay(); // 0 is Sunday
+      const leadingBlanks = (monthStart.getDay() - weekStartsOn + 7) % 7;
       const totalCells = leadingBlanks + daysInMonth.length;
       const trailingBlanks = (7 - (totalCells % 7)) % 7;
 
@@ -80,7 +82,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
     }
 
     return sections;
-  }, [anchorDate, range.pastMonths, range.futureMonths]);
+  }, [anchorDate, range.pastMonths, range.futureMonths, weekStartsOn]);
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, CalendarCategory>();
@@ -99,7 +101,11 @@ export const MonthView: React.FC<MonthViewProps> = ({
     return map;
   }, [events]);
 
-  const weekDayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  const weekDayNames = useMemo(() => {
+    return weekStartsOn === 1
+      ? ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+      : ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  }, [weekStartsOn]);
 
   // Scroll to a specific date smoothly
   const scrollToDate = useCallback((date: Date, behavior: ScrollBehavior = 'smooth') => {

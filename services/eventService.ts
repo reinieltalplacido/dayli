@@ -330,6 +330,42 @@ export const eventService = {
     notifyListeners();
   },
 
+  importMultiple(
+    newEvents: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>[]
+  ): number {
+    if (!newEvents.length) return 0;
+
+    const current = this.getSnapshot();
+    const created: CalendarEvent[] = newEvents.map((item, idx) => ({
+      ...item,
+      id: `imported-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }));
+
+    const combined = [...current, ...created];
+    cachedEvents = combined;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(combined));
+    }
+    notifyListeners();
+
+    // Asynchronously sync new events to backend if online/authenticated
+    Promise.allSettled(
+      created.map((evt) =>
+        fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(evt),
+        })
+      )
+    ).catch(() => {
+      // offline fallback
+    });
+
+    return created.length;
+  },
+
   exportJSON(): string {
     const events = this.getSnapshot();
     return JSON.stringify(events, null, 2);

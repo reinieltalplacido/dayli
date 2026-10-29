@@ -17,6 +17,7 @@ interface WeekViewProps {
   categories: CalendarCategory[];
   onSelectEvent: (event: CalendarEvent) => void;
   onCreateEventOnDateTime: (date: Date, hour: number) => void;
+  weekStartsOn?: 0 | 1;
 }
 
 export const WeekView: React.FC<WeekViewProps> = ({
@@ -25,6 +26,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
   categories,
   onSelectEvent,
   onCreateEventOnDateTime,
+  weekStartsOn = 0,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [currentTimeTopPercent, setCurrentTimeTopPercent] = useState<number | null>(null);
@@ -43,8 +45,8 @@ export const WeekView: React.FC<WeekViewProps> = ({
 
   // 7 days of the current week
   const weekDays = React.useMemo(() => {
-    return getWeekDays(currentDate, 0);
-  }, [currentDate]);
+    return getWeekDays(currentDate, weekStartsOn);
+  }, [currentDate, weekStartsOn]);
 
   const categoryMap = React.useMemo(() => {
     const map = new Map<string, CalendarCategory>();

@@ -21,6 +21,8 @@ import { UserProfile } from '@/types/auth';
 import { MiniCalendar } from '../calendar/MiniCalendar';
 import { DayliLogo } from '../ui/DayliLogo';
 import { AddCategoryModal } from '../categories/AddCategoryModal';
+import { SettingsTab } from '../settings/SettingsModal';
+import { Clock, Shield, Laptop } from 'lucide-react';
 
 interface SidebarProps {
   currentDate: Date;
@@ -33,7 +35,8 @@ interface SidebarProps {
   tasks: TaskItem[];
   isTasksOpen: boolean;
   onToggleTasks: () => void;
-  onOpenSettings: (tab?: 'general' | 'data' | 'shortcuts') => void;
+  onOpenSettings: (tab?: SettingsTab) => void;
+  weekStartsOn?: 0 | 1;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
   user: UserProfile | null;
@@ -54,6 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isTasksOpen,
   onToggleTasks,
   onOpenSettings,
+  weekStartsOn = 0,
   isOpenMobile,
   onCloseMobile,
   user,
@@ -154,6 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 if (isOpenMobile) onCloseMobile();
               }}
               events={events}
+              weekStartsOn={weekStartsOn}
             />
           </div>
 
@@ -370,23 +375,69 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
-                    {/* Preferences & Data */}
+                    {/* Time & Regional */}
                     <button
                       type="button"
                       onClick={() => {
                         setShowUserMenu(false);
-                        onOpenSettings('data');
+                        onOpenSettings('regional');
                       }}
                       className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
                     >
                       <div className="flex items-center gap-2">
-                        <Settings className="w-3.5 h-3.5 text-[#86868B]" />
+                        <Clock className="w-3.5 h-3.5 text-[#86868B]" />
                         <div>
                           <p className="text-xs font-medium text-[#1D1D1F] leading-none">
-                            Preferences & Data
+                            Time & Regional
                           </p>
                           <p className="text-[10px] text-[#86868B] leading-none mt-1">
-                            Backup & Storage
+                            Time zone & clock
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Privacy & Data */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenSettings('privacy');
+                      }}
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-3.5 h-3.5 text-[#86868B]" />
+                        <div>
+                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                            Privacy & Data
+                          </p>
+                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
+                            Export & Accounts
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Connected Devices */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenSettings('devices');
+                      }}
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Laptop className="w-3.5 h-3.5 text-[#86868B]" />
+                        <div>
+                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                            Connected Devices
+                          </p>
+                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
+                            Active sessions
                           </p>
                         </div>
                       </div>
