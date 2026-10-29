@@ -42,14 +42,19 @@ export const authService = {
     return this.getSnapshot();
   },
 
-  signIn(email: string, name?: string, provider: 'google' | 'email' = 'google'): UserProfile {
+  signIn(
+    email: string,
+    name?: string,
+    provider: 'google' | 'email' = 'google',
+    avatarUrl?: string
+  ): UserProfile {
     const defaultName = name || email.split('@')[0];
     const user: UserProfile = {
       id: `usr-${Date.now()}`,
       name: defaultName.charAt(0).toUpperCase() + defaultName.slice(1),
       email,
       provider,
-      avatarUrl: provider === 'google' ? undefined : undefined,
+      avatarUrl,
     };
 
     cachedUser = user;

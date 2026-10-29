@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -271,8 +272,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-full bg-[#0A84FF] text-white flex items-center justify-center font-semibold text-xs shrink-0">
-                    {user.name.charAt(0)}
+                  <div className="w-7 h-7 rounded-full bg-[#0A84FF] text-white flex items-center justify-center font-semibold text-xs shrink-0 overflow-hidden ring-1 ring-black/5">
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      user.name.charAt(0)
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-[#1D1D1F] truncate leading-tight">
@@ -297,13 +307,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {showUserMenu && (
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-2xl shadow-2xl border border-[#E5E5EA] overflow-hidden p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-[#1D1D1F]">
                   {/* Account Header */}
-                  <div className="px-3 py-2 border-b border-[#E5E5EA]/70">
-                    <p className="text-xs font-semibold text-[#1D1D1F] truncate">
-                      {user.name}
-                    </p>
-                    <p className="text-[11px] text-[#86868B] truncate">
-                      {user.email}
-                    </p>
+                  <div className="px-3 py-2 border-b border-[#E5E5EA]/70 flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-[#0A84FF] text-white flex items-center justify-center font-semibold text-xs shrink-0 overflow-hidden ring-1 ring-black/5">
+                      {user.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.name}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        user.name.charAt(0)
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-[#1D1D1F] truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-[11px] text-[#86868B] truncate">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Add Account Option */}

@@ -70,11 +70,17 @@ export function DayliCalendarApp() {
   useEffect(() => {
     if (authSession?.user?.email) {
       const current = authService.getUser();
-      if (!current || current.email !== authSession.user.email) {
+      const userImage = authSession.user.image || undefined;
+      if (
+        !current ||
+        current.email !== authSession.user.email ||
+        current.avatarUrl !== userImage
+      ) {
         authService.signIn(
           authSession.user.email,
           authSession.user.name || undefined,
-          'email'
+          userImage ? 'google' : 'email',
+          userImage
         );
       }
     }
