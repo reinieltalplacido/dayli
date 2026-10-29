@@ -18,6 +18,7 @@ import { eventService } from '@/services/eventService';
 import { taskService } from '@/services/taskService';
 import { categoryService } from '@/services/categoryService';
 import { authService } from '@/services/authService';
+import { authClient } from '@/lib/auth-client';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { HeaderToolbar } from '@/components/layout/HeaderToolbar';
 import { CalendarWorkspace } from '@/components/calendar/CalendarWorkspace';
@@ -56,6 +57,21 @@ export function DayliCalendarApp() {
     authService.getSnapshot,
     authService.getServerSnapshot
   );
+
+  const { data: authSession } = authClient.useSession();
+
+  useEffect(() => {
+    if (authSession?.user?.email) {
+      const current = authService.getUser();
+      if (!current || current.email !== authSession.user.email) {
+        authService.signIn(
+          authSession.user.email,
+          authSession.user.name || undefined,
+          'email'
+        );
+      }
+    }
+  }, [authSession]);
 
   // UI Panels state
   const [isTasksOpen, setIsTasksOpen] = useState(false);
@@ -250,7 +266,12 @@ export function DayliCalendarApp() {
     [addToast]
   );
 
-  const handleSignOut = useCallback(() => {
+  const handleSignOut = useCallback(async () => {
+    try {
+      await authClient.signOut();
+    } catch {
+      // ignore
+    }
     authService.signOut();
     addToast('Signed out. Local storage mode active.', 'info');
   }, [addToast]);
