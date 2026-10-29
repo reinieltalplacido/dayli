@@ -145,3 +145,4 @@ export async function deleteEvent(userId: string, eventId: string): Promise<bool
 
   return true;
 }
+
