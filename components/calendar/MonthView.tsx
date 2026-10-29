@@ -4,9 +4,13 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import {
   format,
   isToday,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  addMonths,
 } from 'date-fns';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
-import { getContinuousDays, toInputDateString } from '@/lib/dateUtils';
+import { toInputDateString } from '@/lib/dateUtils';
 import { EventCard } from './EventCard';
 import { Plus, X } from 'lucide-react';
 
@@ -17,6 +21,13 @@ interface MonthViewProps {
   onSelectEvent: (event: CalendarEvent) => void;
   onCreateEventOnDate: (date: Date) => void;
   onVisibleMonthChange?: (date: Date) => void;
+}
+
+interface MonthSection {
+  monthDate: Date;
+  monthKey: string;
+  label: string;
+  days: (Date | null)[];
 }
 
 export const MonthView: React.FC<MonthViewProps> = ({
@@ -38,8 +49,37 @@ export const MonthView: React.FC<MonthViewProps> = ({
   // Base anchor date for range calculation
   const anchorDate = useMemo(() => new Date(2026, 9, 1), []);
 
-  const days = useMemo(() => {
-    return getContinuousDays(anchorDate, range.pastMonths, range.futureMonths, 0);
+  // Generate month sections with proper leading/trailing blank cells and dividers
+  const monthSections = useMemo<MonthSection[]>(() => {
+    const sections: MonthSection[] = [];
+    const totalMonths = range.pastMonths + range.futureMonths + 1;
+
+    for (let i = 0; i < totalMonths; i++) {
+      const monthOffset = i - range.pastMonths;
+      const monthDate = addMonths(startOfMonth(anchorDate), monthOffset);
+      const monthStart = startOfMonth(monthDate);
+      const monthEnd = endOfMonth(monthDate);
+      const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+      const leadingBlanks = monthStart.getDay(); // 0 is Sunday
+      const totalCells = leadingBlanks + daysInMonth.length;
+      const trailingBlanks = (7 - (totalCells % 7)) % 7;
+
+      const days: (Date | null)[] = [
+        ...Array(leadingBlanks).fill(null),
+        ...daysInMonth,
+        ...Array(trailingBlanks).fill(null),
+      ];
+
+      sections.push({
+        monthDate,
+        monthKey: format(monthDate, 'yyyy-MM'),
+        label: format(monthDate, 'MMMM yyyy'),
+        days,
+      });
+    }
+
+    return sections;
   }, [anchorDate, range.pastMonths, range.futureMonths]);
 
   const categoryMap = useMemo(() => {
@@ -108,7 +148,6 @@ export const MonthView: React.FC<MonthViewProps> = ({
     if (scrollTop < 180) {
       const previousScrollHeight = scrollHeight;
       setRange((prev) => ({ ...prev, pastMonths: prev.pastMonths + 3 }));
-      // Adjust scroll position after prepending
       requestAnimationFrame(() => {
         if (container) {
           const heightDiff = container.scrollHeight - previousScrollHeight;
@@ -122,7 +161,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
       setRange((prev) => ({ ...prev, futureMonths: prev.futureMonths + 4 }));
     }
 
-    // Detect currently visible month at the top of viewport (approx 70px below sticky header)
+    // Detect currently visible month at the top of viewport (approx 75px below sticky header)
     if (!isProgrammaticScrollRef.current && onVisibleMonthChange) {
       const checkY = container.getBoundingClientRect().top + 75;
       const checkX = container.getBoundingClientRect().left + 80;
@@ -139,7 +178,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden relative h-full">
       {/* Sticky Weekday Header Row */}
-      <div className="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#F5F5F7]/90 backdrop-blur-md shrink-0 sticky top-0 z-20">
+      <div className="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#F5F5F7]/95 backdrop-blur-md shrink-0 sticky top-0 z-30">
         {weekDayNames.map((name, idx) => (
           <div
             key={idx}
@@ -154,92 +193,117 @@ export const MonthView: React.FC<MonthViewProps> = ({
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto relative divide-y divide-[#E5E5EA] select-none"
+        className="flex-1 overflow-y-auto relative select-none"
       >
-        <div className="grid grid-cols-7 divide-x divide-[#E5E5EA]">
-          {days.map((day, idx) => {
-            const dateStr = toInputDateString(day);
-            const dayEvents = eventsByDate.get(dateStr) || [];
-            const isCurrentDay = isToday(day);
-            const isFirstOfMonth = day.getDate() === 1;
-            const maxVisible = 3;
-            const visibleEvents = dayEvents.slice(0, maxVisible);
-            const overflowCount = dayEvents.length - maxVisible;
+        {monthSections.map((section) => (
+          <div key={section.monthKey} className="relative">
+            {/* New Month Divider Header */}
+            <div
+              id={`month-divider-${section.monthKey}`}
+              className="flex items-center gap-3 px-4 py-2.5 bg-[#F5F5F7] border-y border-[#E5E5EA] sticky top-0 z-20 select-none shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
+            >
+              <span className="text-xs font-semibold text-[#1D1D1F] tracking-tight">
+                {section.label}
+              </span>
+              <div className="flex-1 h-[1px] bg-[#E5E5EA]" />
+            </div>
 
-            return (
-              <div
-                key={idx}
-                id={`day-cell-${dateStr}`}
-                data-date={dateStr}
-                onClick={() => onCreateEventOnDate(day)}
-                className={`group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 ${
-                  isFirstOfMonth ? 'bg-[#0A84FF]/[0.015]' : 'bg-white'
-                }`}
-              >
-                {/* Day Header (Includes prominent month name on 1st of month) */}
-                <div className="flex items-center justify-between mb-1.5 shrink-0">
-                  <div className="flex items-center gap-1.5">
-                    {isFirstOfMonth && (
-                      <span className="text-[11px] font-bold text-[#0A84FF] tracking-tight">
-                        {format(day, 'MMM')}
-                      </span>
-                    )}
-                    <span
-                      className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
-                        isCurrentDay
-                          ? 'bg-[#0A84FF] text-white shadow-xs'
-                          : isFirstOfMonth
-                          ? 'text-[#0A84FF] font-bold'
-                          : 'text-[#1D1D1F]'
-                      }`}
-                    >
-                      {format(day, 'd')}
-                    </span>
-                  </div>
-
-                  {/* Quick Add Event Hover Button */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCreateEventOnDate(day);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] hover:text-[#0A84FF] hover:bg-white transition-all shadow-2xs"
-                    title="Add event"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                {/* Event Cards List */}
-                <div className="flex-1 space-y-1 overflow-hidden">
-                  {visibleEvents.map((evt) => (
-                    <EventCard
-                      key={evt.id}
-                      event={evt}
-                      category={categoryMap.get(evt.categoryId)}
-                      view="month"
-                      onClick={onSelectEvent}
+            {/* Month Days Grid */}
+            <div className="grid grid-cols-7 divide-x divide-[#E5E5EA]">
+              {section.days.map((day, dIdx) => {
+                if (!day) {
+                  return (
+                    <div
+                      key={`blank-${section.monthKey}-${dIdx}`}
+                      className="min-h-[115px] sm:min-h-[135px] p-2 bg-[#F5F5F7]/30 border-b border-[#E5E5EA]"
                     />
-                  ))}
+                  );
+                }
 
-                  {overflowCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOverflowDate(day);
-                      }}
-                      className="w-full text-left text-[10px] font-medium text-[#0A84FF] hover:underline px-1 py-0.5"
-                    >
-                      +{overflowCount} more
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                const dateStr = toInputDateString(day);
+                const dayEvents = eventsByDate.get(dateStr) || [];
+                const isCurrentDay = isToday(day);
+                const isFirstOfMonth = day.getDate() === 1;
+                const maxVisible = 3;
+                const visibleEvents = dayEvents.slice(0, maxVisible);
+                const overflowCount = dayEvents.length - maxVisible;
+
+                return (
+                  <div
+                    key={dateStr}
+                    id={`day-cell-${dateStr}`}
+                    data-date={dateStr}
+                    onClick={() => onCreateEventOnDate(day)}
+                    className={`group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 ${
+                      isFirstOfMonth ? 'bg-[#0A84FF]/[0.015]' : 'bg-white'
+                    }`}
+                  >
+                    {/* Day Header */}
+                    <div className="flex items-center justify-between mb-1.5 shrink-0">
+                      <div className="flex items-center gap-1.5">
+                        {isFirstOfMonth && (
+                          <span className="text-[11px] font-bold text-[#0A84FF] tracking-tight">
+                            {format(day, 'MMM')}
+                          </span>
+                        )}
+                        <span
+                          className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
+                            isCurrentDay
+                              ? 'bg-[#0A84FF] text-white shadow-xs'
+                              : isFirstOfMonth
+                              ? 'text-[#0A84FF] font-bold'
+                              : 'text-[#1D1D1F]'
+                          }`}
+                        >
+                          {format(day, 'd')}
+                        </span>
+                      </div>
+
+                      {/* Quick Add Event Hover Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCreateEventOnDate(day);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] hover:text-[#0A84FF] hover:bg-white transition-all shadow-2xs"
+                        title="Add event"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Event Cards List */}
+                    <div className="flex-1 space-y-1 overflow-hidden">
+                      {visibleEvents.map((evt) => (
+                        <EventCard
+                          key={evt.id}
+                          event={evt}
+                          category={categoryMap.get(evt.categoryId)}
+                          view="month"
+                          onClick={onSelectEvent}
+                        />
+                      ))}
+
+                      {overflowCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOverflowDate(day);
+                          }}
+                          className="w-full text-left text-[10px] font-medium text-[#0A84FF] hover:underline px-1 py-0.5"
+                        >
+                          +{overflowCount} more
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Overflow Date Popover Modal */}
