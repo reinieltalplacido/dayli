@@ -4,11 +4,19 @@ import { taskService } from './taskService';
 import { categoryService } from './categoryService';
 import { authService } from './authService';
 
+export interface SyncState {
+  isSyncing: boolean;
+  syncError: string | null;
+}
+
 let isSyncing = false;
 let syncError: string | null = null;
+const SERVER_SNAPSHOT: SyncState = Object.freeze({ isSyncing: false, syncError: null });
+let currentSnapshot: SyncState = { isSyncing: false, syncError: null };
 const listeners = new Set<() => void>();
 
 function notify() {
+  currentSnapshot = { isSyncing, syncError };
   listeners.forEach((l) => l());
 }
 
@@ -20,12 +28,12 @@ export const syncService = {
     };
   },
 
-  getSnapshot(): { isSyncing: boolean; syncError: string | null } {
-    return { isSyncing, syncError };
+  getSnapshot() {
+    return currentSnapshot;
   },
 
-  getServerSnapshot(): { isSyncing: boolean; syncError: string | null } {
-    return { isSyncing: false, syncError: null };
+  getServerSnapshot() {
+    return SERVER_SNAPSHOT;
   },
 
   async syncFromServer(): Promise<{
