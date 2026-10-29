@@ -127,3 +127,4 @@ export function useSettings(): UserSettings {
     settingsService.getServerSnapshot
   );
 }
+

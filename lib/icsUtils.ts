@@ -238,3 +238,4 @@ export function downloadFile(content: string, filename: string, mimeType: string
   document.body.removeChild(anchor);
   URL.revokeObjectURL(url);
 }
+
