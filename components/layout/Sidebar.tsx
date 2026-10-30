@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   Jump to Today
                 </p>
                 <p className="text-[11px] text-[#86868B]">
-                  {format(currentDate, 'EEEE, MMM d')}
+                  {format(new Date(), 'EEEE, MMM d')}
                 </p>
               </div>
             </div>

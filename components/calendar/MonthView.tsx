@@ -109,11 +109,20 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
   // Scroll to a specific date smoothly
   const scrollToDate = useCallback((date: Date, behavior: ScrollBehavior = 'smooth') => {
-    const dateStr = toInputDateString(date);
-    const element = document.getElementById(`day-cell-${dateStr}`);
-    if (element && containerRef.current) {
+    const monthKey = format(date, 'yyyy-MM');
+    const divider = document.getElementById(`month-divider-${monthKey}`);
+    const dayStr = toInputDateString(date);
+    const dayCell = document.getElementById(`day-cell-${dayStr}`);
+
+    if (containerRef.current) {
       isProgrammaticScrollRef.current = true;
-      element.scrollIntoView({ behavior, block: 'start' });
+
+      // Scroll to the month header so the full month starts cleanly at the top
+      if (divider) {
+        divider.scrollIntoView({ behavior, block: 'start' });
+      } else if (dayCell) {
+        dayCell.scrollIntoView({ behavior, block: 'center' });
+      }
 
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
       scrollTimeoutRef.current = setTimeout(() => {
@@ -131,20 +140,30 @@ export const MonthView: React.FC<MonthViewProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sync scroll when currentDate changes from toolbar navigation
+  // Sync scroll when currentDate changes from toolbar navigation or Jump to Today
   const prevDateStrRef = useRef(toInputDateString(currentDate));
+  const prevDateTimeRef = useRef(currentDate.getTime());
   const lastReportedMonthRef = useRef<string | null>(null);
 
   useEffect(() => {
     const currentStr = toInputDateString(currentDate);
+    const currentTime = currentDate.getTime();
     const currentMonthStr = format(currentDate, 'yyyy-MM');
-    if (prevDateStrRef.current !== currentStr) {
+
+    // If date changed or user explicitly clicked Jump to Today
+    const dateChanged = prevDateStrRef.current !== currentStr;
+    const timeRefreshed = Math.abs(currentTime - prevDateTimeRef.current) > 10;
+
+    if (dateChanged || timeRefreshed) {
       prevDateStrRef.current = currentStr;
+      prevDateTimeRef.current = currentTime;
+
       // If this month change came from the user's continuous scroll, don't jerk/anchor the scroll position
-      if (lastReportedMonthRef.current === currentMonthStr) {
+      if (lastReportedMonthRef.current === currentMonthStr && !timeRefreshed) {
         lastReportedMonthRef.current = null;
         return;
       }
+
       if (!isProgrammaticScrollRef.current) {
         scrollToDate(currentDate, 'smooth');
       }
@@ -175,20 +194,28 @@ export const MonthView: React.FC<MonthViewProps> = ({
       setRange((prev) => ({ ...prev, futureMonths: prev.futureMonths + 4 }));
     }
 
-    // Detect currently visible month without forcing anchor scroll
+    // Detect currently visible month using month dividers
     if (!isProgrammaticScrollRef.current && onVisibleMonthChange) {
-      const checkY = container.getBoundingClientRect().top + 75;
-      const checkX = container.getBoundingClientRect().left + 80;
-      const element = document.elementFromPoint(checkX, checkY);
-      const cell = element?.closest('[data-date]') as HTMLElement | null;
-      if (cell && cell.dataset.date) {
-        const [year, month] = cell.dataset.date.split('-').map(Number);
-        const cellMonth = new Date(year, month - 1, 1);
-        const monthStr = format(cellMonth, 'yyyy-MM');
-        if (lastReportedMonthRef.current !== monthStr) {
-          lastReportedMonthRef.current = monthStr;
-          onVisibleMonthChange(cellMonth);
+      const dividers = container.querySelectorAll<HTMLElement>('[id^="month-divider-"]');
+      const containerRect = container.getBoundingClientRect();
+      let bestMonthKey: string | null = null;
+
+      dividers.forEach((divider) => {
+        const rect = divider.getBoundingClientRect();
+        const relativeTop = rect.top - containerRect.top;
+        if (relativeTop <= containerRect.height * 0.45) {
+          bestMonthKey = divider.id.replace('month-divider-', '');
         }
+      });
+
+      if (!bestMonthKey && dividers.length > 0) {
+        bestMonthKey = dividers[0].id.replace('month-divider-', '');
+      }
+
+      if (bestMonthKey && lastReportedMonthRef.current !== bestMonthKey) {
+        lastReportedMonthRef.current = bestMonthKey;
+        const [year, month] = (bestMonthKey as string).split('-').map(Number);
+        onVisibleMonthChange(new Date(year, month - 1, 1));
       }
     }
   }, [onVisibleMonthChange]);
