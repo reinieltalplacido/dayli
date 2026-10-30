@@ -16,7 +16,7 @@ export const DayliLogo: React.FC<DayliLogoProps> = ({
 }) => {
   return (
     <div
-      className={`relative inline-flex items-center justify-center shrink-0 overflow-hidden rounded-[7px] ${className}`}
+      className={`relative inline-flex items-center justify-center shrink-0 select-none ${className}`}
       style={{ width: size, height: size }}
       aria-hidden="true"
     >
@@ -25,7 +25,7 @@ export const DayliLogo: React.FC<DayliLogoProps> = ({
         alt="Dayli Logo"
         width={size}
         height={size}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
         priority={priority}
       />
     </div>
