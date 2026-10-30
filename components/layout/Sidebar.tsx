@@ -106,9 +106,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Brand Header */}
         <div className="h-13 px-4 flex items-center justify-between border-b border-[#E5E5EA]/70">
-          <div className="flex items-center gap-2.5">
-            <DayliLogo size={28} priority />
-            <span className="text-[15px] font-semibold tracking-tight text-[#1D1D1F]">
+          <div className="flex items-center gap-2">
+            <DayliLogo size={20} priority />
+            <span className="text-[15px] font-semibold tracking-tight text-[#1D1D1F] leading-none">
               Dayli
             </span>
           </div>

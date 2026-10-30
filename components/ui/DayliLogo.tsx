@@ -11,7 +11,7 @@ interface DayliLogoProps {
 }
 
 export const DayliLogo: React.FC<DayliLogoProps> = ({
-  size = 28,
+  size = 20,
   className = '',
   priority = false,
 }) => {
