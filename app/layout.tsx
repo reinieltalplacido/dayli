@@ -15,6 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Dayli — Personal Calendar & Tasks",
   description: "A premium, minimalist personal calendar and task manager.",
+  icons: {
+    icon: [
+      { url: "/dayli_logo.png" },
+      { url: "/dayli_logo.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/dayli_logo.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
