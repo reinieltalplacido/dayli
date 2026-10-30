@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import dayliLogoImg from '@/public/dayli_logo.png';
 
 interface DayliLogoProps {
   size?: number;
@@ -21,7 +22,7 @@ export const DayliLogo: React.FC<DayliLogoProps> = ({
       aria-hidden="true"
     >
       <Image
-        src="/dayli_logo.png"
+        src={dayliLogoImg}
         alt="Dayli Logo"
         width={size}
         height={size}
