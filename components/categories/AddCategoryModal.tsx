@@ -36,14 +36,15 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/25 backdrop-blur-[2px] animate-in fade-in duration-150">
-      <div className="w-full max-w-sm rounded-xl bg-white shadow-2xl border border-[#E5E5EA] overflow-hidden text-[#1D1D1F]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[4px] animate-backdrop">
+      <div className="w-full max-w-sm rounded-xl bg-white dark:bg-[#1C1C1E] shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] animate-modal">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5EA]">
-          <h3 className="text-sm font-semibold text-[#1D1D1F]">New Calendar</h3>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
+          <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">New Calendar</h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
+            aria-label="Close"
+            className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -52,7 +53,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-[#86868B] mb-1.5">
+            <label className="block text-xs font-medium text-[#86868B] dark:text-[#98989D] mb-1.5">
               Calendar Name
             </label>
             <input
@@ -64,13 +65,13 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
               }}
               placeholder="e.g. Health, Projects, Travel"
               autoFocus
-              className="w-full px-3 py-1.5 text-sm rounded-md border border-[#E5E5EA] focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
+              className="w-full px-3 py-1.5 text-sm rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/60 dark:placeholder-[#98989D]/60 focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
             />
             {error && <p className="text-xs text-[#FF3B30] mt-1">{error}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#86868B] mb-2">
+            <label className="block text-xs font-medium text-[#86868B] dark:text-[#98989D] mb-2">
               Color Label
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -81,8 +82,8 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
                   onClick={() => setSelectedColorIndex(idx)}
                   className={`flex items-center gap-2 p-1.5 rounded-lg border text-xs transition-all ${
                     selectedColorIndex === idx
-                      ? 'border-[#0A84FF] bg-[#0A84FF]/5 font-medium'
-                      : 'border-[#E5E5EA] hover:bg-[#F5F5F7]'
+                      ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 font-medium text-[#1D1D1F] dark:text-[#F5F5F7]'
+                      : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                   }`}
                 >
                   <span
@@ -95,11 +96,11 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA]">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 text-xs font-medium text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md transition-colors"
+              className="px-3 py-1.5 text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] rounded-md transition-colors"
             >
               Cancel
             </button>
@@ -115,4 +116,3 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
     </div>
   );
 };
-

@@ -58,13 +58,13 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
     <div className="w-full select-none">
       {/* Month & Navigation Header */}
       <div className="flex items-center justify-between mb-2 px-1">
-        <span className="text-xs font-semibold text-[#1D1D1F] tracking-tight">
+        <span className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight">
           {format(displayMonth, 'MMMM yyyy')}
         </span>
         <div className="flex items-center gap-0.5">
           <button
             onClick={() => setDisplayMonth((prev) => subMonths(prev, 1))}
-            className="p-1 rounded hover:bg-[#E5E5EA]/60 text-[#86868B] hover:text-[#1D1D1F] transition-colors"
+            className="p-1 rounded hover:bg-[#E5E5EA]/60 dark:hover:bg-[#2C2C2E] text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] transition-colors"
             title="Previous month"
             aria-label="Previous month"
           >
@@ -72,7 +72,7 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
           </button>
           <button
             onClick={() => setDisplayMonth((prev) => addMonths(prev, 1))}
-            className="p-1 rounded hover:bg-[#E5E5EA]/60 text-[#86868B] hover:text-[#1D1D1F] transition-colors"
+            className="p-1 rounded hover:bg-[#E5E5EA]/60 dark:hover:bg-[#2C2C2E] text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] transition-colors"
             title="Next month"
             aria-label="Next month"
           >
@@ -86,7 +86,7 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
         {weekHeaders.map((letter, idx) => (
           <span
             key={idx}
-            className="text-[10px] font-medium text-[#86868B] h-5 flex items-center justify-center"
+            className="text-[10px] font-medium text-[#86868B] dark:text-[#98989D] h-5 flex items-center justify-center"
           >
             {letter}
           </span>
@@ -110,10 +110,10 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
                 isSelected
                   ? 'bg-[#0A84FF] text-white font-medium shadow-sm'
                   : isCurrentDay
-                  ? 'text-[#0A84FF] font-semibold hover:bg-[#0A84FF]/10'
+                  ? 'text-[#0A84FF] font-semibold hover:bg-[#0A84FF]/10 dark:hover:bg-[#0A84FF]/20'
                   : isCurrentMonthDay
-                  ? 'text-[#1D1D1F] hover:bg-[#E5E5EA]/70'
-                  : 'text-[#86868B]/40 hover:bg-[#E5E5EA]/40'
+                  ? 'text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#E5E5EA]/70 dark:hover:bg-[#2C2C2E]'
+                  : 'text-[#86868B]/40 dark:text-[#98989D]/40 hover:bg-[#E5E5EA]/40 dark:hover:bg-[#2C2C2E]/40'
               }`}
             >
               <span>{format(day, 'd')}</span>
@@ -122,7 +122,7 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
               {hasEvents && !isSelected && (
                 <span
                   className={`absolute bottom-0.5 w-1 h-1 rounded-full ${
-                    isCurrentDay ? 'bg-[#0A84FF]' : 'bg-[#86868B]'
+                    isCurrentDay ? 'bg-[#0A84FF]' : 'bg-[#86868B] dark:bg-[#98989D]'
                   }`}
                 />
               )}
