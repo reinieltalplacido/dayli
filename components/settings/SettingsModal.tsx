@@ -22,6 +22,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
+import { TimezoneSelect } from './TimezoneSelect';
 import { useSettings, settingsService, DateFormat, ClockFormat } from '@/services/settingsService';
 import { exportToICS, parseICS, downloadFile } from '@/lib/icsUtils';
 import { CalendarEvent } from '@/types/calendar';
@@ -516,8 +517,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="space-y-4">
               {/* Time Zone */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-[#1D1D1F] flex items-center gap-1.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-[#0A84FF]" />
                     <span>Time Zone</span>
                   </label>
@@ -530,40 +531,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span>Auto-detect</span>
                   </button>
                 </div>
-                <p className="text-[11px] text-[#86868B] mb-2">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mb-2">
                   All dates and times display relative to this zone
                 </p>
 
-                <select
+                {/* Custom Timezone Dropdown UI */}
+                <TimezoneSelect
                   value={settings.timeZone}
-                  onChange={(e) => settingsService.updateSettings({ timeZone: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#E5E5EA] bg-white focus:outline-hidden focus:border-[#0A84FF] text-[#1D1D1F]"
-                >
-                  {/* Common timezones group */}
-                  <optgroup label="Standard Timezones">
-                    {COMMON_TIMEZONES.map((tz) => (
-                      <option key={tz.value} value={tz.value}>
-                        {tz.label} ({tz.value})
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
+                  onChange={(timeZone) => settingsService.updateSettings({ timeZone })}
+                  timezones={COMMON_TIMEZONES}
+                />
 
                 {currentTimeInZone && (
-                  <p className="text-[11px] text-[#86868B] mt-1.5 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-[#34C759]" />
+                  <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-2 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#34C759]" />
                     <span>Current local time: </span>
-                    <span className="font-semibold text-[#1D1D1F]">{currentTimeInZone}</span>
+                    <span className="font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">{currentTimeInZone}</span>
                   </p>
                 )}
               </div>
 
               {/* Date Format */}
-              <div className="pt-3 border-t border-[#E5E5EA]">
-                <label className="block text-xs font-semibold text-[#1D1D1F] mb-1">
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
+                <label className="block text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] mb-1">
                   Date Format
                 </label>
-                <p className="text-[11px] text-[#86868B] mb-2">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mb-2">
                   Choose how calendar dates are presented
                 </p>
 
@@ -581,23 +574,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onClick={() => settingsService.updateSettings({ dateFormat: fmt.id as DateFormat })}
                       className={`flex flex-col items-center p-2.5 rounded-lg border text-xs text-center transition-all ${
                         settings.dateFormat === fmt.id
-                          ? 'border-[#0A84FF] bg-[#0A84FF]/5 text-[#0A84FF] font-medium'
-                          : 'border-[#E5E5EA] hover:bg-[#F5F5F7] text-[#1D1D1F]'
+                          ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 text-[#0A84FF] font-medium'
+                          : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                       }`}
                     >
                       <span className="font-mono text-xs">{fmt.label}</span>
-                      <span className="text-[10px] text-[#86868B] mt-0.5">{fmt.sample}</span>
+                      <span className="text-[10px] text-[#86868B] dark:text-[#98989D] mt-0.5">{fmt.sample}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* First Day of the Week */}
-              <div className="pt-3 border-t border-[#E5E5EA]">
-                <label className="block text-xs font-semibold text-[#1D1D1F] mb-1">
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
+                <label className="block text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] mb-1">
                   First Day of the Week
                 </label>
-                <p className="text-[11px] text-[#86868B] mb-2">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mb-2">
                   Select which day starts the week in month, week, and sidebar calendars
                 </p>
 
@@ -607,8 +600,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => settingsService.updateSettings({ weekStartsOn: 0 })}
                     className={`py-2 px-3 rounded-lg border text-xs font-medium transition-all ${
                       settings.weekStartsOn === 0
-                        ? 'border-[#0A84FF] bg-[#0A84FF]/5 text-[#0A84FF]'
-                        : 'border-[#E5E5EA] hover:bg-[#F5F5F7] text-[#1D1D1F]'
+                        ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 text-[#0A84FF]'
+                        : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                     }`}
                   >
                     Sunday
@@ -618,8 +611,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => settingsService.updateSettings({ weekStartsOn: 1 })}
                     className={`py-2 px-3 rounded-lg border text-xs font-medium transition-all ${
                       settings.weekStartsOn === 1
-                        ? 'border-[#0A84FF] bg-[#0A84FF]/5 text-[#0A84FF]'
-                        : 'border-[#E5E5EA] hover:bg-[#F5F5F7] text-[#1D1D1F]'
+                        ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 text-[#0A84FF]'
+                        : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                     }`}
                   >
                     Monday
@@ -628,11 +621,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Regional Preferences: Time Clock Format */}
-              <div className="pt-3 border-t border-[#E5E5EA]">
-                <label className="block text-xs font-semibold text-[#1D1D1F] mb-1">
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
+                <label className="block text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] mb-1">
                   Regional Time Clock Format
                 </label>
-                <p className="text-[11px] text-[#86868B] mb-2">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mb-2">
                   Display schedule hours using 12-hour or 24-hour notation
                 </p>
 
@@ -642,8 +635,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => settingsService.updateSettings({ clockFormat: '12h' as ClockFormat })}
                     className={`py-2 px-3 rounded-lg border text-xs font-medium transition-all ${
                       settings.clockFormat === '12h'
-                        ? 'border-[#0A84FF] bg-[#0A84FF]/5 text-[#0A84FF]'
-                        : 'border-[#E5E5EA] hover:bg-[#F5F5F7] text-[#1D1D1F]'
+                        ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 text-[#0A84FF]'
+                        : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                     }`}
                   >
                     12-hour (e.g. 1:30 PM)
@@ -653,8 +646,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => settingsService.updateSettings({ clockFormat: '24h' as ClockFormat })}
                     className={`py-2 px-3 rounded-lg border text-xs font-medium transition-all ${
                       settings.clockFormat === '24h'
-                        ? 'border-[#0A84FF] bg-[#0A84FF]/5 text-[#0A84FF]'
-                        : 'border-[#E5E5EA] hover:bg-[#F5F5F7] text-[#1D1D1F]'
+                        ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 text-[#0A84FF]'
+                        : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                     }`}
                   >
                     24-hour (e.g. 13:30)
@@ -669,12 +662,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="space-y-4">
               {/* Connected Google Account */}
               <div>
-                <h4 className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-2">
+                <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider mb-2">
                   Connected Google Account
                 </h4>
-                <div className="p-3 rounded-xl border border-[#E5E5EA] bg-[#F5F5F7]/50 flex items-center justify-between">
+                <div className="p-3 rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-[#F5F5F7]/50 dark:bg-[#242426]/50 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-9 h-9 rounded-full bg-white dark:bg-[#2C2C2E] border border-[#E5E5EA] dark:border-[#38383A] flex items-center justify-center shrink-0 shadow-xs">
                       <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path
                           fill="#4285F4"
@@ -697,18 +690,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <div>
                       {isUserSignedIn ? (
                         <>
-                          <p className="text-xs font-semibold text-[#1D1D1F]">
+                          <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                             {authSession?.user?.name || authSession?.user?.email || 'Google User'}
                           </p>
-                          <p className="text-[11px] text-[#86868B] flex items-center gap-1">
+                          <p className="text-[11px] text-[#86868B] dark:text-[#98989D] flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
                             <span>Connected via Google OAuth</span>
                           </p>
                         </>
                       ) : (
                         <>
-                          <p className="text-xs font-semibold text-[#1D1D1F]">Google Account</p>
-                          <p className="text-[11px] text-[#86868B]">
+                          <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Google Account</p>
+                          <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                             Sign in to enable real-time cloud synchronization
                           </p>
                         </>
@@ -720,7 +713,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => authClient.signIn.social({ provider: 'google', callbackURL: '/' })}
-                      className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[#E5E5EA] bg-white hover:bg-[#F5F5F7] transition-colors"
+                      className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#2C2C2E] hover:bg-[#F5F5F7] dark:hover:bg-[#343438] text-[#1D1D1F] dark:text-[#F5F5F7] transition-colors"
                     >
                       Reconnect
                     </button>
@@ -737,11 +730,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Export & Import Calendar Data */}
-              <div className="pt-3 border-t border-[#E5E5EA]">
-                <h4 className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-2">
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
+                <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider mb-2">
                   Export & Import Calendar Data
                 </h4>
-                <p className="text-[11px] text-[#86868B] mb-2.5">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mb-2.5">
                   Export to industry-standard iCalendar format (.ics) for Apple Calendar, Google Calendar, and Microsoft Outlook, or import external files.
                 </p>
 
@@ -749,13 +742,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={handleExportICS}
-                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-[#0A84FF]/30 bg-[#0A84FF]/5 hover:bg-[#0A84FF]/10 text-[#0A84FF] font-medium transition-colors"
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-[#0A84FF]/30 dark:border-[#0A84FF]/40 bg-[#0A84FF]/5 dark:bg-[#0A84FF]/15 hover:bg-[#0A84FF]/10 text-[#0A84FF] font-medium transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Export to .ics (iCal)</span>
                   </button>
 
-                  <label className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-[#E5E5EA] hover:bg-[#F5F5F7] font-medium transition-colors cursor-pointer text-[#1D1D1F]">
+                  <label className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] font-medium transition-colors cursor-pointer text-[#1D1D1F] dark:text-[#F5F5F7]">
                     <Upload className="w-3.5 h-3.5 text-[#34C759]" />
                     <span>Import .ics / .json</span>
                     <input
@@ -771,7 +764,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={handleExportJSON}
-                    className="text-[11px] text-[#86868B] hover:text-[#1D1D1F] underline flex items-center gap-1"
+                    className="text-[11px] text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] underline flex items-center gap-1"
                   >
                     <Download className="w-3 h-3" />
                     <span>Download raw JSON archive</span>
@@ -780,7 +773,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Danger Zone: Clear Data & Account Deletion */}
-              <div className="pt-3 border-t border-[#E5E5EA] space-y-2">
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E] space-y-2">
                 <h4 className="text-[11px] font-semibold text-[#FF3B30] uppercase tracking-wider">
                   Danger Zone
                 </h4>
@@ -796,7 +789,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <Trash2 className="w-4 h-4 text-[#FF3B30]" />
                       <div>
                         <p className="font-medium text-[#FF3B30]">Delete All Calendar Data</p>
-                        <p className="text-[11px] text-[#86868B]">
+                        <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                           Wipe all events and tasks from this calendar
                         </p>
                       </div>
@@ -809,14 +802,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <AlertTriangle className="w-3.5 h-3.5" />
                       <span>Are you sure you want to clear all calendar data?</span>
                     </p>
-                    <p className="text-[11px] text-[#86868B]">
+                    <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                       This will delete all events and tasks from your schedule. This action cannot be undone.
                     </p>
                     <div className="flex items-center gap-2 justify-end pt-1">
                       <button
                         type="button"
                         onClick={() => setConfirmClearDataOpen(false)}
-                        className="px-2.5 py-1 text-xs rounded border border-[#E5E5EA] bg-white hover:bg-[#F5F5F7]"
+                        className="px-2.5 py-1 text-xs rounded border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#343438]"
                       >
                         Cancel
                       </button>
@@ -844,7 +837,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           <LogOut className="w-4 h-4 text-[#FF3B30]" />
                           <div>
                             <p className="font-medium text-[#FF3B30]">Delete Dayli Account</p>
-                            <p className="text-[11px] text-[#86868B]">
+                            <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                               Permanently remove your account and all synchronized cloud records
                             </p>
                           </div>
@@ -857,7 +850,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           <AlertTriangle className="w-4 h-4" />
                           <span>Permanently Delete Account</span>
                         </p>
-                        <p className="text-[11px] text-[#86868B]">
+                        <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                           To permanently delete your user profile, active sessions, and cloud schedules, please type <strong>DELETE</strong> below:
                         </p>
                         <input
@@ -865,7 +858,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           value={deleteConfirmationText}
                           onChange={(e) => setDeleteConfirmationText(e.target.value)}
                           placeholder="Type DELETE"
-                          className="w-full px-2.5 py-1.5 text-xs rounded border border-[#FF3B30]/50 bg-white text-[#1D1D1F] focus:outline-hidden"
+                          className="w-full px-2.5 py-1.5 text-xs rounded border border-[#FF3B30]/50 bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden"
                         />
                         <div className="flex items-center gap-2 justify-end pt-1">
                           <button
@@ -874,7 +867,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               setConfirmDeleteAccountOpen(false);
                               setDeleteConfirmationText('');
                             }}
-                            className="px-2.5 py-1 text-xs rounded border border-[#E5E5EA] bg-white hover:bg-[#F5F5F7]"
+                            className="px-2.5 py-1 text-xs rounded border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#343438]"
                           >
                             Cancel
                           </button>
@@ -900,10 +893,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="space-y-4">
               {/* Cloud Sync Status */}
               <div>
-                <h4 className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-2">
+                <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider mb-2">
                   Cloud Sync Status
                 </h4>
-                <div className="p-3 rounded-xl border border-[#E5E5EA] bg-[#F5F5F7]/50 flex items-center justify-between">
+                <div className="p-3 rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-[#F5F5F7]/50 dark:bg-[#242426]/50 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <span
                       className={`w-2.5 h-2.5 rounded-full ${
@@ -911,26 +904,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       }`}
                     />
                     <div>
-                      <p className="text-xs font-semibold text-[#1D1D1F]">
+                      <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                         {isUserSignedIn ? 'Cloud Synced' : 'Local Storage Mode (Offline)'}
                       </p>
-                      <p className="text-[11px] text-[#86868B]">
+                      <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                         {isUserSignedIn
                           ? 'Synchronized with Neon PostgreSQL server in real time'
                           : 'Schedules are stored locally on this machine'}
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white border border-[#E5E5EA] text-[#86868B]">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-[#2C2C2E] border border-[#E5E5EA] dark:border-[#38383A] text-[#86868B] dark:text-[#98989D]">
                     {isUserSignedIn ? 'Active' : 'Offline'}
                   </span>
                 </div>
               </div>
 
               {/* Active Sessions & Devices */}
-              <div className="pt-3 border-t border-[#E5E5EA]">
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">
+                  <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider">
                     Active Sessions & Devices
                   </h4>
                   {isUserSignedIn && (
@@ -946,26 +939,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {!isUserSignedIn ? (
-                  <div className="p-3.5 rounded-xl border border-[#E5E5EA] bg-white text-center space-y-1">
-                    <Laptop className="w-6 h-6 text-[#86868B] mx-auto mb-1" />
-                    <p className="text-xs font-medium text-[#1D1D1F]">This Device (Guest)</p>
-                    <p className="text-[11px] text-[#86868B]">
+                  <div className="p-3.5 rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-center space-y-1">
+                    <Laptop className="w-6 h-6 text-[#86868B] dark:text-[#98989D] mx-auto mb-1" />
+                    <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">This Device (Guest)</p>
+                    <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                       Sign in with Google to view active sessions across all your devices and manage remote access.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {sessions.length === 0 && !isLoadingSessions && (
-                      <p className="text-xs text-[#86868B] italic">No active sessions retrieved.</p>
+                      <p className="text-xs text-[#86868B] dark:text-[#98989D] italic">No active sessions retrieved.</p>
                     )}
 
                     {sessions.map((sess) => (
                       <div
                         key={sess.id}
-                        className="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center justify-between shadow-2xs"
+                        className="p-3 rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] flex items-center justify-between shadow-2xs"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-[#F5F5F7] border border-[#E5E5EA] flex items-center justify-center text-[#1D1D1F]">
+                          <div className="w-8 h-8 rounded-lg bg-[#F5F5F7] dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] flex items-center justify-center text-[#1D1D1F] dark:text-[#F5F5F7]">
                             {sess.type === 'mobile' ? (
                               <Smartphone className="w-4 h-4" />
                             ) : (
@@ -974,7 +967,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           </div>
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <p className="text-xs font-semibold text-[#1D1D1F]">
+                              <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                                 {sess.browser} on {sess.os}
                               </p>
                               {sess.isCurrent && (
@@ -983,7 +976,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] text-[#86868B]">
+                            <p className="text-[10px] text-[#86868B] dark:text-[#98989D]">
                               IP: {sess.ipAddress} • Last active:{' '}
                               {format(new Date(sess.updatedAt), 'MMM d, h:mm a')}
                             </p>
@@ -1007,9 +1000,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Desktop App Connections (Future) */}
-              <div className="pt-3 border-t border-[#E5E5EA]">
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
                 <div className="flex items-center justify-between mb-1.5">
-                  <h4 className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">
+                  <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider">
                     Desktop App Connections
                   </h4>
                   <span className="text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-2 py-0.5 rounded-full">
@@ -1017,13 +1010,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </span>
                 </div>
 
-                <div className="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F5F5F7]/40 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-[#E5E5EA] flex items-center justify-center text-[#0A84FF] shrink-0">
+                <div className="p-3.5 rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-[#F5F5F7]/40 dark:bg-[#242426]/40 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] flex items-center justify-center text-[#0A84FF] shrink-0">
                     <Laptop className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-[#1D1D1F]">Dayli Windows & macOS Desktop</p>
-                    <p className="text-[11px] text-[#86868B] leading-relaxed mt-0.5">
+                    <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Dayli Windows & macOS Desktop</p>
+                    <p className="text-[11px] text-[#86868B] dark:text-[#98989D] leading-relaxed mt-0.5">
                       Native desktop application with system tray notifications, offline background sync, global keyboard shortcuts, and mini widget view.
                     </p>
                   </div>
@@ -1036,17 +1029,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {activeTab === 'shortcuts' && (
             <div className="space-y-3">
               <div>
-                <h4 className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-2">
+                <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider mb-2">
                   Keyboard Shortcuts
                 </h4>
-                <div className="divide-y divide-[#E5E5EA] border border-[#E5E5EA] rounded-xl overflow-hidden bg-white">
+                <div className="divide-y divide-[#E5E5EA] dark:divide-[#2C2C2E] border border-[#E5E5EA] dark:border-[#38383A] rounded-xl overflow-hidden bg-white dark:bg-[#202022]">
                   {shortcuts.map((sc) => (
                     <div
                       key={sc.key}
                       className="flex items-center justify-between px-3 py-2 text-xs"
                     >
-                      <span className="text-[#1D1D1F] font-normal">{sc.description}</span>
-                      <kbd className="px-2 py-0.5 rounded bg-[#F5F5F7] border border-[#E5E5EA] font-mono text-[11px] font-semibold text-[#1D1D1F]">
+                      <span className="text-[#1D1D1F] dark:text-[#F5F5F7] font-normal">{sc.description}</span>
+                      <kbd className="px-2 py-0.5 rounded bg-[#F5F5F7] dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] font-mono text-[11px] font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                         {sc.key}
                       </kbd>
                     </div>
@@ -1054,11 +1047,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[#F5F5F7] border border-[#E5E5EA] flex items-start gap-2.5">
+              <div className="p-3 rounded-xl bg-[#F5F5F7] dark:bg-[#242426] border border-[#E5E5EA] dark:border-[#38383A] flex items-start gap-2.5">
                 <HelpCircle className="w-4 h-4 text-[#0A84FF] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-[#1D1D1F]">Need assistance?</p>
-                  <p className="text-[11px] text-[#86868B] mt-0.5 leading-relaxed">
+                  <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Need assistance?</p>
+                  <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5 leading-relaxed">
                     Dayli is designed to be fully navigable via keyboard and mouse. Click on any date cell or timeline row to immediately create an event. Use standard iCalendar (.ics) files to import from Google or Apple Calendar anytime.
                   </p>
                 </div>
