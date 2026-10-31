@@ -221,13 +221,13 @@ export const MonthView: React.FC<MonthViewProps> = ({
   }, [onVisibleMonthChange]);
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden relative h-full">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#121214] overflow-hidden relative h-full">
       {/* Sticky Weekday Header Row */}
-      <div className="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#F5F5F7]/95 backdrop-blur-md shrink-0 sticky top-0 z-30">
+      <div className="grid grid-cols-7 border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/95 dark:bg-[#18181A]/95 backdrop-blur-md shrink-0 sticky top-0 z-30">
         {weekDayNames.map((name, idx) => (
           <div
             key={idx}
-            className="py-2.5 text-center text-[11px] font-semibold tracking-wider text-[#86868B]"
+            className="py-2.5 text-center text-[11px] font-semibold tracking-wider text-[#86868B] dark:text-[#98989D]"
           >
             {name}
           </div>
@@ -245,21 +245,21 @@ export const MonthView: React.FC<MonthViewProps> = ({
             {/* New Month Divider Header */}
             <div
               id={`month-divider-${section.monthKey}`}
-              className="px-4 py-2 bg-[#F5F5F7] border-y border-[#E5E5EA] select-none"
+              className="px-4 py-2 bg-[#F5F5F7] dark:bg-[#1A1A1C] border-y border-[#E5E5EA] dark:border-[#28282A] select-none"
             >
-              <span className="text-xs font-semibold text-[#1D1D1F] tracking-tight">
+              <span className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight">
                 {section.label}
               </span>
             </div>
 
             {/* Month Days Grid */}
-            <div className="grid grid-cols-7 divide-x divide-[#E5E5EA]">
+            <div className="grid grid-cols-7 divide-x divide-[#E5E5EA] dark:divide-[#28282A]">
               {section.days.map((day, dIdx) => {
                 if (!day) {
                   return (
                     <div
                       key={`blank-${section.monthKey}-${dIdx}`}
-                      className="min-h-[115px] sm:min-h-[135px] p-2 bg-[#F5F5F7]/30 border-b border-[#E5E5EA]"
+                      className="min-h-[115px] sm:min-h-[135px] p-2 bg-[#F5F5F7]/30 dark:bg-[#161618]/30 border-b border-[#E5E5EA] dark:border-[#28282A]"
                     />
                   );
                 }
@@ -277,7 +277,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                     id={`day-cell-${dateStr}`}
                     data-date={dateStr}
                     onClick={() => onCreateEventOnDate(day)}
-                    className="group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 bg-white"
+                    className="group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] dark:border-[#28282A] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 dark:hover:bg-[#1C1C1E]/50 bg-white dark:bg-[#121214]"
                   >
                     {/* Day Header */}
                     <div className="flex items-center justify-between mb-1.5 shrink-0">
@@ -285,7 +285,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
                           isCurrentDay
                             ? 'bg-[#0A84FF] text-white shadow-xs'
-                            : 'text-[#1D1D1F]'
+                            : 'text-[#1D1D1F] dark:text-[#F5F5F7]'
                         }`}
                       >
                         {format(day, 'd')}
@@ -298,7 +298,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                           e.stopPropagation();
                           onCreateEventOnDate(day);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] hover:text-[#0A84FF] hover:bg-white transition-all shadow-2xs"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] hover:bg-white dark:hover:bg-[#28282A] transition-all shadow-2xs"
                         title="Add event"
                       >
                         <Plus className="w-3.5 h-3.5" />
@@ -342,19 +342,19 @@ export const MonthView: React.FC<MonthViewProps> = ({
       {overflowDate && (
         <div
           onClick={() => setOverflowDate(null)}
-          className="fixed inset-0 z-50 bg-black/20 flex items-center justify-center p-4 backdrop-blur-[1px]"
+          className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[4px] flex items-center justify-center p-4 animate-backdrop"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm bg-white rounded-xl shadow-2xl border border-[#E5E5EA] overflow-hidden"
+            className="w-full max-w-sm bg-white dark:bg-[#1C1C1E] rounded-xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden animate-modal"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5EA]">
-              <h3 className="text-sm font-semibold text-[#1D1D1F]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
+              <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                 {format(overflowDate, 'EEEE, MMMM d, yyyy')}
               </h3>
               <button
                 onClick={() => setOverflowDate(null)}
-                className="p-1 rounded-md text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F5F5F7]"
+                className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E]"
               >
                 <X className="w-4 h-4" />
               </button>

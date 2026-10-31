@@ -100,24 +100,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-[2px] animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-[#E5E5EA] overflow-hidden text-[#1D1D1F] flex flex-col"
+        className="w-full max-w-sm bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col animate-modal"
       >
         {/* Header & Logo */}
-        <div className="relative pt-6 pb-4 px-6 flex flex-col items-center text-center border-b border-[#E5E5EA]/50">
+        <div className="relative pt-6 pb-4 px-6 flex flex-col items-center text-center border-b border-[#E5E5EA]/70 dark:border-[#2C2C2E]">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1 rounded-md text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
+            className="absolute top-4 right-4 p-1 rounded-md text-[#86868B] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
           </button>
 
           <DayliLogo size={36} className="mb-2 shadow-xs" />
-          <h3 className="text-base font-semibold text-[#1D1D1F] tracking-tight">
+          <h3 className="text-base font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight">
             {mode === 'signin' ? 'Sign In to Dayli' : 'Create Dayli Account'}
           </h3>
           <p className="text-xs text-[#86868B] mt-0.5 max-w-[240px]">
@@ -125,7 +125,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </p>
 
           {/* Segmented Mode Switcher */}
-          <div className="flex items-center w-full mt-4 p-0.5 rounded-lg bg-[#F5F5F7] border border-[#E5E5EA]">
+          <div className="flex items-center w-full mt-4 p-0.5 rounded-lg bg-[#F5F5F7] dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A]">
             <button
               type="button"
               onClick={() => {
@@ -134,8 +134,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               }}
               className={`flex-1 py-1 text-xs font-medium rounded-md transition-all ${
                 mode === 'signin'
-                  ? 'bg-white text-[#1D1D1F] shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                  : 'text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
               }`}
             >
               Sign In
@@ -148,8 +148,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               }}
               className={`flex-1 py-1 text-xs font-medium rounded-md transition-all ${
                 mode === 'signup'
-                  ? 'bg-white text-[#1D1D1F] shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                  : 'text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
               }`}
             >
               Create Account
@@ -170,7 +170,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             type="button"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2.5 py-2 px-3 rounded-lg border border-[#E5E5EA] bg-white hover:bg-[#F5F5F7] active:bg-[#E5E5EA]/60 font-medium text-xs text-[#1D1D1F] shadow-xs transition-all disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2.5 py-2 px-3 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#242426] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] active:bg-[#E5E5EA]/60 font-medium text-xs text-[#1D1D1F] dark:text-[#F5F5F7] shadow-xs transition-all disabled:opacity-60"
           >
             {/* Google G Logo SVG */}
             <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -197,9 +197,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* Divider */}
           <div className="relative flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#E5E5EA]" />
+              <div className="w-full border-t border-[#E5E5EA] dark:border-[#2C2C2E]" />
             </div>
-            <span className="relative bg-white px-2 text-[10px] uppercase font-medium text-[#86868B] tracking-wider">
+            <span className="relative bg-white dark:bg-[#1C1C1E] px-2 text-[10px] uppercase font-medium text-[#86868B] tracking-wider">
               or with email
             </span>
           </div>
@@ -218,7 +218,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Reiniel"
-                    className="w-full text-xs pl-8 pr-3 py-2 rounded-lg border border-[#E5E5EA] bg-white focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
+                    className="w-full text-xs pl-8 pr-3 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#242426] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
                   />
                 </div>
               </div>
@@ -236,7 +236,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   autoComplete="email"
-                  className="w-full text-xs pl-8 pr-3 py-2 rounded-lg border border-[#E5E5EA] bg-white focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
+                  className="w-full text-xs pl-8 pr-3 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#242426] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
                 />
               </div>
             </div>
@@ -253,7 +253,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-                  className="w-full text-xs pl-8 pr-8 py-2 rounded-lg border border-[#E5E5EA] bg-white focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
+                  className="w-full text-xs pl-8 pr-8 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#242426] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
                 />
                 <button
                   type="button"
@@ -283,7 +283,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </form>
 
           {/* Sync Guarantee Notice */}
-          <div className="p-2.5 rounded-lg bg-[#F5F5F7] border border-[#E5E5EA] flex items-start gap-2">
+          <div className="p-2.5 rounded-lg bg-[#F5F5F7] dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] flex items-start gap-2">
             <ShieldCheck className="w-3.5 h-3.5 text-[#34C759] shrink-0 mt-0.5" />
             <p className="text-[10px] text-[#86868B] leading-relaxed">
               Your current schedule and tasks will automatically be linked and preserved in your account.

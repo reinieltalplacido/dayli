@@ -100,21 +100,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#F5F5F7] border-r border-[#E5E5EA] flex flex-col transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#F5F5F7] dark:bg-[#161618] border-r border-[#E5E5EA] dark:border-[#28282A] flex flex-col transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="h-13 px-4 flex items-center justify-between border-b border-[#E5E5EA]/70">
+        <div className="h-13 px-4 flex items-center justify-between border-b border-[#E5E5EA]/70 dark:border-[#28282A]">
           <div className="flex items-center gap-2">
             <DayliLogo size={20} priority />
-            <span className="text-[15px] font-semibold tracking-tight text-[#1D1D1F] leading-none">
+            <span className="text-[15px] font-semibold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7] leading-none">
               Dayli
             </span>
           </div>
           <button
             onClick={onCloseMobile}
-            className="p-1 rounded-md text-[#86868B] hover:text-[#1D1D1F] lg:hidden"
+            className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] lg:hidden"
             aria-label="Close sidebar"
           >
             <X className="w-4 h-4" />
@@ -129,17 +129,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onToday();
               if (isOpenMobile) onCloseMobile();
             }}
-            className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/80 hover:bg-white border border-[#E5E5EA] shadow-[0_1px_2px_rgba(0,0,0,0.03)] text-left transition-all group"
+            className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/80 dark:bg-[#202022] hover:bg-white dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#303034] shadow-[0_1px_2px_rgba(0,0,0,0.03)] text-left transition-all group"
           >
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-md bg-[#0A84FF]/10 text-[#0A84FF] flex items-center justify-center font-semibold text-xs group-hover:bg-[#0A84FF] group-hover:text-white transition-colors">
                 <CalendarDays className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-[#1D1D1F]">
+                <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                   Jump to Today
                 </p>
-                <p className="text-[11px] text-[#86868B]">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
                   {format(new Date(), 'EEEE, MMM d')}
                 </p>
               </div>
@@ -150,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
 
           {/* Mini Calendar Widget */}
-          <div className="p-2.5 bg-white rounded-lg border border-[#E5E5EA] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="p-2.5 bg-white dark:bg-[#202022] rounded-lg border border-[#E5E5EA] dark:border-[#303034] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
             <MiniCalendar
               currentDate={currentDate}
               onSelectDate={(d) => {
@@ -171,8 +171,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
                 isTasksOpen
-                  ? 'bg-white border border-[#E5E5EA] text-[#0A84FF] shadow-xs'
-                  : 'text-[#1D1D1F] hover:bg-white/60'
+                  ? 'bg-white dark:bg-[#202022] border border-[#E5E5EA] dark:border-[#303034] text-[#0A84FF] shadow-xs'
+                  : 'text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-white/60 dark:hover:bg-[#202022]/60'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -190,12 +190,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* My Calendars Section */}
           <div className="pt-1">
             <div className="flex items-center justify-between px-1 mb-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B]">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] dark:text-[#98989D]">
                 My Calendars
               </span>
               <button
                 onClick={() => setIsAddCategoryOpen(true)}
-                className="p-1 rounded text-[#86868B] hover:text-[#0A84FF] hover:bg-white transition-colors"
+                className="p-1 rounded text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] hover:bg-white dark:hover:bg-[#202022] transition-colors"
                 title="Add new calendar"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -212,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={category.id}
                     onClick={() => onToggleCategory(category.id)}
-                    className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-white/70 transition-colors group text-left"
+                    className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-white/70 dark:hover:bg-[#202022] transition-colors group text-left"
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       {/* Checkbox circle */}
@@ -220,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         className={`w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center transition-all ${
                           category.enabled
                             ? 'border-transparent text-white'
-                            : 'border-[#86868B]/40 bg-transparent'
+                            : 'border-[#86868B]/40 dark:border-[#98989D]/40 bg-transparent'
                         }`}
                         style={{
                           backgroundColor: category.enabled
@@ -245,15 +245,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <span
                         className={`text-xs truncate ${
                           category.enabled
-                            ? 'text-[#1D1D1F] font-medium'
-                            : 'text-[#86868B] line-through decoration-transparent'
+                            ? 'text-[#1D1D1F] dark:text-[#F5F5F7] font-medium'
+                            : 'text-[#86868B] dark:text-[#98989D] line-through decoration-transparent'
                         }`}
                       >
                         {category.name}
                       </span>
                     </div>
 
-                    <span className="text-[11px] text-[#86868B] opacity-70 group-hover:opacity-100 tabular-nums">
+                    <span className="text-[11px] text-[#86868B] dark:text-[#98989D] opacity-70 group-hover:opacity-100 tabular-nums">
                       {categoryEventCount}
                     </span>
                   </button>
@@ -264,16 +264,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Sidebar Footer: Account Sync & Integrated Settings */}
-        <div className="p-3 border-t border-[#E5E5EA] space-y-2 bg-[#F5F5F7]">
+        <div className="p-3 border-t border-[#E5E5EA] dark:border-[#28282A] space-y-2 bg-[#F5F5F7] dark:bg-[#161618]">
           {/* User Account Capsule */}
           {user ? (
             <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setShowUserMenu((p) => !p)}
-                className={`w-full flex items-center justify-between p-2 rounded-lg bg-white border text-left transition-all shadow-xs group ${
+                className={`w-full flex items-center justify-between p-2 rounded-lg bg-white dark:bg-[#202022] border text-left transition-all shadow-xs group ${
                   showUserMenu
                     ? 'border-[#0A84FF] ring-2 ring-[#0A84FF]/10'
-                    : 'border-[#E5E5EA] hover:border-[#0A84FF]/40'
+                    : 'border-[#E5E5EA] dark:border-[#303034] hover:border-[#0A84FF]/40'
                 }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
@@ -290,7 +290,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-[#1D1D1F] truncate leading-tight">
+                    <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate leading-tight">
                       {user.name}
                     </p>
                     <div className="flex items-center gap-1 mt-0.5">
@@ -299,20 +299,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           isSyncing ? 'bg-[#0A84FF] animate-pulse' : 'bg-[#34C759]'
                         }`}
                       />
-                      <span className="text-[10px] text-[#86868B] leading-none">
+                      <span className="text-[10px] text-[#86868B] dark:text-[#98989D] leading-none">
                         {isSyncing ? 'Syncing...' : 'Cloud Synced'}
                       </span>
                     </div>
                   </div>
                 </div>
-                <User className="w-3.5 h-3.5 text-[#86868B] group-hover:text-[#1D1D1F] shrink-0" />
+                <User className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] group-hover:text-[#1D1D1F] dark:group-hover:text-[#F5F5F7] shrink-0" />
               </button>
 
               {/* Integrated Account & Settings Dropdown Menu */}
               {showUserMenu && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-2xl shadow-2xl border border-[#E5E5EA] overflow-hidden p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-[#1D1D1F]">
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden p-1.5 z-50 animate-modal text-[#1D1D1F] dark:text-[#F5F5F7]">
                   {/* Account Header */}
-                  <div className="px-3 py-2 border-b border-[#E5E5EA]/70 flex items-center gap-2.5">
+                  <div className="px-3 py-2 border-b border-[#E5E5EA]/70 dark:border-[#2C2C2E] flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-full bg-[#0A84FF] text-white flex items-center justify-center font-semibold text-xs shrink-0 overflow-hidden ring-1 ring-black/5">
                       {user.avatarUrl ? (
                         <img
@@ -326,32 +326,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[#1D1D1F] truncate">
+                      <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate">
                         {user.name}
                       </p>
-                      <p className="text-[11px] text-[#86868B] truncate">
+                      <p className="text-[11px] text-[#86868B] dark:text-[#98989D] truncate">
                         {user.email}
                       </p>
                     </div>
                   </div>
 
                   {/* Add Account Option */}
-                  <div className="py-1 border-b border-[#E5E5EA]/70">
+                  <div className="py-1 border-b border-[#E5E5EA]/70 dark:border-[#2C2C2E]">
                     <button
                       type="button"
                       onClick={() => {
                         setShowUserMenu(false);
                         onOpenAuth();
                       }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors"
                     >
-                      <Plus className="w-3.5 h-3.5 text-[#86868B]" />
+                      <Plus className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D]" />
                       <span>Add account</span>
                     </button>
                   </div>
 
                   {/* Settings & Preferences Group */}
-                  <div className="py-1 border-b border-[#E5E5EA]/70 space-y-0.5">
+                  <div className="py-1 border-b border-[#E5E5EA]/70 dark:border-[#2C2C2E] space-y-0.5">
                     {/* Appearance */}
                     <button
                       type="button"
@@ -359,20 +359,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         setShowUserMenu(false);
                         onOpenSettings('general');
                       }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors group text-left"
                     >
                       <div className="flex items-center gap-2">
-                        <Moon className="w-3.5 h-3.5 text-[#86868B]" />
+                        <Moon className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D]" />
                         <div>
-                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                          <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] leading-none">
                             Appearance
                           </p>
-                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
-                            Light
+                          <p className="text-[10px] text-[#86868B] dark:text-[#98989D] leading-none mt-1">
+                            Theme & colors
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Time & Regional */}
@@ -382,20 +382,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         setShowUserMenu(false);
                         onOpenSettings('regional');
                       }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors group text-left"
                     >
                       <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5 text-[#86868B]" />
+                        <Clock className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D]" />
                         <div>
-                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                          <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] leading-none">
                             Time & Regional
                           </p>
-                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
+                          <p className="text-[10px] text-[#86868B] dark:text-[#98989D] leading-none mt-1">
                             Time zone & clock
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Privacy & Data */}
@@ -405,20 +405,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         setShowUserMenu(false);
                         onOpenSettings('privacy');
                       }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors group text-left"
                     >
                       <div className="flex items-center gap-2">
-                        <Shield className="w-3.5 h-3.5 text-[#86868B]" />
+                        <Shield className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D]" />
                         <div>
-                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                          <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] leading-none">
                             Privacy & Data
                           </p>
-                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
+                          <p className="text-[10px] text-[#86868B] dark:text-[#98989D] leading-none mt-1">
                             Export & Accounts
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Connected Devices */}
@@ -428,20 +428,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         setShowUserMenu(false);
                         onOpenSettings('devices');
                       }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors group text-left"
                     >
                       <div className="flex items-center gap-2">
-                        <Laptop className="w-3.5 h-3.5 text-[#86868B]" />
+                        <Laptop className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D]" />
                         <div>
-                          <p className="text-xs font-medium text-[#1D1D1F] leading-none">
+                          <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] leading-none">
                             Connected Devices
                           </p>
-                          <p className="text-[10px] text-[#86868B] leading-none mt-1">
+                          <p className="text-[10px] text-[#86868B] dark:text-[#98989D] leading-none mt-1">
                             Active sessions
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Help & Shortcuts */}
@@ -451,15 +451,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         setShowUserMenu(false);
                         onOpenSettings('shortcuts');
                       }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors group text-left"
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors group text-left"
                     >
                       <div className="flex items-center gap-2">
-                        <HelpCircle className="w-3.5 h-3.5 text-[#86868B]" />
-                        <p className="text-xs font-medium text-[#1D1D1F]">
+                        <HelpCircle className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D]" />
+                        <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">
                           Help & Shortcuts
                         </p>
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] group-hover:translate-x-0.5 transition-transform" />
                     </button>
                   </div>
 
@@ -483,17 +483,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ) : (
             <button
               onClick={onOpenAuth}
-              className="w-full flex items-center justify-between p-2 rounded-lg bg-white/80 hover:bg-white border border-[#E5E5EA] hover:border-[#0A84FF]/40 text-left transition-all shadow-xs group"
+              className="w-full flex items-center justify-between p-2 rounded-lg bg-white/80 dark:bg-[#202022] hover:bg-white dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#303034] hover:border-[#0A84FF]/40 text-left transition-all shadow-xs group"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-7 h-7 rounded-md bg-[#0A84FF]/10 text-[#0A84FF] flex items-center justify-center shrink-0 group-hover:bg-[#0A84FF] group-hover:text-white transition-colors">
                   <Cloud className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-[#1D1D1F] leading-tight">
+                  <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] leading-tight">
                     Sign in to Sync
                   </p>
-                  <p className="text-[10px] text-[#86868B] leading-none mt-0.5">
+                  <p className="text-[10px] text-[#86868B] dark:text-[#98989D] leading-none mt-0.5">
                     Local Storage
                   </p>
                 </div>
@@ -507,7 +507,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Quick Settings Shortcut (Available in all states) */}
           <button
             onClick={() => onOpenSettings('general')}
-            className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#86868B] hover:text-[#1D1D1F] hover:bg-white transition-colors"
+            className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-white dark:hover:bg-[#202022] transition-colors"
           >
             <Settings className="w-3.5 h-3.5" />
             <span>Preferences & Settings</span>

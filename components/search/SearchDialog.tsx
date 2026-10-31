@@ -2,9 +2,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, X, MapPin, CheckSquare } from 'lucide-react';
+import { format } from 'date-fns';
 import { CalendarCategory, CalendarEvent, TaskItem } from '@/types/calendar';
 import { formatTime12h, parseDateString } from '@/lib/dateUtils';
-import { format } from 'date-fns';
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -33,7 +33,7 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
 
   const filteredEvents = useMemo(() => {
     if (!query.trim()) return [];
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
     return events.filter(
       (e) =>
         e.title.toLowerCase().includes(q) ||
@@ -44,7 +44,7 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
 
   const filteredTasks = useMemo(() => {
     if (!query.trim()) return [];
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
     return tasks.filter((t) => t.title.toLowerCase().includes(q));
   }, [tasks, query]);
 
@@ -53,34 +53,34 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-black/25 backdrop-blur-[2px] animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-black/35 backdrop-blur-[4px] animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-[#E5E5EA] overflow-hidden text-[#1D1D1F] flex flex-col max-h-[70vh]"
+        className="w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col max-h-[70vh] animate-modal"
       >
         {/* Search Input Bar */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-[#E5E5EA]">
-          <Search className="w-4 h-4 text-[#86868B]" />
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
+          <Search className="w-4 h-4 text-[#86868B] dark:text-[#98989D]" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search events, notes, locations, tasks..."
             autoFocus
-            className="flex-1 text-sm bg-transparent focus:outline-none placeholder:text-[#86868B]"
+            className="flex-1 text-sm bg-transparent focus:outline-none placeholder:text-[#86868B] dark:placeholder:text-[#98989D] text-[#1D1D1F] dark:text-[#F5F5F7]"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="text-[#86868B] hover:text-[#1D1D1F] p-0.5"
+              className="text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] p-0.5"
             >
               <X className="w-4 h-4" />
             </button>
           )}
           <button
             onClick={onClose}
-            className="text-xs px-2 py-1 rounded bg-[#F5F5F7] text-[#86868B] hover:text-[#1D1D1F]"
+            className="text-xs px-2 py-1 rounded bg-[#F5F5F7] dark:bg-[#28282A] text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]"
           >
             Esc
           </button>
@@ -89,11 +89,11 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
         {/* Results Area */}
         <div className="flex-1 overflow-y-auto p-3 space-y-4">
           {!query.trim() ? (
-            <div className="p-6 text-center text-xs text-[#86868B]">
+            <div className="p-6 text-center text-xs text-[#86868B] dark:text-[#98989D]">
               Type a title, meeting attendee, or location to search your Dayli calendar.
             </div>
           ) : filteredEvents.length === 0 && filteredTasks.length === 0 ? (
-            <div className="p-6 text-center text-xs text-[#86868B]">
+            <div className="p-6 text-center text-xs text-[#86868B] dark:text-[#98989D]">
               No events or tasks matching &quot;{query}&quot;
             </div>
           ) : (
@@ -101,7 +101,7 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
               {/* Event results */}
               {filteredEvents.length > 0 && (
                 <div>
-                  <h4 className="text-[10px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5 px-2">
+                  <h4 className="text-[10px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider mb-1.5 px-2">
                     Events ({filteredEvents.length})
                   </h4>
                   <div className="space-y-1">
@@ -114,7 +114,7 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
                             onClose();
                             onSelectEvent(event);
                           }}
-                          className="flex items-start justify-between p-2 rounded-lg hover:bg-[#F5F5F7] cursor-pointer transition-colors border border-transparent hover:border-[#E5E5EA]"
+                          className="flex items-start justify-between p-2 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] cursor-pointer transition-colors border border-transparent hover:border-[#E5E5EA] dark:hover:border-[#38383A]"
                         >
                           <div className="flex-1 min-w-0 pr-2">
                             <div className="flex items-center gap-1.5">
@@ -122,23 +122,23 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
                                 className="w-2 h-2 rounded-full shrink-0"
                                 style={{ backgroundColor: cat?.color || '#0A84FF' }}
                               />
-                              <span className="text-xs font-semibold text-[#1D1D1F] truncate">
+                              <span className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate">
                                 {event.title}
                               </span>
                             </div>
                             {event.description && (
-                              <p className="text-[11px] text-[#86868B] truncate mt-0.5 ml-3.5">
+                              <p className="text-[11px] text-[#86868B] dark:text-[#98989D] truncate mt-0.5 ml-3.5">
                                 {event.description}
                               </p>
                             )}
                             {event.location && (
-                              <p className="text-[10px] text-[#86868B] flex items-center gap-1 mt-0.5 ml-3.5">
+                              <p className="text-[10px] text-[#86868B] dark:text-[#98989D] flex items-center gap-1 mt-0.5 ml-3.5">
                                 <MapPin className="w-2.5 h-2.5" />
                                 <span>{event.location}</span>
                               </p>
                             )}
                           </div>
-                          <div className="text-right text-[11px] text-[#86868B] shrink-0">
+                          <div className="text-right text-[11px] text-[#86868B] dark:text-[#98989D] shrink-0">
                             <div>{format(parseDateString(event.startDate), 'MMM d')}</div>
                             <div className="text-[10px] tabular-nums">
                               {event.isAllDay ? 'All Day' : formatTime12h(event.startTime)}
@@ -154,17 +154,17 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
               {/* Task results */}
               {filteredTasks.length > 0 && (
                 <div>
-                  <h4 className="text-[10px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5 px-2">
+                  <h4 className="text-[10px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider mb-1.5 px-2">
                     Tasks ({filteredTasks.length})
                   </h4>
                   <div className="space-y-1">
                     {filteredTasks.map((task) => (
                       <div
                         key={task.id}
-                        className="flex items-center gap-2 p-2 rounded-lg bg-[#F5F5F7]/50 text-xs text-[#1D1D1F]"
+                        className="flex items-center gap-2 p-2 rounded-lg bg-[#F5F5F7]/50 dark:bg-[#242426]/50 text-xs text-[#1D1D1F] dark:text-[#F5F5F7]"
                       >
                         <CheckSquare className="w-3.5 h-3.5 text-[#0A84FF]" />
-                        <span className={`truncate ${task.completed ? 'line-through text-[#86868B]' : ''}`}>
+                        <span className={`truncate ${task.completed ? 'line-through text-[#86868B] dark:text-[#98989D]' : ''}`}>
                           {task.title}
                         </span>
                       </div>

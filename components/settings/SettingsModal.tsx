@@ -332,34 +332,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/25 backdrop-blur-[2px] animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[4px] animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-[#E5E5EA] overflow-hidden text-[#1D1D1F] flex flex-col max-h-[88vh]"
+        className="w-full max-w-xl bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col max-h-[88vh] animate-modal"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E5EA]">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
           <div className="flex items-center gap-2">
             <DayliLogo size={22} />
-            <h3 className="text-sm font-semibold text-[#1D1D1F]">Preferences & Settings</h3>
+            <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Preferences & Settings</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
+            className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 px-4 pt-2 border-b border-[#E5E5EA] bg-[#F5F5F7]/30 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1 px-4 pt-2 border-b border-[#E5E5EA] dark:border-[#2C2C2E] bg-[#F5F5F7]/30 dark:bg-[#202022]/40 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('general')}
             className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
               activeTab === 'general'
                 ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] hover:text-[#1D1D1F]'
+                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
@@ -371,7 +371,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
               activeTab === 'regional'
                 ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] hover:text-[#1D1D1F]'
+                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -383,7 +383,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
               activeTab === 'privacy'
                 ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] hover:text-[#1D1D1F]'
+                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
             }`}
           >
             <Shield className="w-3.5 h-3.5" />
@@ -395,7 +395,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
               activeTab === 'devices'
                 ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] hover:text-[#1D1D1F]'
+                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
             }`}
           >
             <Laptop className="w-3.5 h-3.5" />
@@ -407,7 +407,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
               activeTab === 'shortcuts'
                 ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] hover:text-[#1D1D1F]'
+                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
             }`}
           >
             <Command className="w-3.5 h-3.5" />
@@ -439,10 +439,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {activeTab === 'general' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#1D1D1F] mb-1">
+                <label className="block text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] mb-1">
                   Appearance Theme
                 </label>
-                <p className="text-[11px] text-[#86868B] mb-2.5">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mb-2.5">
                   Select your interface color theme
                 </p>
                 <div className="grid grid-cols-3 gap-2.5">
@@ -451,11 +451,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => settingsService.updateSettings({ theme: 'light' })}
                     className={`flex flex-col items-center gap-2 p-3 rounded-xl border text-center transition-all ${
                       settings.theme === 'light'
-                        ? 'border-[#0A84FF] bg-[#0A84FF]/5 shadow-xs font-medium'
-                        : 'border-[#E5E5EA] hover:bg-[#F5F5F7]'
+                        ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 shadow-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]'
+                        : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-full bg-white border border-[#E5E5EA] flex items-center justify-center text-[#FF9500]">
+                    <div className="w-8 h-8 rounded-full bg-white dark:bg-[#2C2C2E] border border-[#E5E5EA] dark:border-[#38383A] flex items-center justify-center text-[#FF9500]">
                       <Sun className="w-4 h-4" />
                     </div>
                     <span className="text-xs">Light</span>
@@ -466,11 +466,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => settingsService.updateSettings({ theme: 'system' })}
                     className={`flex flex-col items-center gap-2 p-3 rounded-xl border text-center transition-all ${
                       settings.theme === 'system'
-                        ? 'border-[#0A84FF] bg-[#0A84FF]/5 shadow-xs font-medium'
-                        : 'border-[#E5E5EA] hover:bg-[#F5F5F7]'
+                        ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 shadow-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]'
+                        : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#1D1D1F] text-white flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-[#1D1D1F] dark:bg-[#2C2C2E] text-white flex items-center justify-center">
                       <Sliders className="w-4 h-4" />
                     </div>
                     <span className="text-xs">System</span>
@@ -481,30 +481,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => settingsService.updateSettings({ theme: 'dark' })}
                     className={`flex flex-col items-center gap-2 p-3 rounded-xl border text-center transition-all ${
                       settings.theme === 'dark'
-                        ? 'border-[#0A84FF] bg-[#0A84FF]/5 shadow-xs font-medium'
-                        : 'border-[#E5E5EA] hover:bg-[#F5F5F7]'
+                        ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 shadow-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]'
+                        : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#1D1D1F] text-white flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-[#1D1D1F] dark:bg-[#2C2C2E] text-white flex items-center justify-center">
                       <Moon className="w-4 h-4 text-[#0A84FF]" />
                     </div>
-                    <span className="text-xs">Dark (Preview)</span>
+                    <span className="text-xs">Dark</span>
                   </button>
                 </div>
               </div>
 
               {/* Dayli Info Card */}
-              <div className="p-3.5 rounded-xl bg-[#F5F5F7] border border-[#E5E5EA] space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-[#F5F5F7] dark:bg-[#242426] border border-[#E5E5EA] dark:border-[#38383A] space-y-1.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <DayliLogo size={18} />
-                    <span className="font-semibold text-xs text-[#1D1D1F]">Dayli Calendar</span>
+                    <span className="font-semibold text-xs text-[#1D1D1F] dark:text-[#F5F5F7]">Dayli Calendar</span>
                   </div>
                   <span className="text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-2 py-0.5 rounded-full">
                     Production v1.0
                   </span>
                 </div>
-                <p className="text-[11px] text-[#86868B] leading-relaxed">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] leading-relaxed">
                   Fast, focused personal calendar & task workspace with continuous scrolling, Neon PostgreSQL cloud sync, and full iCalendar portability.
                 </p>
               </div>
@@ -1068,10 +1068,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-[#E5E5EA] bg-[#F5F5F7]/40 flex justify-end">
+        <div className="px-5 py-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E] bg-[#F5F5F7]/40 dark:bg-[#1A1A1C] flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-md bg-white border border-[#E5E5EA] hover:bg-[#F5F5F7] font-medium text-xs text-[#1D1D1F] transition-colors"
+            className="px-4 py-1.5 rounded-md bg-white dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#303034] font-medium text-xs text-[#1D1D1F] dark:text-[#F5F5F7] transition-colors"
           >
             Done
           </button>

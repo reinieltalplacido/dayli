@@ -65,15 +65,15 @@ export const DayView: React.FC<DayViewProps> = ({
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#121214] overflow-hidden">
       {/* Day Header Banner */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-[#E5E5EA] bg-[#F5F5F7]/30 shrink-0">
+      <div className="flex items-center justify-between px-6 py-3 border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/30 dark:bg-[#18181A]/30 shrink-0">
         <div className="flex items-center gap-3">
           <div
             className={`w-10 h-10 rounded-full flex flex-col items-center justify-center font-bold text-sm ${
               isCurrentDay
                 ? 'bg-[#0A84FF] text-white shadow-xs'
-                : 'bg-white border border-[#E5E5EA] text-[#1D1D1F]'
+                : 'bg-white dark:bg-[#202022] border border-[#E5E5EA] dark:border-[#38383A] text-[#1D1D1F] dark:text-[#F5F5F7]'
             }`}
           >
             <span className="text-[10px] uppercase font-semibold leading-none -mt-0.5">
@@ -84,10 +84,10 @@ export const DayView: React.FC<DayViewProps> = ({
             </span>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#1D1D1F]">
+            <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
               {format(currentDate, 'EEEE, MMMM d, yyyy')}
             </h3>
-            <p className="text-xs text-[#86868B]">
+            <p className="text-xs text-[#86868B] dark:text-[#98989D]">
               {dayEvents.length} {dayEvents.length === 1 ? 'event' : 'events'}{' '}
               scheduled
             </p>
@@ -97,8 +97,8 @@ export const DayView: React.FC<DayViewProps> = ({
 
       {/* All-Day Events Strip */}
       {allDayEvents.length > 0 && (
-        <div className="grid grid-cols-[64px_1fr] border-b border-[#E5E5EA] bg-[#F5F5F7]/15 p-2 shrink-0">
-          <div className="text-right pr-3 text-[11px] font-medium text-[#86868B] self-center">
+        <div className="grid grid-cols-[64px_1fr] border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/15 dark:bg-[#18181A]/15 p-2 shrink-0">
+          <div className="text-right pr-3 text-[11px] font-medium text-[#86868B] dark:text-[#98989D] self-center">
             All-day
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -106,7 +106,7 @@ export const DayView: React.FC<DayViewProps> = ({
               <button
                 key={evt.id}
                 onClick={() => onSelectEvent(evt)}
-                className="px-2.5 py-1 rounded-md text-xs font-medium border border-black/5 flex items-center gap-1.5 shadow-xs transition-transform hover:scale-[1.01]"
+                className="px-2.5 py-1 rounded-md text-xs font-medium border border-black/5 dark:border-white/10 text-[#1D1D1F] dark:text-[#F5F5F7] flex items-center gap-1.5 shadow-xs transition-transform hover:scale-[1.01]"
                 style={{
                   backgroundColor:
                     categoryMap.get(evt.categoryId)?.lightBg || '#0A84FF1A',
@@ -128,11 +128,11 @@ export const DayView: React.FC<DayViewProps> = ({
         className="flex-1 overflow-y-auto relative grid grid-cols-[64px_1fr] select-none"
       >
         {/* Time column */}
-        <div className="border-r border-[#E5E5EA] bg-[#F5F5F7]/25">
+        <div className="border-r border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/25 dark:bg-[#161618]/25">
           {hours.map((hour) => (
             <div
               key={hour}
-              className="h-14 border-b border-[#E5E5EA]/60 pr-3 pt-1 text-right text-[11px] font-medium text-[#86868B] tabular-nums"
+              className="h-14 border-b border-[#E5E5EA]/60 dark:border-[#28282A]/60 pr-3 pt-1 text-right text-[11px] font-medium text-[#86868B] dark:text-[#98989D] tabular-nums"
             >
               {hour !== 0 && formatHourLabel(hour)}
             </div>
@@ -145,10 +145,10 @@ export const DayView: React.FC<DayViewProps> = ({
             <div
               key={hour}
               onClick={() => onCreateEventOnDateTime(currentDate, hour)}
-              className="h-14 border-b border-[#E5E5EA]/60 hover:bg-[#F5F5F7]/50 cursor-pointer transition-colors relative group"
+              className="h-14 border-b border-[#E5E5EA]/60 dark:border-[#28282A]/60 hover:bg-[#F5F5F7]/50 dark:hover:bg-[#1C1C1E]/50 cursor-pointer transition-colors relative group"
             >
               {/* Half hour divider */}
-              <div className="absolute top-1/2 left-0 right-0 border-b border-dashed border-[#E5E5EA]/40" />
+              <div className="absolute top-1/2 left-0 right-0 border-b border-dashed border-[#E5E5EA]/40 dark:border-[#28282A]/40" />
             </div>
           ))}
 

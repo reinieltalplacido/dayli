@@ -115,6 +115,31 @@ export function DayliCalendarApp() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  // Sync and observe dark mode theme setting
+  useEffect(() => {
+    const applyTheme = () => {
+      const isDark =
+        settings.theme === 'dark' ||
+        (settings.theme === 'system' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    applyTheme();
+
+    if (settings.theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => applyTheme();
+      mediaQuery.addEventListener('change', listener);
+      return () => mediaQuery.removeEventListener('change', listener);
+    }
+  }, [settings.theme]);
+
   // Sync data with backend when user is authenticated
   useEffect(() => {
     if (user) {
@@ -382,7 +407,7 @@ export function DayliCalendarApp() {
   }, [handleToday, handleOpenCreateEvent]);
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden bg-[#F5F5F7] text-[#1D1D1F]">
+    <div className="h-screen w-screen flex overflow-hidden bg-[#F5F5F7] dark:bg-[#121214] text-[#1D1D1F] dark:text-[#F5F5F7]">
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 

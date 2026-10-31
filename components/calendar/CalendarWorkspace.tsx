@@ -39,7 +39,7 @@ export const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({
   }, [events, enabledCategoryIds]);
 
   return (
-    <main className="flex-1 flex flex-col min-w-0 bg-white overflow-hidden relative h-full">
+    <main className="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#121214] overflow-hidden relative h-full">
       {view === 'month' && (
         <MonthView
           currentDate={currentDate}
