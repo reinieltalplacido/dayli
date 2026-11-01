@@ -43,6 +43,43 @@ const QUICK_PROMPTS = [
   "Add gym session tomorrow at 6pm",
 ];
 
+function renderFormattedContent(content: string) {
+  const lines = content.split('\n');
+  return lines.map((line, idx) => {
+    const trimmed = line.trim();
+    const isBullet = trimmed.startsWith('* ') || trimmed.startsWith('• ') || trimmed.startsWith('- ');
+    const cleanLine = isBullet ? trimmed.replace(/^[\*•\-]\s*/, '') : line;
+
+    // Bold replacement
+    const parts = cleanLine.split(/(\*\*[^*]+\*\*)/g);
+    const renderedParts = parts.map((part, pIdx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong key={pIdx} className="font-semibold text-inherit">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return part;
+    });
+
+    if (isBullet) {
+      return (
+        <div key={idx} className="flex items-start gap-1.5 my-0.5">
+          <span className="text-[#0A84FF] shrink-0 leading-relaxed">•</span>
+          <span>{renderedParts}</span>
+        </div>
+      );
+    }
+
+    return (
+      <div key={idx} className={line.trim() === '' ? 'h-1.5' : ''}>
+        {renderedParts}
+      </div>
+    );
+  });
+}
+
 export const DayliChatbot: React.FC<DayliChatbotProps> = ({
   events,
   tasks,
@@ -296,13 +333,13 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
                   className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[88%] px-3.5 py-2.5 rounded-2xl whitespace-pre-wrap ${
+                    className={`max-w-[88%] px-3.5 py-2.5 rounded-2xl ${
                       isUser
-                        ? 'bg-[#0A84FF] text-white rounded-br-xs shadow-xs font-medium'
+                        ? 'bg-[#0A84FF] text-white rounded-br-xs shadow-xs font-medium whitespace-pre-wrap'
                         : 'bg-[#F5F5F7] dark:bg-[#222226] text-[#1D1D1F] dark:text-[#F5F5F7] rounded-bl-xs border border-[#E5E5EA] dark:border-[#303034]'
                     }`}
                   >
-                    {m.content}
+                    {isUser ? m.content : renderFormattedContent(m.content)}
                   </div>
 
                   {/* Action Proposal Card */}
@@ -434,3 +471,4 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
     </>
   );
 };
+

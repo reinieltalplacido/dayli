@@ -150,7 +150,7 @@ Style Guidelines:
             contents,
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 800,
+              maxOutputTokens: 2500,
             },
           }),
         });
@@ -158,7 +158,11 @@ Style Guidelines:
         if (geminiRes.ok) {
           const geminiData = await geminiRes.json();
           const candidate = geminiData.candidates?.[0];
-          const text = candidate?.content?.parts?.[0]?.text;
+          const text = candidate?.content?.parts
+            ?.map((p: { text?: string }) => p.text || '')
+            .filter(Boolean)
+            .join('') || '';
+
           if (text) {
             return NextResponse.json({
               reply: text,
@@ -209,3 +213,4 @@ Style Guidelines:
     );
   }
 }
+
