@@ -8,7 +8,7 @@ import {
   Search,
   CheckSquare,
   Menu,
-  Sparkles,
+  Zap,
 } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 import { CalendarView } from '@/types/calendar';
@@ -156,14 +156,14 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
           </kbd>
         </button>
 
-        {/* AI Quick Schedule Button */}
+        {/* Quick Schedule Button */}
         <button
           onClick={onOpenSmartSchedule}
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-[#AF52DE] dark:text-[#BF5AF2] bg-[#AF52DE]/10 hover:bg-[#AF52DE]/15 dark:bg-[#AF52DE]/20 dark:hover:bg-[#AF52DE]/25 border border-[#AF52DE]/30 rounded-md transition-all shadow-2xs"
-          title="Smart AI Schedule (Ctrl+J)"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] hover:text-[#0A84FF] dark:hover:text-[#0A84FF] bg-[#F5F5F7] dark:bg-[#202022] hover:bg-[#E5E5EA]/70 dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] rounded-md transition-colors"
+          title="Smart Schedule (Ctrl+J)"
         >
-          <Sparkles className="w-3.5 h-3.5 text-[#AF52DE] dark:text-[#BF5AF2]" />
-          <span className="hidden sm:inline">AI Schedule</span>
+          <Zap className="w-3.5 h-3.5 text-[#0A84FF]" />
+          <span className="hidden sm:inline">Smart Schedule</span>
         </button>
 
         {/* Tasks Toggle (Desktop) */}

@@ -14,7 +14,7 @@ import {
   Moon,
   HelpCircle,
   ChevronRight,
-  Sparkles,
+  Zap,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { CalendarCategory, CalendarEvent, TaskItem } from '@/types/calendar';
@@ -152,29 +152,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
           </button>
 
-          {/* AI Smart Schedule Button */}
+          {/* Smart Schedule Button */}
           {onOpenSmartSchedule && (
             <button
               onClick={() => {
                 onOpenSmartSchedule();
                 if (isOpenMobile) onCloseMobile();
               }}
-              className="w-full flex items-center justify-between p-2.5 rounded-lg bg-gradient-to-r from-[#AF52DE]/10 via-[#0A84FF]/10 to-[#AF52DE]/5 hover:from-[#AF52DE]/15 hover:to-[#0A84FF]/15 border border-[#AF52DE]/30 shadow-xs text-left transition-all group"
+              className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/80 dark:bg-[#202022] hover:bg-white dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#303034] shadow-[0_1px_2px_rgba(0,0,0,0.03)] text-left transition-all group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-md bg-gradient-to-tr from-[#0A84FF] to-[#AF52DE] text-white flex items-center justify-center font-semibold text-xs shadow-xs group-hover:scale-105 transition-transform">
-                  <Sparkles className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-md bg-[#0A84FF]/10 text-[#0A84FF] flex items-center justify-center font-semibold text-xs group-hover:bg-[#0A84FF] group-hover:text-white transition-colors">
+                  <Zap className="w-4 h-4 fill-current" />
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                     Smart Schedule
                   </p>
-                  <p className="text-[10px] text-[#86868B] dark:text-[#98989D]">
-                    Gemini AI Quick-Add
+                  <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
+                    Quick event parser
                   </p>
                 </div>
               </div>
-              <span className="text-[10px] font-semibold text-[#AF52DE] dark:text-[#BF5AF2] group-hover:translate-x-0.5 transition-transform">
+              <span className="text-[10px] font-medium text-[#86868B] dark:text-[#98989D] group-hover:text-[#0A84FF] transition-colors">
                 Ctrl+J
               </span>
             </button>
