@@ -228,33 +228,35 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
   };
 
   const handleExecuteAction = (messageId: string) => {
+    const targetMsg = messages.find((m) => m.id === messageId);
+    if (!targetMsg || !targetMsg.action || targetMsg.action.executed) return;
+
+    // 1. Mark as executed in local UI state
     setMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.id === messageId && msg.action && !msg.action.executed) {
-          if (msg.action.type === 'create_event') {
-            const p = msg.action.payload;
-            onSaveEvent({
-              title: p.title || 'New Event',
-              startDate: p.startDate,
-              startTime: p.startTime || '09:00',
-              endDate: p.endDate || p.startDate,
-              endTime: p.endTime || '10:00',
-              isAllDay: Boolean(p.isAllDay),
-              location: p.location || undefined,
-              categoryId: p.categoryId || categories[0]?.id || 'personal',
-            });
-          } else if (msg.action.type === 'create_task') {
-            const p = msg.action.payload;
-            onAddTask(p.title || 'New Task', p.dueDate || undefined, p.categoryId || undefined);
-          }
-          return {
-            ...msg,
-            action: { ...msg.action, executed: true },
-          };
-        }
-        return msg;
-      })
+      prev.map((msg) =>
+        msg.id === messageId && msg.action
+          ? { ...msg, action: { ...msg.action, executed: true } }
+          : msg
+      )
     );
+
+    // 2. Perform the side-effect outside the React setState updater
+    if (targetMsg.action.type === 'create_event') {
+      const p = targetMsg.action.payload;
+      onSaveEvent({
+        title: p.title || 'New Event',
+        startDate: p.startDate,
+        startTime: p.startTime || '09:00',
+        endDate: p.endDate || p.startDate,
+        endTime: p.endTime || '10:00',
+        isAllDay: Boolean(p.isAllDay),
+        location: p.location || undefined,
+        categoryId: p.categoryId || categories[0]?.id || 'personal',
+      });
+    } else if (targetMsg.action.type === 'create_task') {
+      const p = targetMsg.action.payload;
+      onAddTask(p.title || 'New Task', p.dueDate || undefined, p.categoryId || undefined);
+    }
   };
 
   const handleClearHistory = () => {
