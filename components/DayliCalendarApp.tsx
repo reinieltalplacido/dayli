@@ -21,6 +21,7 @@ import { categoryService } from '@/services/categoryService';
 import { authService } from '@/services/authService';
 import { authClient } from '@/lib/auth-client';
 import { syncService } from '@/services/syncService';
+import { holidayService } from '@/services/holidayService';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { HeaderToolbar } from '@/components/layout/HeaderToolbar';
 import { CalendarWorkspace } from '@/components/calendar/CalendarWorkspace';
@@ -69,6 +70,25 @@ export function DayliCalendarApp() {
     syncService.getSnapshot,
     syncService.getServerSnapshot
   );
+
+  const holidays = useSyncExternalStore(
+    holidayService.subscribe,
+    holidayService.getSnapshot,
+    holidayService.getServerSnapshot
+  );
+
+  // Load official public holidays for current, previous, and next year for seamless navigation
+  useEffect(() => {
+    const year = currentDate.getFullYear();
+    const country = settings.holidayCountry || 'PH';
+    holidayService.loadHolidays(country, [year - 1, year, year + 1]);
+  }, [currentDate, settings.holidayCountry]);
+
+  // Combine user events with national public holidays when the holidays category is active
+  const allEvents = React.useMemo(() => {
+    const isHolidaysEnabled = categories.some((c) => c.id === 'holidays' && c.enabled);
+    return isHolidaysEnabled ? [...events, ...holidays] : events;
+  }, [events, holidays, categories]);
 
   const { data: authSession } = authClient.useSession();
 
@@ -436,7 +456,7 @@ export function DayliCalendarApp() {
         categories={categories}
         onToggleCategory={handleToggleCategory}
         onAddCategory={handleAddCategory}
-        events={events}
+        events={allEvents}
         tasks={tasks}
         isTasksOpen={isTasksOpen}
         onToggleTasks={() => setIsTasksOpen((prev) => !prev)}
@@ -474,7 +494,7 @@ export function DayliCalendarApp() {
           <CalendarWorkspace
             currentDate={currentDate}
             view={view}
-            events={events}
+            events={allEvents}
             categories={categories}
             onSelectEvent={handleSelectEvent}
             onCreateEventOnDate={handleCreateOnDate}
@@ -620,7 +640,7 @@ export function DayliCalendarApp() {
         <SearchDialog
           isOpen={isSearchOpen}
           onClose={() => setIsSearchOpen(false)}
-          events={events}
+          events={allEvents}
           tasks={tasks}
           categories={categories}
           onSelectEvent={handleSelectEvent}

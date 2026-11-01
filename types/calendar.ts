@@ -21,6 +21,8 @@ export interface CalendarEvent {
   isAllDay: boolean;
   categoryId: string;
   location?: string;
+  isHoliday?: boolean;
+  isReadOnly?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,4 +41,3 @@ export interface ToastNotification {
   type: 'success' | 'info' | 'error';
   message: string;
 }
-

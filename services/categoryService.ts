@@ -46,6 +46,16 @@ export const categoryService = {
       }
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        // Ensure built-in categories like 'holidays' exist even for existing user profiles
+        const holidayDefault = DEFAULT_CATEGORIES.find((c) => c.id === 'holidays');
+        const hasHolidays = parsed.some((c) => c.id === 'holidays');
+        if (holidayDefault && !hasHolidays) {
+          const updatedWithHolidays = [...parsed, holidayDefault];
+          localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(updatedWithHolidays));
+          cachedCategories = updatedWithHolidays;
+          return updatedWithHolidays;
+        }
+
         cachedCategories = parsed;
         return parsed;
       }

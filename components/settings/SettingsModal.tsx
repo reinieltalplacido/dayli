@@ -21,10 +21,11 @@ import {
   AlertTriangle,
   LogOut,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
 import { TimezoneSelect } from './TimezoneSelect';
-import { useSettings, settingsService, DateFormat, ClockFormat } from '@/services/settingsService';
+import { useSettings, settingsService, DateFormat, ClockFormat, SUPPORTED_HOLIDAY_COUNTRIES } from '@/services/settingsService';
 import { exportToICS, parseICS, downloadFile } from '@/lib/icsUtils';
 import { CalendarEvent } from '@/types/calendar';
 import { authClient } from '@/lib/auth-client';
@@ -757,6 +758,40 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   >
                     24-hour (e.g. 13:30)
                   </button>
+                </div>
+              </div>
+
+              {/* Public Holidays Country Region */}
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#FF2D55]" />
+                    <span>Public Holidays Region</span>
+                  </label>
+                  <span className="text-[10px] text-[#FF2D55] font-semibold bg-[#FF2D55]/10 px-2 py-0.5 rounded-full border border-[#FF2D55]/20">
+                    Official Calendar
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mb-2.5">
+                  Select which country&apos;s national public holidays are automatically displayed
+                </p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
+                  {SUPPORTED_HOLIDAY_COUNTRIES.map((c) => (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => settingsService.updateSettings({ holidayCountry: c.code })}
+                      className={`flex items-center gap-2 p-2 rounded-lg border text-xs text-left transition-all ${
+                        (settings.holidayCountry || 'PH') === c.code
+                          ? 'border-[#FF2D55] bg-[#FF2D55]/10 text-[#FF2D55] font-medium shadow-xs'
+                          : 'border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7]'
+                      }`}
+                    >
+                      <span className="text-base shrink-0">{c.flag}</span>
+                      <span className="truncate">{c.name}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>

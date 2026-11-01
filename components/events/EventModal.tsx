@@ -8,6 +8,8 @@ import {
   MapPin,
   AlignLeft,
   Trash2,
+  Sparkles,
+  Info,
 } from 'lucide-react';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 import { toInputDateString } from '@/lib/dateUtils';
@@ -47,6 +49,8 @@ export const EventModal: React.FC<EventModalProps> = ({
   const [error, setError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const isReadOnly = Boolean(initialEvent?.isHoliday || initialEvent?.isReadOnly);
+
   // Sync form state when modal opens or initial values change
   useEffect(() => {
     if (initialEvent) {
@@ -83,6 +87,11 @@ export const EventModal: React.FC<EventModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isReadOnly) {
+      onClose();
+      return;
+    }
+
     if (!title.trim()) {
       setError('Please provide an event title');
       return;
@@ -110,7 +119,7 @@ export const EventModal: React.FC<EventModalProps> = ({
   };
 
   const handleDelete = () => {
-    if (initialEvent && onDelete) {
+    if (initialEvent && onDelete && !isReadOnly) {
       onDelete(initialEvent.id);
       onClose();
     }
@@ -127,11 +136,25 @@ export const EventModal: React.FC<EventModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 sm:py-3.5 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
-          <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
-            {initialEvent ? 'Edit Event' : 'New Event'}
-          </h3>
+          <div className="flex items-center gap-2">
+            {isReadOnly ? (
+              <>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#FF2D55]" />
+                <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                  Public Holiday
+                </h3>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#FF2D55]/10 text-[#FF2D55] border border-[#FF2D55]/20">
+                  Official
+                </span>
+              </>
+            ) : (
+              <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                {initialEvent ? 'Edit Event' : 'New Event'}
+              </h3>
+            )}
+          </div>
           <div className="flex items-center gap-1">
-            {initialEvent && onDelete && !showDeleteConfirm && (
+            {!isReadOnly && initialEvent && onDelete && !showDeleteConfirm && (
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
@@ -176,6 +199,19 @@ export const EventModal: React.FC<EventModalProps> = ({
           </div>
         )}
 
+        {/* Read-Only Notice Banner for Public Holidays */}
+        {isReadOnly && (
+          <div className="px-5 py-3 bg-[#FF2D55]/5 border-b border-[#FF2D55]/15 flex items-start gap-2.5">
+            <Sparkles className="w-4 h-4 text-[#FF2D55] shrink-0 mt-0.5" />
+            <div className="text-xs">
+              <p className="font-semibold text-[#FF2D55]">Official National Holiday</p>
+              <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5 leading-relaxed">
+                This is a verified public holiday synchronized with your regional calendar. You can show or hide holidays anytime via the sidebar under &ldquo;MY CALENDARS&rdquo;.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
           {error && (
@@ -189,13 +225,16 @@ export const EventModal: React.FC<EventModalProps> = ({
             <input
               type="text"
               value={title}
+              disabled={isReadOnly}
               onChange={(e) => {
                 setTitle(e.target.value);
                 if (error) setError('');
               }}
               placeholder="Event Title..."
-              autoFocus
-              className="w-full text-base sm:text-lg font-semibold px-3 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
+              autoFocus={!isReadOnly}
+              className={`w-full text-base sm:text-lg font-semibold px-3 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all ${
+                isReadOnly ? 'opacity-90 cursor-default' : ''
+              }`}
             />
           </div>
 
@@ -209,12 +248,13 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <button
                   key={cat.id}
                   type="button"
+                  disabled={isReadOnly}
                   onClick={() => setCategoryId(cat.id)}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs transition-all ${
                     categoryId === cat.id
                       ? 'border-[#0A84FF] bg-[#0A84FF]/10 dark:bg-[#0A84FF]/25 font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] shadow-xs'
                       : 'border-[#E5E5EA] dark:border-[#38383A] text-[#86868B] dark:text-[#98989D] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A]'
-                  }`}
+                  } ${isReadOnly ? 'cursor-default opacity-85' : ''}`}
                 >
                   <span
                     className="w-2.5 h-2.5 rounded-full"
@@ -229,10 +269,11 @@ export const EventModal: React.FC<EventModalProps> = ({
           {/* All Day Toggle */}
           <div className="flex items-center justify-between py-1">
             <span className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">All-Day Event</span>
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className={`relative inline-flex items-center ${isReadOnly ? 'cursor-default' : 'cursor-pointer'}`}>
               <input
                 type="checkbox"
                 checked={isAllDay}
+                disabled={isReadOnly}
                 onChange={(e) => setIsAllDay(e.target.checked)}
                 className="sr-only peer"
               />
@@ -252,13 +293,14 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <input
                   type="date"
                   value={startDate}
+                  disabled={isReadOnly}
                   onChange={(e) => {
                     setStartDate(e.target.value);
                     if (endDate < e.target.value) {
                       setEndDate(e.target.value);
                     }
                   }}
-                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF] disabled:opacity-85"
                 />
               </div>
 
@@ -271,8 +313,9 @@ export const EventModal: React.FC<EventModalProps> = ({
                   <input
                     type="time"
                     value={startTime}
+                    disabled={isReadOnly}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                    className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF] disabled:opacity-85"
                   />
                 </div>
               )}
@@ -288,9 +331,10 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <input
                   type="date"
                   value={endDate}
+                  disabled={isReadOnly}
                   min={startDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF] disabled:opacity-85"
                 />
               </div>
 
@@ -303,8 +347,9 @@ export const EventModal: React.FC<EventModalProps> = ({
                   <input
                     type="time"
                     value={endTime}
+                    disabled={isReadOnly}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                    className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF] disabled:opacity-85"
                   />
                 </div>
               )}
@@ -315,14 +360,15 @@ export const EventModal: React.FC<EventModalProps> = ({
           <div>
             <label className="flex items-center gap-1.5 text-xs font-medium text-[#86868B] dark:text-[#98989D] mb-1">
               <MapPin className="w-3.5 h-3.5" />
-              <span>Location or Video Link</span>
+              <span>Location / Region</span>
             </label>
             <input
               type="text"
               value={location}
+              disabled={isReadOnly}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. Science Hall 102 or Zoom link"
-              className="w-full text-base sm:text-xs px-3 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+              className="w-full text-base sm:text-xs px-3 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] disabled:opacity-85"
             />
           </div>
 
@@ -334,28 +380,41 @@ export const EventModal: React.FC<EventModalProps> = ({
             </label>
             <textarea
               value={description}
+              disabled={isReadOnly}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add details, agenda items, or notes..."
               rows={3}
-              className="w-full text-base sm:text-xs px-3 py-2 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] resize-none"
+              className="w-full text-base sm:text-xs px-3 py-2 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] resize-none disabled:opacity-85"
             />
           </div>
 
           {/* Footer Actions */}
           <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3.5 py-1.5 text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] rounded-md transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-1.5 text-xs font-medium text-white bg-[#0A84FF] hover:bg-[#0071E3] rounded-md shadow-sm transition-colors"
-            >
-              {initialEvent ? 'Save Changes' : 'Create Event'}
-            </button>
+            {isReadOnly ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-1.5 text-xs font-semibold text-white bg-[#0A84FF] hover:bg-[#0071E3] rounded-md shadow-sm transition-colors"
+              >
+                Done
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-3.5 py-1.5 text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 text-xs font-medium text-white bg-[#0A84FF] hover:bg-[#0071E3] rounded-md shadow-sm transition-colors"
+                >
+                  {initialEvent ? 'Save Changes' : 'Create Event'}
+                </button>
+              </>
+            )}
           </div>
         </form>
       </div>
