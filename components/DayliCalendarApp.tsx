@@ -33,6 +33,7 @@ import { SettingsModal, SettingsTab } from '@/components/settings/SettingsModal'
 import { useSettings } from '@/services/settingsService';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { ToastContainer } from '@/components/ui/Toast';
+import { DayliChatbot } from '@/components/ai/DayliChatbot';
 
 export function DayliCalendarApp() {
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
@@ -661,6 +662,17 @@ export function DayliCalendarApp() {
           initialTab={settingsTab}
         />
       )}
+
+      {/* Dayli AI Assistant Floating Chatbot */}
+      <DayliChatbot
+        events={allEvents}
+        tasks={tasks}
+        categories={categories}
+        currentDate={currentDate}
+        userTimezone={settings.timeZone}
+        onSaveEvent={handleSaveEvent}
+        onAddTask={handleAddTask}
+      />
     </div>
   );
 }
