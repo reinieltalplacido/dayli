@@ -91,6 +91,15 @@ export function DayliCalendarApp() {
     return isHolidaysEnabled ? [...events, ...holidays] : events;
   }, [events, holidays, categories]);
 
+  // Only events from categories checked/enabled in the sidebar
+  const enabledCategoryIds = React.useMemo(() => {
+    return new Set(categories.filter((c) => c.enabled).map((c) => c.id));
+  }, [categories]);
+
+  const visibleEvents = React.useMemo(() => {
+    return allEvents.filter((evt) => enabledCategoryIds.has(evt.categoryId));
+  }, [allEvents, enabledCategoryIds]);
+
   const { data: authSession } = authClient.useSession();
 
   useEffect(() => {
@@ -641,7 +650,7 @@ export function DayliCalendarApp() {
         <SearchDialog
           isOpen={isSearchOpen}
           onClose={() => setIsSearchOpen(false)}
-          events={allEvents}
+          events={visibleEvents}
           tasks={tasks}
           categories={categories}
           onSelectEvent={handleSelectEvent}
@@ -665,7 +674,7 @@ export function DayliCalendarApp() {
 
       {/* Dayli AI Assistant Floating Chatbot */}
       <DayliChatbot
-        events={allEvents}
+        events={visibleEvents}
         tasks={tasks}
         categories={categories}
         currentDate={currentDate}

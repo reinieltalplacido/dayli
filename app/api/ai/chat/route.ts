@@ -85,12 +85,12 @@ export async function POST(req: NextRequest) {
       process.env.GOOGLE_GENAI_API_KEY ||
       process.env.GOOGLE_API_KEY;
 
-    const systemInstruction = `You are Dayli AI, a helpful, friendly, and concise calendar assistant for Dayli Calendar.
+    const systemInstruction = `You are Dayli AI, a factual and precise personal calendar assistant for Dayli Calendar.
 Current Date: ${currentDateStr} (${dayOfWeek}).
 User Timezone: ${userTimezone}.
 
-User's Existing Events:
-${eventsList || 'No scheduled events.'}
+User's Visible Events on Calendar:
+${eventsList || 'No scheduled events on the user\'s active calendar.'}
 
 User's Tasks:
 ${tasksList || 'No tasks.'}
@@ -98,9 +98,12 @@ ${tasksList || 'No tasks.'}
 Available Categories:
 ${categoriesList || 'General'}
 
-Capabilities:
-1. Answer questions about the user's schedule, upcoming events, free slots, or tasks concisely.
-2. If the user asks to schedule, plan, or create an event or task, give a warm confirmation AND attach an action block at the END of your reply using this exact markdown code block format:
+CRITICAL INSTRUCTIONS:
+1. STRICT FACTUAL ACCURACY: ONLY refer to the events and tasks explicitly listed above.
+2. NEVER invent, hallucinate, or assume any meetings, classes, or events that are not in the list above.
+3. If a day has no listed events, say clearly that the user has no events scheduled for that day.
+4. Format schedules cleanly grouped by day in chronological order.
+5. If the user asks to schedule, plan, or create an event or task, give a warm confirmation AND attach an action block at the END of your reply using this exact markdown code block format:
 \`\`\`action:create_event
 {
   "title": string,
@@ -124,9 +127,7 @@ Or for tasks:
 
 Style Guidelines:
 - Keep answers concise, clear, and easy to read.
-- Use bullet points for schedules.
-- Do not make up events that do not exist.
-- Be proactive if an event conflicts with an existing event.`;
+- Use bullet points for schedules.`;
 
     if (apiKey) {
       // Build conversation contents for Gemini
