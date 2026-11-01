@@ -344,3 +344,4 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
     </div>
   );
 };
+
