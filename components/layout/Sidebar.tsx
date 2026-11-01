@@ -14,6 +14,7 @@ import {
   Moon,
   HelpCircle,
   ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { CalendarCategory, CalendarEvent, TaskItem } from '@/types/calendar';
@@ -36,6 +37,7 @@ interface SidebarProps {
   isTasksOpen: boolean;
   onToggleTasks: () => void;
   onOpenSettings: (tab?: SettingsTab) => void;
+  onOpenSmartSchedule?: () => void;
   weekStartsOn?: 0 | 1;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
@@ -57,6 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isTasksOpen,
   onToggleTasks,
   onOpenSettings,
+  onOpenSmartSchedule,
   weekStartsOn = 0,
   isOpenMobile,
   onCloseMobile,
@@ -148,6 +151,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Today
             </span>
           </button>
+
+          {/* AI Smart Schedule Button */}
+          {onOpenSmartSchedule && (
+            <button
+              onClick={() => {
+                onOpenSmartSchedule();
+                if (isOpenMobile) onCloseMobile();
+              }}
+              className="w-full flex items-center justify-between p-2.5 rounded-lg bg-gradient-to-r from-[#AF52DE]/10 via-[#0A84FF]/10 to-[#AF52DE]/5 hover:from-[#AF52DE]/15 hover:to-[#0A84FF]/15 border border-[#AF52DE]/30 shadow-xs text-left transition-all group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-md bg-gradient-to-tr from-[#0A84FF] to-[#AF52DE] text-white flex items-center justify-center font-semibold text-xs shadow-xs group-hover:scale-105 transition-transform">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                    Smart Schedule
+                  </p>
+                  <p className="text-[10px] text-[#86868B] dark:text-[#98989D]">
+                    Gemini AI Quick-Add
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-semibold text-[#AF52DE] dark:text-[#BF5AF2] group-hover:translate-x-0.5 transition-transform">
+                Ctrl+J
+              </span>
+            </button>
+          )}
 
           {/* Mini Calendar Widget */}
           <div className="p-2.5 bg-white dark:bg-[#202022] rounded-lg border border-[#E5E5EA] dark:border-[#303034] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">

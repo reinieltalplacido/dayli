@@ -26,6 +26,7 @@ import { HeaderToolbar } from '@/components/layout/HeaderToolbar';
 import { CalendarWorkspace } from '@/components/calendar/CalendarWorkspace';
 import { TasksPanel } from '@/components/tasks/TasksPanel';
 import { EventModal } from '@/components/events/EventModal';
+import { SmartScheduleModal } from '@/components/ai/SmartScheduleModal';
 import { SearchDialog } from '@/components/search/SearchDialog';
 import { SettingsModal, SettingsTab } from '@/components/settings/SettingsModal';
 import { useSettings } from '@/services/settingsService';
@@ -101,6 +102,7 @@ export function DayliCalendarApp() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('general');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isSmartScheduleOpen, setIsSmartScheduleOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
   // Toast feedback helper
@@ -392,11 +394,15 @@ export function DayliCalendarApp() {
       } else if (e.key === 'n' || e.key === 'N') {
         e.preventDefault();
         handleOpenCreateEvent();
+      } else if (e.key === 'j' || e.key === 'J') {
+        e.preventDefault();
+        setIsSmartScheduleOpen(true);
       } else if (e.key === '/') {
         e.preventDefault();
         setIsSearchOpen(true);
       } else if (e.key === 'Escape') {
         setIsEventModalOpen(false);
+        setIsSmartScheduleOpen(false);
         setIsSearchOpen(false);
         setIsSettingsOpen(false);
         setIsAuthModalOpen(false);
@@ -425,6 +431,7 @@ export function DayliCalendarApp() {
         isTasksOpen={isTasksOpen}
         onToggleTasks={() => setIsTasksOpen((prev) => !prev)}
         onOpenSettings={handleOpenSettings}
+        onOpenSmartSchedule={() => setIsSmartScheduleOpen(true)}
         isOpenMobile={isSidebarMobileOpen}
         onCloseMobile={() => setIsSidebarMobileOpen(false)}
         user={user}
@@ -445,6 +452,7 @@ export function DayliCalendarApp() {
           onNext={handleNext}
           onToday={handleToday}
           onOpenCreateEvent={handleOpenCreateEvent}
+          onOpenSmartSchedule={() => setIsSmartScheduleOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
           onToggleTasks={() => setIsTasksOpen((prev) => !prev)}
           isTasksOpen={isTasksOpen}
@@ -578,6 +586,22 @@ export function DayliCalendarApp() {
           defaultDate={modalDefaultDate}
           defaultHour={modalDefaultHour}
           categories={categories}
+        />
+      )}
+
+      {/* Smart AI Scheduling Modal */}
+      {isSmartScheduleOpen && (
+        <SmartScheduleModal
+          isOpen={isSmartScheduleOpen}
+          onClose={() => setIsSmartScheduleOpen(false)}
+          onEventCreated={handleSaveEvent}
+          onOpenDetailedModal={(prefilled) => {
+            setSelectedEvent(prefilled as CalendarEvent);
+            setIsEventModalOpen(true);
+          }}
+          categories={categories}
+          currentDate={currentDate}
+          userTimezone={settings.timeZone}
         />
       )}
 

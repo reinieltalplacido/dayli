@@ -8,6 +8,7 @@ import {
   Search,
   CheckSquare,
   Menu,
+  Sparkles,
 } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 import { CalendarView } from '@/types/calendar';
@@ -20,6 +21,7 @@ interface HeaderToolbarProps {
   onNext: () => void;
   onToday: () => void;
   onOpenCreateEvent: () => void;
+  onOpenSmartSchedule: () => void;
   onOpenSearch: () => void;
   onToggleTasks: () => void;
   isTasksOpen: boolean;
@@ -34,6 +36,7 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
   onNext,
   onToday,
   onOpenCreateEvent,
+  onOpenSmartSchedule,
   onOpenSearch,
   onToggleTasks,
   isTasksOpen,
@@ -151,6 +154,16 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
           <kbd className="hidden lg:inline text-[10px] bg-white dark:bg-[#18181A] border border-[#E5E5EA] dark:border-[#38383A] px-1 py-0.2 rounded text-[#86868B] dark:text-[#98989D]">
             /
           </kbd>
+        </button>
+
+        {/* AI Quick Schedule Button */}
+        <button
+          onClick={onOpenSmartSchedule}
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-[#AF52DE] dark:text-[#BF5AF2] bg-[#AF52DE]/10 hover:bg-[#AF52DE]/15 dark:bg-[#AF52DE]/20 dark:hover:bg-[#AF52DE]/25 border border-[#AF52DE]/30 rounded-md transition-all shadow-2xs"
+          title="Smart AI Schedule (Ctrl+J)"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#AF52DE] dark:text-[#BF5AF2]" />
+          <span className="hidden sm:inline">AI Schedule</span>
         </button>
 
         {/* Tasks Toggle (Desktop) */}
