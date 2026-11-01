@@ -226,6 +226,16 @@ export function DayliCalendarApp() {
     async (eventData: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
         const created = await eventService.create(eventData);
+
+        // If the event's category was disabled/unchecked in the sidebar, auto-enable it so the user sees it immediately
+        if (eventData.categoryId) {
+          const allCats = categoryService.getAll();
+          const targetCat = allCats.find((c) => c.id === eventData.categoryId);
+          if (targetCat && !targetCat.enabled) {
+            categoryService.toggle(targetCat.id);
+          }
+        }
+
         addToast(`Event "${created.title}" created`, 'success');
       } catch {
         addToast('Failed to create event', 'error');
