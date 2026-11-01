@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -79,6 +80,44 @@ const COMMON_TIMEZONES = [
   { value: 'Australia/Sydney', label: 'Australian Eastern Time - Sydney, Melbourne' },
   { value: 'Pacific/Auckland', label: 'New Zealand Time - Auckland' },
   { value: 'Pacific/Honolulu', label: 'Hawaii-Aleutian Time - Honolulu' },
+];
+
+const SETTINGS_TABS: {
+  id: SettingsTab;
+  label: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  {
+    id: 'general',
+    label: 'General',
+    description: 'Interface theme, color appearance, and application defaults',
+    icon: Sliders,
+  },
+  {
+    id: 'regional',
+    label: 'Time & Regional',
+    description: 'Time zone, clock notation (12h/24h), and first day of week',
+    icon: Globe,
+  },
+  {
+    id: 'privacy',
+    label: 'Privacy & Data',
+    description: 'Google account sync, calendar export/import, and data reset',
+    icon: Shield,
+  },
+  {
+    id: 'devices',
+    label: 'Connected Devices',
+    description: 'Active login sessions, hardware tracking, and security',
+    icon: Laptop,
+  },
+  {
+    id: 'shortcuts',
+    label: 'Shortcuts & Help',
+    description: 'Keyboard navigation cheatsheet and shortcuts reference',
+    icon: Command,
+  },
 ];
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -330,112 +369,178 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     { key: 'Esc', description: 'Close any open modal or panel' },
   ];
 
+  const currentTabInfo =
+    SETTINGS_TABS.find((t) => t.id === activeTab) || SETTINGS_TABS[0];
+
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[4px] animate-backdrop"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/45 backdrop-blur-[6px] animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col max-h-[88vh] animate-modal"
+        className="w-full max-w-4xl h-[620px] max-h-[92vh] bg-white dark:bg-[#18181A] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col md:flex-row animate-modal"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
-          <div className="flex items-center gap-2">
-            <DayliLogo size={22} />
-            <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Preferences & Settings</h3>
+        {/* Left Sidebar (Desktop / Tablet) */}
+        <aside className="hidden md:flex flex-col w-64 shrink-0 bg-[#F5F5F7]/90 dark:bg-[#131315] border-r border-[#E5E5EA] dark:border-[#28282A] p-3 justify-between select-none">
+          <div>
+            {/* Header / Brand */}
+            <div className="flex items-center gap-2.5 px-3 py-2 mb-3">
+              <DayliLogo size={22} />
+              <div>
+                <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] leading-tight">
+                  Settings
+                </h3>
+                <p className="text-[10px] text-[#86868B] dark:text-[#98989D] leading-none mt-0.5">
+                  Preferences & Config
+                </p>
+              </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <nav className="space-y-1">
+              {SETTINGS_TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all text-left ${
+                      isActive
+                        ? 'bg-[#0A84FF] text-white shadow-xs font-semibold'
+                        : 'text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-black/5 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <Icon
+                      className={`w-4 h-4 shrink-0 ${
+                        isActive
+                          ? 'text-white'
+                          : 'text-[#86868B] dark:text-[#98989D]'
+                      }`}
+                    />
+                    <span className="truncate">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
 
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-1 px-4 pt-2 border-b border-[#E5E5EA] dark:border-[#2C2C2E] bg-[#F5F5F7]/30 dark:bg-[#202022]/40 overflow-x-auto no-scrollbar">
-          <button
-            onClick={() => setActiveTab('general')}
-            className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
-              activeTab === 'general'
-                ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
-            }`}
-          >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>General</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('regional')}
-            className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
-              activeTab === 'regional'
-                ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
-            }`}
-          >
-            <Clock className="w-3.5 h-3.5" />
-            <span>Time & Regional</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('privacy')}
-            className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
-              activeTab === 'privacy'
-                ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
-            }`}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span>Privacy & Data</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('devices')}
-            className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
-              activeTab === 'devices'
-                ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
-            }`}
-          >
-            <Laptop className="w-3.5 h-3.5" />
-            <span>Connected Devices</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('shortcuts')}
-            className={`flex items-center gap-1.5 pb-2 px-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-all ${
-              activeTab === 'shortcuts'
-                ? 'border-[#0A84FF] text-[#0A84FF]'
-                : 'border-transparent text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
-            }`}
-          >
-            <Command className="w-3.5 h-3.5" />
-            <span>Shortcuts & Help</span>
-          </button>
-        </div>
-
-        {/* Global Toast Feedback inside modal */}
-        {statusMessage && (
-          <div
-            className={`px-4 py-2 text-xs flex items-center gap-2 border-b transition-all ${
-              statusMessage.type === 'success'
-                ? 'bg-[#34C759]/10 text-[#34C759] border-[#34C759]/20'
-                : 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20'
-            }`}
-          >
-            {statusMessage.type === 'success' ? (
-              <Check className="w-3.5 h-3.5 shrink-0" />
+          {/* Sidebar Footer account info */}
+          <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#28282A] px-2">
+            {isUserSignedIn ? (
+              <div className="flex items-center gap-2.5 min-w-0">
+                {authSession?.user?.image ? (
+                  <img
+                    src={authSession.user.image}
+                    alt="Profile"
+                    className="w-7 h-7 rounded-full object-cover shrink-0 border border-[#E5E5EA] dark:border-[#38383A]"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] flex items-center justify-center font-bold text-xs shrink-0">
+                    {(authSession?.user?.name || authSession?.user?.email || 'U')[0].toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] truncate leading-tight">
+                    {authSession?.user?.name || authSession?.user?.email}
+                  </p>
+                  <p className="text-[10px] text-[#34C759] flex items-center gap-1 mt-0.5 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
+                    <span>Cloud Synced</span>
+                  </p>
+                </div>
+              </div>
             ) : (
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <div className="flex items-center justify-between text-[11px] text-[#86868B] dark:text-[#98989D]">
+                <span>Dayli Calendar</span>
+                <span className="text-[10px] bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">
+                  v1.0
+                </span>
+              </div>
             )}
-            <span>{statusMessage.text}</span>
           </div>
-        )}
+        </aside>
 
-        {/* Tab Content */}
-        <div className="p-5 flex-1 overflow-y-auto space-y-5 text-xs">
+        {/* Mobile Header & Horizontal Scrollable Tabs (< md) */}
+        <div className="md:hidden flex flex-col shrink-0 border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7] dark:bg-[#141416]">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2">
+              <DayliLogo size={20} />
+              <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Settings</h3>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 pb-2.5 overflow-x-auto no-scrollbar">
+            {SETTINGS_TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium shrink-0 transition-all ${
+                    isActive
+                      ? 'bg-[#0A84FF] text-white shadow-xs font-semibold'
+                      : 'text-[#86868B] dark:text-[#98989D] bg-white dark:bg-[#202022] border border-[#E5E5EA] dark:border-[#2C2C2E]'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Content Panel */}
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-white dark:bg-[#18181A]">
+          {/* Content Header (Desktop: active tab title + subtitle + Close X) */}
+          <div className="hidden md:flex items-center justify-between px-6 py-4 border-b border-[#E5E5EA] dark:border-[#28282A] shrink-0">
+            <div>
+              <h2 className="text-base font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight">
+                {currentTabInfo.label}
+              </h2>
+              <p className="text-xs text-[#86868B] dark:text-[#98989D] mt-0.5">
+                {currentTabInfo.description}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#242426] transition-colors"
+              title="Close (Esc)"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Global Toast Feedback inside modal */}
+          {statusMessage && (
+            <div
+              className={`px-6 py-2 text-xs flex items-center gap-2 border-b shrink-0 transition-all ${
+                statusMessage.type === 'success'
+                  ? 'bg-[#34C759]/10 text-[#34C759] border-[#34C759]/20'
+                  : 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20'
+              }`}
+            >
+              {statusMessage.type === 'success' ? (
+                <Check className="w-3.5 h-3.5 shrink-0" />
+              ) : (
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              )}
+              <span>{statusMessage.text}</span>
+            </div>
+          )}
+
+          {/* Tab Content Body */}
+          <div className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 text-xs">
           {/* TAB 1: GENERAL */}
           {activeTab === 'general' && (
             <div className="space-y-4">
@@ -1060,14 +1165,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E] bg-[#F5F5F7]/40 dark:bg-[#1A1A1C] flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-md bg-white dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] hover:bg-[#F5F5F7] dark:hover:bg-[#303034] font-medium text-xs text-[#1D1D1F] dark:text-[#F5F5F7] transition-colors"
-          >
-            Done
-          </button>
+          {/* Content Footer */}
+          <div className="px-6 py-3 border-t border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/40 dark:bg-[#141416] flex items-center justify-between shrink-0">
+            <span className="text-[11px] text-[#86868B] dark:text-[#98989D] hidden sm:inline">
+              Preferences save automatically
+            </span>
+            <button
+              onClick={onClose}
+              className="px-4 py-1.5 rounded-lg bg-[#0A84FF] hover:bg-[#0071E3] active:bg-[#0062C4] font-medium text-xs text-white shadow-xs transition-colors ml-auto"
+            >
+              Done
+            </button>
+          </div>
         </div>
       </div>
     </div>
