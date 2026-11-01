@@ -100,8 +100,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#F5F5F7] dark:bg-[#161618] border-r border-[#E5E5EA] dark:border-[#28282A] flex flex-col transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
-          isOpenMobile ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#F5F5F7] dark:bg-[#161618] border-r border-[#E5E5EA] dark:border-[#28282A] flex flex-col transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 pt-safe pb-safe ${
+          isOpenMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}

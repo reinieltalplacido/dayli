@@ -14,6 +14,7 @@ import {
   CalendarView,
   ToastNotification,
 } from '@/types/calendar';
+import { Calendar, CalendarDays, Columns, CheckSquare, Plus } from 'lucide-react';
 import { eventService } from '@/services/eventService';
 import { taskService } from '@/services/taskService';
 import { categoryService } from '@/services/categoryService';
@@ -407,7 +408,7 @@ export function DayliCalendarApp() {
   }, [handleToday, handleOpenCreateEvent]);
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden bg-[#F5F5F7] dark:bg-[#121214] text-[#1D1D1F] dark:text-[#F5F5F7]">
+    <div className="h-[100dvh] w-screen flex overflow-hidden bg-[#F5F5F7] dark:bg-[#121214] text-[#1D1D1F] dark:text-[#F5F5F7] relative">
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
@@ -433,7 +434,7 @@ export function DayliCalendarApp() {
         weekStartsOn={settings.weekStartsOn}
       />
 
-      {/* Main Area: Top Toolbar + Calendar Workspace + Tasks Panel */}
+      {/* Main Area: Top Toolbar + Calendar Workspace + Tasks Panel + Mobile Nav */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Top Header Toolbar */}
         <HeaderToolbar
@@ -475,6 +476,87 @@ export function DayliCalendarApp() {
             onDeleteTask={handleDeleteTask}
           />
         </div>
+
+        {/* Mobile Floating Action Button (FAB) for Instant Event Creation */}
+        <button
+          type="button"
+          onClick={handleOpenCreateEvent}
+          className="md:hidden fixed right-4 bottom-18 z-40 w-13 h-13 rounded-full bg-[#0A84FF] hover:bg-[#0071E3] active:scale-90 text-white shadow-[0_4px_16px_rgba(10,132,255,0.45)] flex items-center justify-center transition-transform duration-150"
+          aria-label="New Event"
+        >
+          <Plus className="w-6 h-6 stroke-[2.4]" />
+        </button>
+
+        {/* Mobile Bottom Navigation Bar */}
+        <nav className="md:hidden shrink-0 bg-white/95 dark:bg-[#161618]/95 backdrop-blur-md border-t border-[#E5E5EA] dark:border-[#28282A] px-2 py-1 flex items-center justify-around z-30 pb-[max(0.4rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={() => {
+              setView('day');
+              setIsTasksOpen(false);
+            }}
+            className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] transition-colors ${
+              view === 'day' && !isTasksOpen
+                ? 'text-[#0A84FF]'
+                : 'text-[#86868B] dark:text-[#98989D]'
+            }`}
+          >
+            <Calendar className="w-5 h-5" />
+            <span className="text-[10px] font-medium mt-0.5">Day</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setView('week');
+              setIsTasksOpen(false);
+            }}
+            className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] transition-colors ${
+              view === 'week' && !isTasksOpen
+                ? 'text-[#0A84FF]'
+                : 'text-[#86868B] dark:text-[#98989D]'
+            }`}
+          >
+            <Columns className="w-5 h-5" />
+            <span className="text-[10px] font-medium mt-0.5">Week</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setView('month');
+              setIsTasksOpen(false);
+            }}
+            className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] transition-colors ${
+              view === 'month' && !isTasksOpen
+                ? 'text-[#0A84FF]'
+                : 'text-[#86868B] dark:text-[#98989D]'
+            }`}
+          >
+            <CalendarDays className="w-5 h-5" />
+            <span className="text-[10px] font-medium mt-0.5">Month</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsTasksOpen((prev) => !prev)}
+            className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] relative transition-colors ${
+              isTasksOpen
+                ? 'text-[#0A84FF]'
+                : 'text-[#86868B] dark:text-[#98989D]'
+            }`}
+          >
+            <div className="relative">
+              <CheckSquare className="w-5 h-5" />
+              {tasks.filter((t) => !t.completed).length > 0 && (
+                <span className="absolute -top-1 -right-2.5 bg-[#0A84FF] text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center">
+                  {tasks.filter((t) => !t.completed).length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-medium mt-0.5">Tasks</span>
+          </button>
+        </nav>
       </div>
 
       {/* Auth Modal (Sign In / Sign Up) */}

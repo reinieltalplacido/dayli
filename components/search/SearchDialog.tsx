@@ -68,7 +68,7 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search events, notes, locations, tasks..."
             autoFocus
-            className="flex-1 text-sm bg-transparent focus:outline-none placeholder:text-[#86868B] dark:placeholder:text-[#98989D] text-[#1D1D1F] dark:text-[#F5F5F7]"
+            className="flex-1 text-base sm:text-sm bg-transparent focus:outline-none placeholder:text-[#86868B] dark:placeholder:text-[#98989D] text-[#1D1D1F] dark:text-[#F5F5F7]"
           />
           {query && (
             <button

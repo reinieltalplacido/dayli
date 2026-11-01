@@ -85,8 +85,10 @@ export const WeekView: React.FC<WeekViewProps> = ({
 
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-[#121214] overflow-hidden">
-      {/* Header Row: Days of Week */}
-      <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/40 dark:bg-[#18181A]/40 shrink-0">
+      <div className="flex-1 flex flex-col overflow-x-auto min-w-0">
+        <div className="min-w-[580px] sm:min-w-0 flex-1 flex flex-col">
+          {/* Header Row: Days of Week */}
+          <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/40 dark:bg-[#18181A]/40 shrink-0">
         <div className="border-r border-[#E5E5EA] dark:border-[#28282A] py-2 text-center text-[10px] text-[#86868B] dark:text-[#98989D] font-medium">
           GMT
         </div>
@@ -239,7 +241,9 @@ export const WeekView: React.FC<WeekViewProps> = ({
             </div>
           );
         })}
+        </div>
       </div>
     </div>
-  );
+  </div>
+);
 };

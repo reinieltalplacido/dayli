@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -26,6 +26,18 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F5F5F7" },
+    { media: "(prefers-color-scheme: dark)", color: "#121214" },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,7 +56,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="h-full bg-[#F5F5F7] dark:bg-[#121214] text-[#1D1D1F] dark:text-[#F5F5F7] overflow-hidden select-none transition-colors duration-150">
+      <body className="h-[100dvh] bg-[#F5F5F7] dark:bg-[#121214] text-[#1D1D1F] dark:text-[#F5F5F7] overflow-hidden select-none transition-colors duration-150 overscroll-none">
         {children}
       </body>
     </html>

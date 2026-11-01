@@ -117,13 +117,16 @@ export const EventModal: React.FC<EventModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[4px] animate-backdrop">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-[4px] animate-backdrop">
       <div
-        className="w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col max-h-[90vh] animate-modal"
+        className="w-full sm:max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-2xl sm:rounded-2xl shadow-2xl border-t sm:border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col max-h-[88vh] sm:max-h-[90vh] pb-safe animate-modal"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Mobile handle indicator */}
+        <div className="w-10 h-1 bg-[#86868B]/30 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
+        <div className="flex items-center justify-between px-5 py-3 sm:py-3.5 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
           <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
             {initialEvent ? 'Edit Event' : 'New Event'}
           </h3>
@@ -255,7 +258,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                       setEndDate(e.target.value);
                     }
                   }}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
                 />
               </div>
 
@@ -269,7 +272,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                    className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
                   />
                 </div>
               )}
@@ -287,7 +290,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   value={endDate}
                   min={startDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
                 />
               </div>
 
@@ -301,7 +304,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                    className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
                   />
                 </div>
               )}
@@ -319,7 +322,7 @@ export const EventModal: React.FC<EventModalProps> = ({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. Science Hall 102 or Zoom link"
-              className="w-full text-xs px-3 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+              className="w-full text-base sm:text-xs px-3 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
             />
           </div>
 
@@ -334,7 +337,7 @@ export const EventModal: React.FC<EventModalProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add details, agenda items, or notes..."
               rows={3}
-              className="w-full text-xs px-3 py-2 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] resize-none"
+              className="w-full text-base sm:text-xs px-3 py-2 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] resize-none"
             />
           </div>
 

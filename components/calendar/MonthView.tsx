@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import {
   format,
   isToday,
+  isSameDay,
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
@@ -12,7 +13,7 @@ import {
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 import { toInputDateString } from '@/lib/dateUtils';
 import { EventCard } from './EventCard';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Clock, MapPin, Calendar as CalendarIcon } from 'lucide-react';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -47,6 +48,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
   // Month ranges for continuous window
   const [range, setRange] = useState({ pastMonths: 3, futureMonths: 8 });
   const [overflowDate, setOverflowDate] = useState<Date | null>(null);
+  const [mobileSelectedDate, setMobileSelectedDate] = useState<Date | null>(null);
 
   // Base anchor date for range calculation
   const anchorDate = useMemo(() => new Date(2026, 9, 1), []);
@@ -259,7 +261,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                   return (
                     <div
                       key={`blank-${section.monthKey}-${dIdx}`}
-                      className="min-h-[115px] sm:min-h-[135px] p-2 bg-[#F5F5F7]/30 dark:bg-[#161618]/30 border-b border-[#E5E5EA] dark:border-[#28282A]"
+                      className="min-h-[58px] sm:min-h-[135px] p-1 sm:p-2 bg-[#F5F5F7]/30 dark:bg-[#161618]/30 border-b border-[#E5E5EA] dark:border-[#28282A]"
                     />
                   );
                 }
@@ -267,6 +269,8 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 const dateStr = toInputDateString(day);
                 const dayEvents = eventsByDate.get(dateStr) || [];
                 const isCurrentDay = isToday(day);
+                const isSelectedMobile =
+                  mobileSelectedDate !== null && isSameDay(mobileSelectedDate, day);
                 const maxVisible = 3;
                 const visibleEvents = dayEvents.slice(0, maxVisible);
                 const overflowCount = dayEvents.length - maxVisible;
@@ -276,37 +280,68 @@ export const MonthView: React.FC<MonthViewProps> = ({
                     key={dateStr}
                     id={`day-cell-${dateStr}`}
                     data-date={dateStr}
-                    onClick={() => onCreateEventOnDate(day)}
-                    className="group min-h-[115px] sm:min-h-[135px] p-2 flex flex-col border-b border-[#E5E5EA] dark:border-[#28282A] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 dark:hover:bg-[#1C1C1E]/50 bg-white dark:bg-[#121214]"
+                    onClick={() => {
+                      if (typeof window !== 'undefined' && window.innerWidth < 640) {
+                        setMobileSelectedDate((prev) =>
+                          prev && isSameDay(prev, day) ? null : day
+                        );
+                      } else {
+                        onCreateEventOnDate(day);
+                      }
+                    }}
+                    className={`group min-h-[58px] sm:min-h-[135px] p-1 sm:p-2 flex flex-col border-b border-[#E5E5EA] dark:border-[#28282A] relative transition-colors cursor-pointer hover:bg-[#F5F5F7]/50 dark:hover:bg-[#1C1C1E]/50 bg-white dark:bg-[#121214] ${
+                      isSelectedMobile
+                        ? 'bg-[#0A84FF]/[0.06] dark:bg-[#0A84FF]/[0.1]'
+                        : ''
+                    }`}
                   >
                     {/* Day Header */}
-                    <div className="flex items-center justify-between mb-1.5 shrink-0">
+                    <div className="flex items-center justify-between sm:mb-1.5 shrink-0">
                       <span
                         className={`w-6 h-6 flex items-center justify-center text-xs font-semibold rounded-full transition-colors ${
                           isCurrentDay
                             ? 'bg-[#0A84FF] text-white shadow-xs'
+                            : isSelectedMobile
+                            ? 'bg-[#0A84FF]/20 text-[#0A84FF] ring-2 ring-[#0A84FF]'
                             : 'text-[#1D1D1F] dark:text-[#F5F5F7]'
                         }`}
                       >
                         {format(day, 'd')}
                       </span>
 
-                      {/* Quick Add Event Hover Button */}
+                      {/* Quick Add Event Hover Button (Desktop only) */}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           onCreateEventOnDate(day);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] hover:bg-white dark:hover:bg-[#28282A] transition-all shadow-2xs"
+                        className="hidden sm:inline-flex opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] hover:bg-white dark:hover:bg-[#28282A] transition-all shadow-2xs"
                         title="Add event"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    {/* Event Cards List */}
-                    <div className="flex-1 space-y-1 overflow-hidden">
+                    {/* Mobile Category Dots */}
+                    <div className="flex sm:hidden items-center justify-center gap-1 mt-1 flex-wrap">
+                      {dayEvents.slice(0, 3).map((evt) => (
+                        <span
+                          key={evt.id}
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={{
+                            backgroundColor:
+                              categoryMap.get(evt.categoryId)?.color || '#0A84FF',
+                          }}
+                        />
+                      ))}
+                      {dayEvents.length > 3 && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#86868B] dark:bg-[#98989D] shrink-0" />
+                      )}
+                    </div>
+
+                    {/* Desktop Event Cards List */}
+                    <div className="hidden sm:block flex-1 space-y-1 overflow-hidden">
                       {visibleEvents.map((evt) => (
                         <EventCard
                           key={evt.id}
@@ -337,6 +372,115 @@ export const MonthView: React.FC<MonthViewProps> = ({
           </div>
         ))}
       </div>
+
+      {/* Mobile Agenda Sheet (When a day is selected on mobile) */}
+      {mobileSelectedDate && (
+        <div className="sm:hidden fixed inset-x-0 bottom-14 z-30 bg-white dark:bg-[#1C1C1E] border-t border-[#E5E5EA] dark:border-[#2C2C2E] shadow-[0_-8px_30px_rgba(0,0,0,0.15)] rounded-t-2xl max-h-[46vh] flex flex-col animate-modal">
+          {/* Handle bar & Header */}
+          <div className="px-4 py-2.5 border-b border-[#E5E5EA] dark:border-[#28282A] flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-[#0A84FF] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                {format(mobileSelectedDate, 'd')}
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                  {format(mobileSelectedDate, 'EEEE, MMM d')}
+                </h4>
+                <p className="text-[10px] text-[#86868B] dark:text-[#98989D]">
+                  {(eventsByDate.get(toInputDateString(mobileSelectedDate)) || []).length}{' '}
+                  events scheduled
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => onCreateEventOnDate(mobileSelectedDate)}
+                className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-white bg-[#0A84FF] active:bg-[#0071E3] rounded-md shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileSelectedDate(null)}
+                className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Events list */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+            {(() => {
+              const selectedDayEvents =
+                eventsByDate.get(toInputDateString(mobileSelectedDate)) || [];
+              if (selectedDayEvents.length === 0) {
+                return (
+                  <div className="py-6 text-center text-xs text-[#86868B] dark:text-[#98989D]">
+                    <CalendarIcon className="w-8 h-8 mx-auto mb-2 opacity-30 text-[#86868B]" />
+                    <p>No events scheduled for this day</p>
+                    <button
+                      type="button"
+                      onClick={() => onCreateEventOnDate(mobileSelectedDate)}
+                      className="mt-2 text-[#0A84FF] font-medium text-xs hover:underline"
+                    >
+                      + Tap here to add an event
+                    </button>
+                  </div>
+                );
+              }
+
+              return selectedDayEvents.map((evt) => {
+                const cat = categoryMap.get(evt.categoryId);
+                return (
+                  <div
+                    key={evt.id}
+                    onClick={() => onSelectEvent(evt)}
+                    className="p-2.5 rounded-lg border border-[#E5E5EA] dark:border-[#2C2C2E] bg-[#F5F5F7]/50 dark:bg-[#202022] active:bg-[#E5E5EA]/70 dark:active:bg-[#28282A] cursor-pointer flex items-center justify-between transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: cat?.color || '#0A84FF' }}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate">
+                          {evt.title}
+                        </p>
+                        <div className="flex items-center gap-2 text-[10px] text-[#86868B] dark:text-[#98989D] mt-0.5">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {evt.isAllDay
+                              ? 'All Day'
+                              : `${evt.startTime} – ${evt.endTime}`}
+                          </span>
+                          {evt.location && (
+                            <span className="flex items-center gap-1 truncate">
+                              <MapPin className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{evt.location}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      className="text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ml-2"
+                      style={{
+                        backgroundColor: cat?.lightBg || '#0A84FF15',
+                        color: cat?.color || '#0A84FF',
+                      }}
+                    >
+                      {cat?.name || 'General'}
+                    </span>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        </div>
+      )}
 
       {/* Overflow Date Popover Modal */}
       {overflowDate && (

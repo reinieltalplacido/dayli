@@ -66,9 +66,9 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
   categories.forEach((c) => categoryMap.set(c.id, c));
 
   return (
-    <aside className="fixed sm:relative top-0 bottom-0 right-0 z-30 w-full sm:w-80 bg-white dark:bg-[#161618] border-l border-[#E5E5EA] dark:border-[#28282A] flex flex-col shadow-lg sm:shadow-none animate-in slide-in-from-right duration-200">
+    <aside className="fixed sm:relative top-0 bottom-0 right-0 z-40 w-full sm:w-80 bg-white dark:bg-[#161618] border-l border-[#E5E5EA] dark:border-[#28282A] flex flex-col shadow-lg sm:shadow-none animate-in slide-in-from-right duration-200 pb-safe">
       {/* Panel Header */}
-      <div className="h-13 px-4 flex items-center justify-between border-b border-[#E5E5EA] dark:border-[#28282A]">
+      <div className="h-13 px-4 flex items-center justify-between border-b border-[#E5E5EA] dark:border-[#28282A] pt-safe sm:pt-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
             Tasks & Reminders
@@ -111,7 +111,7 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             placeholder="Add new task..."
-            className="w-full text-xs pl-3 pr-8 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/60 dark:placeholder-[#98989D]/60 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] shadow-xs"
+            className="w-full text-base sm:text-xs pl-3 pr-8 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/60 dark:placeholder-[#98989D]/60 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] shadow-xs"
           />
           <button
             type="submit"

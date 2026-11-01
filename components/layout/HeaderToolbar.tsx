@@ -99,15 +99,15 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
         </div>
 
         {/* Title */}
-        <h2 className="text-sm sm:text-base font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight truncate ml-1">
+        <h2 className="text-sm sm:text-base font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight truncate ml-0.5 sm:ml-1">
           {formattedTitle}
         </h2>
       </div>
 
       {/* Right side: View selector + Search + Tasks + New Event */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Segmented Control for Views */}
-        <div className="flex items-center bg-[#F5F5F7] dark:bg-[#202022] p-0.5 rounded-lg border border-[#E5E5EA] dark:border-[#38383A]">
+      <div className="flex items-center gap-1.5 sm:gap-3">
+        {/* Segmented Control for Views - Desktop/Tablet only, bottom bar handles mobile */}
+        <div className="hidden md:flex items-center bg-[#F5F5F7] dark:bg-[#202022] p-0.5 rounded-lg border border-[#E5E5EA] dark:border-[#38383A]">
           <button
             onClick={() => onChangeView('day')}
             className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
@@ -143,20 +143,20 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
         {/* Quick Search */}
         <button
           onClick={onOpenSearch}
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] bg-[#F5F5F7] dark:bg-[#202022] hover:bg-[#E5E5EA]/70 dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] rounded-md transition-colors"
+          className="flex items-center gap-1.5 p-2 sm:px-2.5 sm:py-1 text-xs text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] bg-[#F5F5F7] dark:bg-[#202022] hover:bg-[#E5E5EA]/70 dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] rounded-md transition-colors"
           title="Search events (/)"
         >
-          <Search className="w-3.5 h-3.5" />
+          <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           <span className="hidden md:inline">Search</span>
           <kbd className="hidden lg:inline text-[10px] bg-white dark:bg-[#18181A] border border-[#E5E5EA] dark:border-[#38383A] px-1 py-0.2 rounded text-[#86868B] dark:text-[#98989D]">
             /
           </kbd>
         </button>
 
-        {/* Tasks Toggle */}
+        {/* Tasks Toggle (Desktop) */}
         <button
           onClick={onToggleTasks}
-          className={`p-1.5 rounded-md border text-xs transition-colors hidden sm:flex items-center gap-1 ${
+          className={`p-1.5 rounded-md border text-xs transition-colors hidden md:flex items-center gap-1 ${
             isTasksOpen
               ? 'bg-[#0A84FF]/10 dark:bg-[#0A84FF]/20 border-[#0A84FF]/30 dark:border-[#0A84FF]/40 text-[#0A84FF]'
               : 'border-[#E5E5EA] dark:border-[#38383A] text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#202022]'
@@ -166,13 +166,13 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
           <CheckSquare className="w-4 h-4" />
         </button>
 
-        {/* Create Event Button */}
+        {/* Create Event Button (Desktop/Tablet) */}
         <button
           onClick={onOpenCreateEvent}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#0A84FF] hover:bg-[#0071E3] active:bg-[#0062C4] rounded-md shadow-[0_1px_2px_rgba(10,132,255,0.25)] transition-all"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#0A84FF] hover:bg-[#0071E3] active:bg-[#0062C4] rounded-md shadow-[0_1px_2px_rgba(10,132,255,0.25)] transition-all"
         >
           <Plus className="w-4 h-4 stroke-[2.2]" />
-          <span className="hidden sm:inline">New Event</span>
+          <span>New Event</span>
         </button>
       </div>
     </header>
