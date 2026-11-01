@@ -21,7 +21,6 @@ import {
   AlertTriangle,
   LogOut,
   RefreshCw,
-  Sparkles,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
 import { TimezoneSelect } from './TimezoneSelect';
@@ -765,7 +764,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#FF2D55]" />
+                    <Globe className="w-3.5 h-3.5 text-[#FF2D55]" />
                     <span>Public Holidays Region</span>
                   </label>
                   <span className="text-[10px] text-[#FF2D55] font-semibold bg-[#FF2D55]/10 px-2 py-0.5 rounded-full border border-[#FF2D55]/20">

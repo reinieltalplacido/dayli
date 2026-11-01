@@ -55,7 +55,6 @@ const PREBAKED_HOLIDAYS_US_2026: RawHoliday[] = [
 
 function holidayToEvent(holiday: RawHoliday): CalendarEvent {
   const isDiffName = holiday.localName && holiday.localName !== holiday.name;
-  const displayTitle = isDiffName ? `${holiday.name} (${holiday.localName})` : holiday.name;
 
   return {
     id: `holiday-${holiday.countryCode}-${holiday.date}-${holiday.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
@@ -70,14 +69,17 @@ function holidayToEvent(holiday: RawHoliday): CalendarEvent {
     description: `Official Public Holiday in ${holiday.countryCode}${isDiffName ? ` • ${holiday.localName}` : ''}`,
     isHoliday: true,
     isReadOnly: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   };
 }
 
-let cachedEvents: CalendarEvent[] = [];
+// Stable reference cached for server snapshot and initial client snapshot to avoid re-render loops in useSyncExternalStore
+const STABLE_SERVER_SNAPSHOT: CalendarEvent[] = PREBAKED_HOLIDAYS_PH_2026.map(holidayToEvent);
+
+let cachedEvents: CalendarEvent[] = STABLE_SERVER_SNAPSHOT;
 let loadedCountry = '';
-let loadedYears = new Set<number>();
+const loadedYears = new Set<number>();
 const listeners = new Set<() => void>();
 
 function notify() {
@@ -93,16 +95,11 @@ export const holidayService = {
   },
 
   getSnapshot(): CalendarEvent[] {
-    if (cachedEvents.length === 0 && typeof window !== 'undefined') {
-      // Initialize with prebaked 2026 data
-      const prebaked = PREBAKED_HOLIDAYS_PH_2026.map(holidayToEvent);
-      cachedEvents = prebaked;
-    }
     return cachedEvents;
   },
 
   getServerSnapshot(): CalendarEvent[] {
-    return PREBAKED_HOLIDAYS_PH_2026.map(holidayToEvent);
+    return STABLE_SERVER_SNAPSHOT;
   },
 
   /**

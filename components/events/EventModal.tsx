@@ -8,7 +8,6 @@ import {
   MapPin,
   AlignLeft,
   Trash2,
-  Sparkles,
   Info,
 } from 'lucide-react';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
@@ -202,7 +201,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         {/* Read-Only Notice Banner for Public Holidays */}
         {isReadOnly && (
           <div className="px-5 py-3 bg-[#FF2D55]/5 border-b border-[#FF2D55]/15 flex items-start gap-2.5">
-            <Sparkles className="w-4 h-4 text-[#FF2D55] shrink-0 mt-0.5" />
+            <Info className="w-4 h-4 text-[#FF2D55] shrink-0 mt-0.5" />
             <div className="text-xs">
               <p className="font-semibold text-[#FF2D55]">Official National Holiday</p>
               <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5 leading-relaxed">
