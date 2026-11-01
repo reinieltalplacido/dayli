@@ -2,18 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Sparkles,
   X,
   Calendar,
   Clock,
   MapPin,
   ArrowRight,
   Check,
-  Tag,
   Loader2,
-  ExternalLink,
 } from 'lucide-react';
-import { format } from 'date-fns';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 
 interface SmartScheduleModalProps {
@@ -38,13 +34,6 @@ interface ParsedEventResult {
   categoryId?: string;
 }
 
-const EXAMPLE_PROMPTS = [
-  'Dinner with Alex tomorrow at 7pm at Italian Bistro',
-  'Math Final Exam next Monday 9 to 11am in Room 402',
-  'Team sprint review this Friday at 3pm on Google Meet',
-  'Gym session tomorrow 6am',
-];
-
 export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
   isOpen,
   onClose,
@@ -57,7 +46,6 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [parsedResult, setParsedResult] = useState<ParsedEventResult | null>(null);
-  const [engineSource, setEngineSource] = useState<'gemini' | 'local' | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,15 +54,14 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
       setPrompt('');
       setParsedResult(null);
       setErrorMessage('');
-      setEngineSource(null);
       setTimeout(() => inputRef.current?.focus(), 80);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleParse = async (textToParse?: string) => {
-    const inputPrompt = (textToParse || prompt).trim();
+  const handleParse = async () => {
+    const inputPrompt = prompt.trim();
     if (!inputPrompt) return;
 
     setIsLoading(true);
@@ -96,11 +83,10 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
       const data = await res.json();
       if (res.ok && data.success && data.event) {
         setParsedResult(data.event);
-        setEngineSource(data.source);
       } else {
         setErrorMessage(data.error || 'Could not parse event. Please try again.');
       }
-    } catch (err: unknown) {
+    } catch {
       setErrorMessage('Network error while analyzing prompt.');
     } finally {
       setIsLoading(false);
@@ -154,22 +140,9 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/40 dark:bg-[#141416]/50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#0A84FF] to-[#AF52DE] text-white flex items-center justify-center shadow-xs">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
-                  Smart Schedule
-                </h3>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] border border-[#0A84FF]/20 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0A84FF] animate-pulse" />
-                  Gemini AI
-                </span>
-              </div>
-            </div>
-          </div>
+          <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+            Smart Schedule
+          </h3>
           <button
             onClick={onClose}
             className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors"
@@ -185,7 +158,6 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
               e.preventDefault();
               handleParse();
             }}
-            className="space-y-3"
           >
             <div className="relative flex items-center">
               <input
@@ -209,37 +181,13 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
                 )}
               </button>
             </div>
-
-            {/* Quick Example Chips */}
-            {!parsedResult && !isLoading && (
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-medium text-[#86868B] dark:text-[#98989D]">
-                  Quick examples:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {EXAMPLE_PROMPTS.map((ex, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => {
-                        setPrompt(ex);
-                        handleParse(ex);
-                      }}
-                      className="text-[11px] px-2.5 py-1 rounded-lg bg-[#F5F5F7] dark:bg-[#222226] hover:bg-[#E5E5EA] dark:hover:bg-[#2C2C2E] border border-[#E5E5EA] dark:border-[#303034] text-[#1D1D1F] dark:text-[#F5F5F7] transition-all text-left"
-                    >
-                      {ex}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </form>
 
           {/* Loading state */}
           {isLoading && (
-            <div className="py-8 flex flex-col items-center justify-center gap-2.5 text-xs text-[#86868B] dark:text-[#98989D] animate-pulse">
-              <Sparkles className="w-6 h-6 text-[#0A84FF] animate-spin" />
-              <span>Analyzing phrasing with Gemini 2.0 Flash...</span>
+            <div className="py-6 flex flex-col items-center justify-center gap-2 text-xs text-[#86868B] dark:text-[#98989D]">
+              <Loader2 className="w-5 h-5 text-[#0A84FF] animate-spin" />
+              <span>Analyzing schedule...</span>
             </div>
           )}
 
@@ -321,27 +269,7 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
             </div>
           )}
         </div>
-
-        {/* Footer info banner */}
-        <div className="px-5 py-2.5 bg-[#F5F5F7] dark:bg-[#141416] border-t border-[#E5E5EA] dark:border-[#28282A] flex items-center justify-between text-[11px] text-[#86868B] dark:text-[#98989D]">
-          <span className="flex items-center gap-1">
-            <span>Powered by</span>
-            <strong className="text-[#1D1D1F] dark:text-[#F5F5F7]">
-              {engineSource === 'gemini' ? 'Gemini 2.0 Flash' : 'Google Gemini API'}
-            </strong>
-          </span>
-          <a
-            href="https://aistudio.google.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#0A84FF] hover:underline flex items-center gap-1 font-medium"
-          >
-            <span>Get Free API Key</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
       </div>
     </div>
   );
 };
-
