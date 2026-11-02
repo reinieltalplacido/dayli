@@ -15,6 +15,7 @@ import {
   HelpCircle,
   ChevronRight,
   Zap,
+  BookOpen,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { CalendarCategory, CalendarEvent, TaskItem } from '@/types/calendar';
@@ -38,6 +39,7 @@ interface SidebarProps {
   onToggleTasks: () => void;
   onOpenSettings: (tab?: SettingsTab) => void;
   onOpenSmartSchedule?: () => void;
+  onOpenTutorial?: () => void;
   weekStartsOn?: 0 | 1;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
@@ -60,6 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleTasks,
   onOpenSettings,
   onOpenSmartSchedule,
+  onOpenTutorial,
   weekStartsOn = 0,
   isOpenMobile,
   onCloseMobile,
@@ -219,7 +222,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* My Calendars Section */}
-          <div className="pt-1">
+          <div id="tour-calendars" className="pt-1">
             <div className="flex items-center justify-between px-1 mb-1.5">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] dark:text-[#98989D]">
                 My Calendars
@@ -492,6 +495,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] group-hover:translate-x-0.5 transition-transform" />
                     </button>
+
+                    {/* How to Use Dayli Interactive Guide */}
+                    {onOpenTutorial && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          if (isOpenMobile) onCloseMobile();
+                          onOpenTutorial();
+                        }}
+                        className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors group text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          <BookOpen className="w-3.5 h-3.5 text-[#0A84FF]" />
+                          <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">
+                            How to Use Dayli
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-1.5 py-0.5 rounded">
+                          Tutorial
+                        </span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Sign Out Action */}
@@ -535,8 +561,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
 
+          {/* How to Use Dayli Interactive Guide */}
+          {onOpenTutorial && (
+            <button
+              type="button"
+              onClick={() => {
+                if (isOpenMobile) onCloseMobile();
+                onOpenTutorial();
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-white dark:hover:bg-[#202022] transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-3.5 h-3.5 text-[#0A84FF]" />
+                <span>How to Use Dayli</span>
+              </div>
+              <span className="text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-1.5 py-0.5 rounded">
+                Guide
+              </span>
+            </button>
+          )}
+
           {/* Quick Settings Shortcut (Available in all states) */}
           <button
+            id="tour-settings"
             onClick={() => onOpenSettings('general')}
             className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-white dark:hover:bg-[#202022] transition-colors"
           >

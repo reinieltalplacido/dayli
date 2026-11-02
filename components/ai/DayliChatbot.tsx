@@ -274,6 +274,7 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
       {/* Floating Trigger Button */}
       {!isOpen && (
         <button
+          id="tour-chatbot"
           type="button"
           onClick={() => setIsOpen(true)}
           className="fixed right-4 sm:right-6 bottom-20 md:bottom-6 z-40 h-11 px-3.5 rounded-full bg-[#0A84FF] hover:bg-[#0071E3] active:scale-95 text-white shadow-[0_4px_16px_rgba(10,132,255,0.4)] flex items-center gap-2 transition-all duration-150 group"

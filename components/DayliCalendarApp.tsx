@@ -34,6 +34,8 @@ import { useSettings } from '@/services/settingsService';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { ToastContainer } from '@/components/ui/Toast';
 import { DayliChatbot } from '@/components/ai/DayliChatbot';
+import { TutorialModal } from '@/components/tutorial/TutorialModal';
+import { startDayliTour } from '@/services/tourService';
 
 export function DayliCalendarApp() {
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
@@ -133,6 +135,7 @@ export function DayliCalendarApp() {
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('general');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSmartScheduleOpen, setIsSmartScheduleOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
   // Toast feedback helper
@@ -408,6 +411,19 @@ export function DayliCalendarApp() {
     [addToast]
   );
 
+  // Interactive Guided Tour handler
+  const handleStartTour = useCallback(() => {
+    setIsTutorialOpen(false);
+    setIsSettingsOpen(false);
+    setIsSidebarMobileOpen(false);
+    setIsSearchOpen(false);
+    setIsSmartScheduleOpen(false);
+    setIsEventModalOpen(false);
+    setTimeout(() => {
+      startDayliTour();
+    }, 120);
+  }, []);
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -440,9 +456,13 @@ export function DayliCalendarApp() {
       } else if (e.key === '/') {
         e.preventDefault();
         setIsSearchOpen(true);
+      } else if (e.key === '?') {
+        e.preventDefault();
+        handleStartTour();
       } else if (e.key === 'Escape') {
         setIsEventModalOpen(false);
         setIsSmartScheduleOpen(false);
+        setIsTutorialOpen(false);
         setIsSearchOpen(false);
         setIsSettingsOpen(false);
         setIsAuthModalOpen(false);
@@ -451,7 +471,7 @@ export function DayliCalendarApp() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleToday, handleOpenCreateEvent]);
+  }, [handleToday, handleOpenCreateEvent, handleStartTour]);
 
   return (
     <div className="h-[100dvh] w-screen flex overflow-hidden bg-[#F5F5F7] dark:bg-[#121214] text-[#1D1D1F] dark:text-[#F5F5F7] relative">
@@ -472,6 +492,7 @@ export function DayliCalendarApp() {
         onToggleTasks={() => setIsTasksOpen((prev) => !prev)}
         onOpenSettings={handleOpenSettings}
         onOpenSmartSchedule={() => setIsSmartScheduleOpen(true)}
+        onOpenTutorial={handleStartTour}
         isOpenMobile={isSidebarMobileOpen}
         onCloseMobile={() => setIsSidebarMobileOpen(false)}
         user={user}
@@ -494,6 +515,7 @@ export function DayliCalendarApp() {
           onOpenCreateEvent={handleOpenCreateEvent}
           onOpenSmartSchedule={() => setIsSmartScheduleOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenTutorial={handleStartTour}
           onToggleTasks={() => setIsTasksOpen((prev) => !prev)}
           isTasksOpen={isTasksOpen}
           onToggleMobileMenu={() => setIsSidebarMobileOpen(true)}
@@ -527,6 +549,7 @@ export function DayliCalendarApp() {
 
         {/* Mobile Floating Action Button (FAB) for Instant Event Creation */}
         <button
+          id="tour-fab-new"
           type="button"
           onClick={handleOpenCreateEvent}
           className="md:hidden fixed right-4 bottom-18 z-40 w-13 h-13 rounded-full bg-[#0A84FF] hover:bg-[#0071E3] active:scale-90 text-white shadow-[0_4px_16px_rgba(10,132,255,0.45)] flex items-center justify-center transition-transform duration-150"
@@ -536,7 +559,10 @@ export function DayliCalendarApp() {
         </button>
 
         {/* Mobile Bottom Navigation Bar */}
-        <nav className="md:hidden shrink-0 bg-white/95 dark:bg-[#161618]/95 backdrop-blur-md border-t border-[#E5E5EA] dark:border-[#28282A] px-2 py-1 flex items-center justify-around z-30 pb-[max(0.4rem,env(safe-area-inset-bottom))]">
+        <nav
+          id="tour-views-mobile"
+          className="md:hidden shrink-0 bg-white/95 dark:bg-[#161618]/95 backdrop-blur-md border-t border-[#E5E5EA] dark:border-[#28282A] px-2 py-1 flex items-center justify-around z-30 pb-[max(0.4rem,env(safe-area-inset-bottom))]"
+        >
           <button
             type="button"
             onClick={() => {
@@ -586,6 +612,7 @@ export function DayliCalendarApp() {
           </button>
 
           <button
+            id="tour-tasks-mobile"
             type="button"
             onClick={() => setIsTasksOpen((prev) => !prev)}
             className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] relative transition-colors ${
@@ -669,8 +696,17 @@ export function DayliCalendarApp() {
           onSignOut={handleSignOut}
           isUserSignedIn={Boolean(user)}
           initialTab={settingsTab}
+          onOpenTutorial={handleStartTour}
         />
       )}
+
+      {/* Interactive Tutorial & Feature Tour Modal */}
+      <TutorialModal
+        isOpen={isTutorialOpen}
+        onClose={() => setIsTutorialOpen(false)}
+        onOpenSmartSchedule={() => setIsSmartScheduleOpen(true)}
+        onStartInteractiveTour={handleStartTour}
+      />
 
       {/* Dayli AI Assistant Floating Chatbot */}
       <DayliChatbot

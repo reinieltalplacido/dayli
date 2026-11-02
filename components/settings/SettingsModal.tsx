@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   LogOut,
   RefreshCw,
+  BookOpen,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
 import { TimezoneSelect } from './TimezoneSelect';
@@ -54,6 +55,7 @@ interface SettingsModalProps {
   onSignOut: () => void;
   isUserSignedIn?: boolean;
   initialTab?: SettingsTab;
+  onOpenTutorial?: () => void;
 }
 
 // Common timezones curated for quick selection
@@ -130,6 +132,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSignOut,
   isUserSignedIn = false,
   initialTab = 'general',
+  onOpenTutorial,
 }) => {
   const settings = useSettings();
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
@@ -1166,7 +1169,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* TAB 5: SHORTCUTS & HELP */}
           {activeTab === 'shortcuts' && (
-            <div className="space-y-3">
+            <div className="space-y-4">
+              {/* Interactive Tutorial Banner */}
+              <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#0A84FF]/10 via-[#0A84FF]/5 to-transparent border border-[#0A84FF]/25 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#0A84FF] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                      Interactive Feature Guide
+                    </h4>
+                    <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
+                      Step-by-step walkthrough of smart scheduling, shortcuts, AI, and views.
+                    </p>
+                  </div>
+                </div>
+                {onOpenTutorial && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenTutorial();
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-[#0A84FF] hover:bg-[#0071E3] active:bg-[#0062C4] text-white text-xs font-semibold shrink-0 shadow-xs transition-colors"
+                  >
+                    Start Tour
+                  </button>
+                )}
+              </div>
+
               <div>
                 <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider mb-2">
                   Keyboard Shortcuts

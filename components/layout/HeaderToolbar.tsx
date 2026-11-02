@@ -9,6 +9,7 @@ import {
   CheckSquare,
   Menu,
   Zap,
+  BookOpen,
 } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 import { CalendarView } from '@/types/calendar';
@@ -23,6 +24,7 @@ interface HeaderToolbarProps {
   onOpenCreateEvent: () => void;
   onOpenSmartSchedule: () => void;
   onOpenSearch: () => void;
+  onOpenTutorial?: () => void;
   onToggleTasks: () => void;
   isTasksOpen: boolean;
   onToggleMobileMenu: () => void;
@@ -38,6 +40,7 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
   onOpenCreateEvent,
   onOpenSmartSchedule,
   onOpenSearch,
+  onOpenTutorial,
   onToggleTasks,
   isTasksOpen,
   onToggleMobileMenu,
@@ -110,7 +113,7 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
       {/* Right side: View selector + Search + Tasks + New Event */}
       <div className="flex items-center gap-1.5 sm:gap-3">
         {/* Segmented Control for Views - Desktop/Tablet only, bottom bar handles mobile */}
-        <div className="hidden md:flex items-center bg-[#F5F5F7] dark:bg-[#202022] p-0.5 rounded-lg border border-[#E5E5EA] dark:border-[#38383A]">
+        <div id="tour-views" className="hidden md:flex items-center bg-[#F5F5F7] dark:bg-[#202022] p-0.5 rounded-lg border border-[#E5E5EA] dark:border-[#38383A]">
           <button
             onClick={() => onChangeView('day')}
             className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
@@ -156,8 +159,24 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
           </kbd>
         </button>
 
+        {/* How to Use / Tutorial Guide Button */}
+        {onOpenTutorial && (
+          <button
+            onClick={onOpenTutorial}
+            className="flex items-center gap-1.5 p-2 sm:px-2.5 sm:py-1 text-xs text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] bg-[#F5F5F7] dark:bg-[#202022] hover:bg-[#E5E5EA]/70 dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] rounded-md transition-colors"
+            title="How to Use Dayli (?)"
+          >
+            <BookOpen className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#0A84FF]" />
+            <span className="hidden lg:inline">Guide</span>
+            <kbd className="hidden lg:inline text-[10px] bg-white dark:bg-[#18181A] border border-[#E5E5EA] dark:border-[#38383A] px-1 py-0.2 rounded text-[#86868B] dark:text-[#98989D]">
+              ?
+            </kbd>
+          </button>
+        )}
+
         {/* Quick Schedule Button */}
         <button
+          id="tour-smart-schedule"
           onClick={onOpenSmartSchedule}
           className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7] hover:text-[#0A84FF] dark:hover:text-[#0A84FF] bg-[#F5F5F7] dark:bg-[#202022] hover:bg-[#E5E5EA]/70 dark:hover:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] rounded-md transition-colors"
           title="Smart Schedule (Ctrl+J)"
@@ -168,6 +187,7 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
 
         {/* Tasks Toggle (Desktop) */}
         <button
+          id="tour-tasks-header"
           onClick={onToggleTasks}
           className={`p-1.5 rounded-md border text-xs transition-colors hidden md:flex items-center gap-1 ${
             isTasksOpen
@@ -181,6 +201,7 @@ export const HeaderToolbar: React.FC<HeaderToolbarProps> = ({
 
         {/* Create Event Button (Desktop/Tablet) */}
         <button
+          id="tour-new-event"
           onClick={onOpenCreateEvent}
           className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#0A84FF] hover:bg-[#0071E3] active:bg-[#0062C4] rounded-md shadow-[0_1px_2px_rgba(10,132,255,0.25)] transition-all"
         >
