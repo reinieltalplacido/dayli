@@ -22,8 +22,8 @@ export function startDayliTour(options?: { onComplete?: () => void }) {
       popover: {
         title: 'Smart Schedule (Quick-Add)',
         description: 'Type plain English like "Dinner with Alex tomorrow 7pm at Bistro" and Dayli extracts the title, date, time, and location.',
-        side: isMobile ? 'top' : 'bottom',
-        align: 'center',
+        side: isMobile ? 'top' : 'right',
+        align: isMobile ? 'center' : 'start',
       },
     },
     {

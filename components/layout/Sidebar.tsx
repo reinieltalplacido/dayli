@@ -158,6 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Smart Schedule Button */}
           {onOpenSmartSchedule && (
             <button
+              id="tour-smart-schedule"
               onClick={() => {
                 onOpenSmartSchedule();
                 if (isOpenMobile) onCloseMobile();
@@ -168,14 +169,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="w-8 h-8 rounded-md bg-[#0A84FF]/10 text-[#0A84FF] flex items-center justify-center font-semibold text-xs group-hover:bg-[#0A84FF] group-hover:text-white transition-colors">
                   <Zap className="w-4 h-4 fill-current" />
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
-                    Smart Schedule
-                  </p>
-                  <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
-                    Quick event parser
-                  </p>
-                </div>
+                <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                  Smart Schedule
+                </p>
               </div>
               <span className="text-[10px] font-medium text-[#86868B] dark:text-[#98989D] group-hover:text-[#0A84FF] transition-colors">
                 Ctrl+J

@@ -513,9 +513,7 @@ export function DayliCalendarApp() {
           onNext={handleNext}
           onToday={handleToday}
           onOpenCreateEvent={handleOpenCreateEvent}
-          onOpenSmartSchedule={() => setIsSmartScheduleOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
-          onOpenTutorial={handleStartTour}
           onToggleTasks={() => setIsTasksOpen((prev) => !prev)}
           isTasksOpen={isTasksOpen}
           onToggleMobileMenu={() => setIsSidebarMobileOpen(true)}
