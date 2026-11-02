@@ -201,7 +201,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
           description: 'Public holidays automatically display in pink. Change your country anytime in Preferences & Settings > Time & Regional.',
         },
         {
-          label: 'Neon Cloud Sync',
+          label: 'Real-Time Cloud Sync',
           description: 'Sign in with Google to sync your calendar across your phone, tablet, and laptop in real time.',
         },
         {

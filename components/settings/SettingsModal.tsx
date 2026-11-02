@@ -614,7 +614,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </span>
                 </div>
                 <p className="text-[11px] text-[#86868B] dark:text-[#98989D] leading-relaxed">
-                  Fast, focused personal calendar & task workspace with continuous scrolling, Neon PostgreSQL cloud sync, and full iCalendar portability.
+                  Fast, focused personal calendar & task workspace with continuous scrolling, cloud sync, and full iCalendar portability.
                 </p>
               </div>
             </div>
@@ -1045,16 +1045,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         isUserSignedIn ? 'bg-[#34C759] animate-pulse' : 'bg-[#FF9500]'
                       }`}
                     />
-                    <div>
-                      <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
-                        {isUserSignedIn ? 'Cloud Synced' : 'Local Storage Mode (Offline)'}
-                      </p>
-                      <p className="text-[11px] text-[#86868B] dark:text-[#98989D]">
-                        {isUserSignedIn
-                          ? 'Synchronized with Neon PostgreSQL server in real time'
-                          : 'Schedules are stored locally on this machine'}
-                      </p>
-                    </div>
+                    <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                      {isUserSignedIn ? 'Cloud Synced' : 'Local Storage Mode (Offline)'}
+                    </p>
                   </div>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-[#2C2C2E] border border-[#E5E5EA] dark:border-[#38383A] text-[#86868B] dark:text-[#98989D]">
                     {isUserSignedIn ? 'Active' : 'Offline'}
@@ -1139,30 +1132,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     ))}
                   </div>
                 )}
-              </div>
-
-              {/* Desktop App Connections (Future) */}
-              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
-                <div className="flex items-center justify-between mb-1.5">
-                  <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider">
-                    Desktop App Connections
-                  </h4>
-                  <span className="text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-2 py-0.5 rounded-full">
-                    Future (v2.0)
-                  </span>
-                </div>
-
-                <div className="p-3.5 rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-[#F5F5F7]/40 dark:bg-[#242426]/40 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A] flex items-center justify-center text-[#0A84FF] shrink-0">
-                    <Laptop className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">Dayli Windows & macOS Desktop</p>
-                    <p className="text-[11px] text-[#86868B] dark:text-[#98989D] leading-relaxed mt-0.5">
-                      Native desktop application with system tray notifications, offline background sync, global keyboard shortcuts, and mini widget view.
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
           )}
