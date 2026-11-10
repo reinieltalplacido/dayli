@@ -52,34 +52,38 @@ export const EventModal: React.FC<EventModalProps> = ({
 
   // Sync form state when modal opens or initial values change
   useEffect(() => {
-    if (initialEvent) {
-      setTitle(initialEvent.title);
-      setStartDate(initialEvent.startDate);
-      setStartTime(initialEvent.startTime);
-      setEndDate(initialEvent.endDate);
-      setEndTime(initialEvent.endTime);
-      setIsAllDay(initialEvent.isAllDay);
-      setCategoryId(initialEvent.categoryId);
-      setLocation(initialEvent.location || '');
-      setDescription(initialEvent.description || '');
-    } else {
-      const baseDate = defaultDate ? toInputDateString(defaultDate) : toInputDateString(new Date());
-      const hour = defaultHour !== undefined ? defaultHour : 9;
-      const hourStr = hour.toString().padStart(2, '0');
-      const nextHourStr = ((hour + 1) % 24).toString().padStart(2, '0');
+    const timer = setTimeout(() => {
+      if (initialEvent) {
+        setTitle(initialEvent.title);
+        setStartDate(initialEvent.startDate);
+        setStartTime(initialEvent.startTime);
+        setEndDate(initialEvent.endDate);
+        setEndTime(initialEvent.endTime);
+        setIsAllDay(initialEvent.isAllDay);
+        setCategoryId(initialEvent.categoryId);
+        setLocation(initialEvent.location || '');
+        setDescription(initialEvent.description || '');
+      } else {
+        const baseDate = defaultDate ? toInputDateString(defaultDate) : toInputDateString(new Date());
+        const hour = defaultHour !== undefined ? defaultHour : 9;
+        const hourStr = hour.toString().padStart(2, '0');
+        const nextHourStr = ((hour + 1) % 24).toString().padStart(2, '0');
 
-      setTitle('');
-      setStartDate(baseDate);
-      setStartTime(`${hourStr}:00`);
-      setEndDate(baseDate);
-      setEndTime(`${nextHourStr}:00`);
-      setIsAllDay(false);
-      setCategoryId(categories[0]?.id || 'personal');
-      setLocation('');
-      setDescription('');
-    }
-    setError('');
-    setShowDeleteConfirm(false);
+        setTitle('');
+        setStartDate(baseDate);
+        setStartTime(`${hourStr}:00`);
+        setEndDate(baseDate);
+        setEndTime(`${nextHourStr}:00`);
+        setIsAllDay(false);
+        setCategoryId(categories[0]?.id || 'personal');
+        setLocation('');
+        setDescription('');
+      }
+      setError('');
+      setShowDeleteConfirm(false);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [initialEvent, defaultDate, defaultHour, categories, isOpen]);
 
   if (!isOpen) return null;

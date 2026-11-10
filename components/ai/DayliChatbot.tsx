@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  MessageSquare,
   X,
   Send,
   Loader2,
@@ -16,16 +15,35 @@ import {
 } from 'lucide-react';
 import { CalendarCategory, CalendarEvent, TaskItem } from '@/types/calendar';
 
+interface ActionPayload {
+  title?: string;
+  startDate?: string;
+  startTime?: string;
+  endDate?: string;
+  endTime?: string;
+  isAllDay?: boolean;
+  location?: string;
+  categoryId?: string;
+  dueDate?: string;
+}
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   action?: {
     type: 'create_event' | 'create_task';
-    payload: any;
+    payload: ActionPayload;
     executed?: boolean;
   };
 }
+
+const generateMsgId = (prefix: string) => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `${prefix}-${crypto.randomUUID()}`;
+  }
+  return `${prefix}-${Date.now()}`;
+};
 
 interface DayliChatbotProps {
   events: CalendarEvent[];
@@ -144,12 +162,12 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
     return { cleanReply, actionData };
   };
 
-  const handleSend = async (userText?: string) => {
+  const handleSend = useCallback(async (userText?: string) => {
     const text = (userText || input).trim();
     if (!text || isLoading) return;
 
     const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
+      id: generateMsgId('user'),
       role: 'user',
       content: text,
     };
@@ -197,7 +215,7 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
       if (res.ok && data.reply) {
         const { cleanReply, actionData } = parseActionFromReply(data.reply);
         const assistantMessage: ChatMessage = {
-          id: `assistant-${Date.now()}`,
+          id: generateMsgId('assistant'),
           role: 'assistant',
           content: cleanReply,
           action: actionData,
@@ -207,7 +225,7 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
         setMessages((prev) => [
           ...prev,
           {
-            id: `err-${Date.now()}`,
+            id: generateMsgId('err'),
             role: 'assistant',
             content: "Sorry, I ran into an issue connecting to the AI assistant. Please try again.",
           },
@@ -217,7 +235,7 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
       setMessages((prev) => [
         ...prev,
         {
-          id: `err-${Date.now()}`,
+          id: generateMsgId('err'),
           role: 'assistant',
           content: "Network error. Please check your connection and try again.",
         },
@@ -225,7 +243,7 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, messages, categories, events, tasks, currentDate, userTimezone]);
 
   const handleExecuteAction = (messageId: string) => {
     const targetMsg = messages.find((m) => m.id === messageId);
@@ -243,11 +261,12 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
     // 2. Perform the side-effect outside the React setState updater
     if (targetMsg.action.type === 'create_event') {
       const p = targetMsg.action.payload;
+      const todayStr = currentDate.toISOString().slice(0, 10);
       onSaveEvent({
         title: p.title || 'New Event',
-        startDate: p.startDate,
+        startDate: p.startDate || todayStr,
         startTime: p.startTime || '09:00',
-        endDate: p.endDate || p.startDate,
+        endDate: p.endDate || p.startDate || todayStr,
         endTime: p.endTime || '10:00',
         isAllDay: Boolean(p.isAllDay),
         location: p.location || undefined,

@@ -51,10 +51,13 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setPrompt('');
-      setParsedResult(null);
-      setErrorMessage('');
-      setTimeout(() => inputRef.current?.focus(), 80);
+      const timer = setTimeout(() => {
+        setPrompt('');
+        setParsedResult(null);
+        setErrorMessage('');
+        inputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

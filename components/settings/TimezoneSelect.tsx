@@ -40,14 +40,18 @@ export const TimezoneSelect: React.FC<TimezoneSelectProps> = ({
     };
   }, [isOpen]);
 
-  // Focus search input on open
+  // Focus search input on open and reset search on close
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         searchInputRef.current?.focus();
       }, 50);
+      return () => clearTimeout(timer);
     } else {
-      setSearch('');
+      const timer = setTimeout(() => {
+        setSearch('');
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
