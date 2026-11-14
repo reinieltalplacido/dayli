@@ -4,5 +4,6 @@ export interface UserProfile {
   email: string;
   avatarUrl?: string;
   provider?: 'google' | 'email';
+  birthday?: string;
 }
 

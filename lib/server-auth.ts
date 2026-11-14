@@ -6,6 +6,7 @@ export interface AuthenticatedUser {
   name: string;
   email: string;
   image?: string | null;
+  birthday?: string | null;
 }
 
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
@@ -19,11 +20,14 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
       return null;
     }
 
+    const userObj = session.user as Record<string, unknown>;
+
     return {
       id: session.user.id,
       name: session.user.name,
       email: session.user.email,
       image: session.user.image,
+      birthday: (userObj.birthday as string | undefined | null) ?? null,
     };
   } catch (error) {
     console.error('Error verifying server session:', error);

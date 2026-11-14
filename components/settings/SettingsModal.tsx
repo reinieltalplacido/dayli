@@ -22,6 +22,7 @@ import {
   LogOut,
   RefreshCw,
   BookOpen,
+  Cake,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
 import { TimezoneSelect } from './TimezoneSelect';
@@ -29,6 +30,7 @@ import { useSettings, settingsService, DateFormat, ClockFormat, SUPPORTED_HOLIDA
 import { exportToICS, parseICS, downloadFile } from '@/lib/icsUtils';
 import { CalendarEvent } from '@/types/calendar';
 import { authClient } from '@/lib/auth-client';
+import { authService } from '@/services/authService';
 import { format } from 'date-fns';
 
 export type SettingsTab = 'general' | 'regional' | 'privacy' | 'devices' | 'shortcuts';
@@ -192,6 +194,54 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       isMounted = false;
     };
   }, [isOpen, activeTab, isUserSignedIn]);
+
+  // Birthday state
+  const [userBirthday, setUserBirthday] = useState<string>('');
+  const [isSavingBirthday, setIsSavingBirthday] = useState<boolean>(false);
+  const [birthdaySaved, setBirthdaySaved] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const localUser = authService.getUser();
+    if (localUser?.birthday) {
+      setTimeout(() => {
+        setUserBirthday(localUser.birthday || '');
+      }, 0);
+    } else if (isUserSignedIn) {
+      fetch('/api/account')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.user?.birthday) {
+            setUserBirthday(data.user.birthday);
+            authService.setBirthday(data.user.birthday);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isOpen, isUserSignedIn]);
+
+  const handleSaveBirthday = async (newBirthday: string) => {
+    setUserBirthday(newBirthday);
+    setIsSavingBirthday(true);
+    try {
+      authService.setBirthday(newBirthday || null);
+      if (isUserSignedIn) {
+        await fetch('/api/account', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ birthday: newBirthday || null }),
+        });
+      }
+      setBirthdaySaved(true);
+      showStatus('Birthday saved successfully', 'success');
+      setTimeout(() => setBirthdaySaved(false), 2000);
+    } catch (e) {
+      console.error('Failed to save birthday:', e);
+      showStatus('Failed to update birthday', 'error');
+    } finally {
+      setIsSavingBirthday(false);
+    }
+  };
 
   // Status message auto-dismiss
   const showStatus = (text: string, type: 'success' | 'error' = 'success') => {
@@ -880,6 +930,61 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       Connect
                     </button>
                   )}
+                </div>
+              </div>
+
+              {/* Personal Birthday */}
+              <div className="pt-3 border-t border-[#E5E5EA] dark:border-[#2C2C2E]">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider flex items-center gap-1.5">
+                    <Cake className="w-3.5 h-3.5 text-[#FF2D55]" />
+                    <span>Personal Birthday</span>
+                  </h4>
+                  {birthdaySaved && (
+                    <span className="text-[11px] font-medium text-[#34C759] flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Saved
+                    </span>
+                  )}
+                </div>
+
+                <div className="p-3 rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-[#F5F5F7]/50 dark:bg-[#242426]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] flex items-center gap-1.5">
+                      <span>Birthday Celebration & Event</span>
+                      {userBirthday ? (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#FF2D55]/10 text-[#FF2D55] border border-[#FF2D55]/20">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#86868B]/10 text-[#86868B] border border-[#86868B]/20">
+                          Not set
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-[11px] text-[#86868B] dark:text-[#98989D] max-w-sm">
+                      Synced from your Google Account or customized here. Dayli shows an annual recurring event on your calendar and celebrates on your day!
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      value={userBirthday}
+                      onChange={(e) => handleSaveBirthday(e.target.value)}
+                      disabled={isSavingBirthday}
+                      className="px-2.5 py-1 text-xs rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#2C2C2E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden focus:ring-2 focus:ring-[#0A84FF] transition-all cursor-pointer"
+                    />
+                    {userBirthday && (
+                      <button
+                        type="button"
+                        onClick={() => handleSaveBirthday('')}
+                        title="Clear birthday"
+                        className="p-1 rounded-md text-[#86868B] hover:text-[#FF3B30] hover:bg-white dark:hover:bg-[#2C2C2E] border border-transparent hover:border-[#E5E5EA] dark:hover:border-[#38383A] transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

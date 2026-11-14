@@ -9,14 +9,17 @@ export async function GET() {
   }
 
   try {
-    const googleAccount = await prisma.account.findFirst({
-      where: {
-        userId: user.id,
-        providerId: 'google',
-      },
-    });
-
-    const [eventsCount, tasksCount] = await Promise.all([
+    const [googleAccount, dbUser, eventsCount, tasksCount] = await Promise.all([
+      prisma.account.findFirst({
+        where: {
+          userId: user.id,
+          providerId: 'google',
+        },
+      }),
+      prisma.user.findUnique({
+        where: { id: user.id },
+        select: { birthday: true },
+      }),
       prisma.event.count({ where: { userId: user.id } }),
       prisma.task.count({ where: { userId: user.id } }),
     ]);
@@ -27,6 +30,7 @@ export async function GET() {
         name: user.name,
         email: user.email,
         image: user.image,
+        birthday: dbUser?.birthday || user.birthday || null,
       },
       googleConnected: Boolean(googleAccount),
       googleAccountId: googleAccount?.accountId || null,
@@ -38,6 +42,37 @@ export async function GET() {
   } catch (error) {
     console.error('Failed to get account details:', error);
     return NextResponse.json({ error: 'Failed to get account information' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { birthday } = body;
+
+    const updated = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        birthday: birthday ? String(birthday).trim() : null,
+      },
+      select: {
+        id: true,
+        birthday: true,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      birthday: updated.birthday,
+    });
+  } catch (error) {
+    console.error('Failed to update birthday:', error);
+    return NextResponse.json({ error: 'Failed to update birthday' }, { status: 500 });
   }
 }
 

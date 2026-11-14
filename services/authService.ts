@@ -46,7 +46,8 @@ export const authService = {
     email: string,
     name?: string,
     provider: 'google' | 'email' = 'google',
-    avatarUrl?: string
+    avatarUrl?: string,
+    birthday?: string
   ): UserProfile {
     const defaultName = name || email.split('@')[0];
     const user: UserProfile = {
@@ -55,6 +56,7 @@ export const authService = {
       email,
       provider,
       avatarUrl,
+      birthday,
     };
 
     cachedUser = user;
@@ -63,6 +65,16 @@ export const authService = {
     }
     notifyListeners();
     return user;
+  },
+
+  setBirthday(birthday: string | null): void {
+    if (cachedUser) {
+      cachedUser = { ...cachedUser, birthday: birthday || undefined };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedUser));
+      }
+      notifyListeners();
+    }
   },
 
   signOut(): void {

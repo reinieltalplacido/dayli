@@ -87,11 +87,43 @@ export function DayliCalendarApp() {
     holidayService.loadHolidays(country, [year - 1, year, year + 1]);
   }, [currentDate, settings.holidayCountry]);
 
-  // Combine user events with national public holidays when the holidays category is active
+  // Generate annual birthday event for the user when a birthday is configured
+  const birthdayEvents = React.useMemo(() => {
+    if (!user?.birthday) return [];
+    const parts = user.birthday.split('-');
+    if (parts.length < 3) return [];
+    const [, month, day] = parts;
+    if (!month || !day) return [];
+
+    const currentYear = currentDate.getFullYear();
+    const years = [currentYear - 1, currentYear, currentYear + 1];
+    const firstName = user.name ? user.name.split(' ')[0] : 'My';
+
+    return years.map((y) => {
+      const dateStr = `${y}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      return {
+        id: `user-birthday-${y}`,
+        title: `🎂 ${firstName}'s Birthday`,
+        startDate: dateStr,
+        endDate: dateStr,
+        startTime: '00:00',
+        endTime: '23:59',
+        isAllDay: true,
+        categoryId: 'personal',
+        description: `Happy Birthday${user.name ? `, ${user.name}` : ''}! 🎉`,
+        isReadOnly: true,
+        createdAt: dateStr,
+        updatedAt: dateStr,
+      } as CalendarEvent;
+    });
+  }, [user, currentDate]);
+
+  // Combine user events with national public holidays and user's birthday
   const allEvents = React.useMemo(() => {
     const isHolidaysEnabled = categories.some((c) => c.id === 'holidays' && c.enabled);
-    return isHolidaysEnabled ? [...events, ...holidays] : events;
-  }, [events, holidays, categories]);
+    const base = isHolidaysEnabled ? [...events, ...holidays] : events;
+    return birthdayEvents.length > 0 ? [...base, ...birthdayEvents] : base;
+  }, [events, holidays, categories, birthdayEvents]);
 
   // Only events from categories checked/enabled in the sidebar
   const enabledCategoryIds = React.useMemo(() => {
@@ -108,20 +140,37 @@ export function DayliCalendarApp() {
     if (authSession?.user?.email) {
       const current = authService.getUser();
       const userImage = authSession.user.image || undefined;
+      const userBirthday = (authSession.user as Record<string, unknown>).birthday as string | undefined;
       if (
         !current ||
         current.email !== authSession.user.email ||
-        current.avatarUrl !== userImage
+        current.avatarUrl !== userImage ||
+        (userBirthday && current.birthday !== userBirthday)
       ) {
         authService.signIn(
           authSession.user.email,
           authSession.user.name || undefined,
           userImage ? 'google' : 'email',
-          userImage
+          userImage,
+          userBirthday || current?.birthday
         );
       }
     }
   }, [authSession]);
+
+  // Sync birthday from account database endpoint if available
+  useEffect(() => {
+    if (authSession?.user?.email) {
+      fetch('/api/account')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.user?.birthday) {
+            authService.setBirthday(data.user.birthday);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [authSession?.user?.email]);
 
   // UI Panels state
   const [isTasksOpen, setIsTasksOpen] = useState(false);
@@ -150,6 +199,28 @@ export function DayliCalendarApp() {
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
+  // Celebratory birthday notification if today matches the user's birthday
+  useEffect(() => {
+    if (!user?.birthday) return;
+    const parts = user.birthday.split('-');
+    if (parts.length < 3) return;
+    const [, bMonth, bDay] = parts;
+
+    const today = new Date();
+    const todayM = String(today.getMonth() + 1).padStart(2, '0');
+    const todayD = String(today.getDate()).padStart(2, '0');
+
+    if (bMonth === todayM && bDay === todayD) {
+      const yearKey = `dayli_bday_${today.getFullYear()}_${user.email}`;
+      if (typeof window !== 'undefined' && !sessionStorage.getItem(yearKey)) {
+        sessionStorage.setItem(yearKey, 'true');
+        setTimeout(() => {
+          addToast(`🎉 Happy Birthday${user.name ? `, ${user.name}` : ''}! Wishing you a wonderful year ahead! 🎂✨`, 'success');
+        }, 0);
+      }
+    }
+  }, [user, addToast]);
 
   // Sync and observe dark mode theme setting
   useEffect(() => {
