@@ -96,7 +96,13 @@ export function DayliCalendarApp() {
     if (!month || !day) return [];
 
     const currentYear = currentDate.getFullYear();
-    const years = [currentYear - 1, currentYear, currentYear + 1];
+    const years = [
+      currentYear - 2,
+      currentYear - 1,
+      currentYear,
+      currentYear + 1,
+      currentYear + 2,
+    ];
     const firstName = user.name ? user.name.split(' ')[0] : 'My';
 
     return years.map((y) => {
@@ -160,16 +166,14 @@ export function DayliCalendarApp() {
 
   // Sync birthday from account database endpoint if available
   useEffect(() => {
-    if (authSession?.user?.email) {
-      fetch('/api/account')
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data?.user?.birthday) {
-            authService.setBirthday(data.user.birthday);
-          }
-        })
-        .catch(() => {});
-    }
+    fetch('/api/account')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user?.birthday) {
+          authService.setBirthday(data.user.birthday);
+        }
+      })
+      .catch(() => {});
   }, [authSession?.user?.email]);
 
   // UI Panels state
