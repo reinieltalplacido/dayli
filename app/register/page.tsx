@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 import { DayliLogo } from '@/components/ui/DayliLogo';
 import { authClient } from '@/lib/auth-client';
 
@@ -14,9 +14,16 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const passwordRequirements = [
+    { label: 'At least 8 characters', met: password.length >= 8 },
+    { label: 'At least one number (0-9)', met: /\d/.test(password) },
+    { label: 'At least one letter (a-z, A-Z)', met: /[a-zA-Z]/.test(password) },
+  ];
 
   React.useEffect(() => {
     if (session?.user) {
@@ -27,15 +34,23 @@ export default function RegisterPage() {
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError('Please enter your full name');
+      setError('Please enter your name');
       return;
     }
     if (!email.trim() || !email.includes('@')) {
       setError('Please enter a valid email address');
       return;
     }
-    if (!password.trim() || password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+    if (!/\d/.test(password)) {
+      setError('Password must contain at least one number');
+      return;
+    }
+    if (!/[a-zA-Z]/.test(password)) {
+      setError('Password must contain at least one letter');
       return;
     }
 
@@ -142,7 +157,7 @@ export default function RegisterPage() {
           <form onSubmit={handleEmailSignUp} className="space-y-3">
             <div>
               <label className="block text-[11px] font-medium text-[#86868B] mb-1">
-                Full Name
+                Name
               </label>
               <div className="relative">
                 <User className="w-3.5 h-3.5 text-[#86868B] absolute left-3 top-3" />
@@ -184,7 +199,9 @@ export default function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 characters"
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
+                  placeholder="••••••••"
                   autoComplete="new-password"
                   className="w-full text-xs pl-8.5 pr-9 py-2.5 rounded-xl border border-[#E5E5EA] bg-white focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] transition-all"
                 />
@@ -196,6 +213,32 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
+
+              {/* Password Requirements (shown when active / focused or typed) */}
+              {(isPasswordFocused || password.length > 0) && (
+                <div className="mt-2 p-2.5 rounded-lg bg-[#F5F5F7] border border-[#E5E5EA] space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <p className="text-[10px] font-semibold text-[#86868B] uppercase tracking-wider">
+                    Password Requirements
+                  </p>
+                  <div className="space-y-1">
+                    {passwordRequirements.map((req, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-center gap-1.5 text-[11px] transition-colors ${
+                          req.met ? 'text-[#34C759] font-medium' : 'text-[#86868B]'
+                        }`}
+                      >
+                        {req.met ? (
+                          <Check className="w-3 h-3 text-[#34C759] shrink-0 stroke-[2.5]" />
+                        ) : (
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#86868B]/40 ml-0.75 mr-0.75 shrink-0" />
+                        )}
+                        <span>{req.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
