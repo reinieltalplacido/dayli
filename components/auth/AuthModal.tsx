@@ -114,13 +114,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     setError('');
     try {
-      await authClient.signIn.social({
+      const res = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/',
-        additionalParams: {
-          prompt: 'select_account',
-        },
       });
+      if (res?.data?.url) {
+        window.location.href = res.data.url;
+      }
     } catch {
       // Fallback transition if Google OAuth is pending credentials
       onSuccess('user@example.com', 'User', 'google');

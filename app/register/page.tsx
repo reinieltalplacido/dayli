@@ -89,13 +89,13 @@ export default function RegisterPage() {
     setIsGoogleLoading(true);
     setError('');
     try {
-      await authClient.signIn.social({
+      const res = await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/',
-        additionalParams: {
-          prompt: 'select_account',
-        },
       });
+      if (res?.data?.url) {
+        window.location.href = res.data.url;
+      }
     } catch {
       setError('Google sign-in is not configured yet. Please check your credentials in .env.local.');
       setIsGoogleLoading(false);
