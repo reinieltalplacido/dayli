@@ -139,24 +139,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </button>
 
           <DayliLogo size={36} className="mb-2 shadow-xs" />
-          <h3 className="text-base font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight">
+          <h3 className="text-base font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] tracking-tight transition-opacity duration-150">
             {mode === 'signin' ? 'Sign In to Dayli' : 'Create Dayli Account'}
           </h3>
           <p className="text-xs text-[#86868B] mt-0.5 max-w-[240px]">
             Sync your calendar and tasks seamlessly across all your devices.
           </p>
 
-          {/* Segmented Mode Switcher */}
-          <div className="flex items-center w-full mt-4 p-0.5 rounded-lg bg-[#F5F5F7] dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A]">
+          {/* Segmented Mode Switcher with animated sliding pill */}
+          <div className="relative grid grid-cols-2 w-full mt-4 p-1 rounded-lg bg-[#F5F5F7] dark:bg-[#28282A] border border-[#E5E5EA] dark:border-[#38383A]">
+            {/* Sliding Pill Indicator */}
+            <div
+              className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md bg-white dark:bg-[#1C1C1E] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] border border-black/5 dark:border-white/5 transition-transform duration-200 ease-out pointer-events-none"
+              style={{
+                transform: mode === 'signin' ? 'translateX(0px)' : 'translateX(calc(100% + 4px))',
+              }}
+            />
+
             <button
               type="button"
               onClick={() => {
                 setMode('signin');
                 setError('');
               }}
-              className={`flex-1 py-1 text-xs font-medium rounded-md transition-all ${
+              className={`relative z-10 py-1 text-xs font-medium text-center rounded-md transition-colors duration-200 ${
                 mode === 'signin'
-                  ? 'bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                  ? 'text-[#1D1D1F] dark:text-[#F5F5F7]'
                   : 'text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
               }`}
             >
@@ -168,9 +176,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 setMode('signup');
                 setError('');
               }}
-              className={`flex-1 py-1 text-xs font-medium rounded-md transition-all ${
+              className={`relative z-10 py-1 text-xs font-medium text-center rounded-md transition-colors duration-200 ${
                 mode === 'signup'
-                  ? 'bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                  ? 'text-[#1D1D1F] dark:text-[#F5F5F7]'
                   : 'text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
               }`}
             >
@@ -229,7 +237,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* Email / Password Form */}
           <form onSubmit={handleSubmit} className="space-y-3">
             {mode === 'signup' && (
-              <div>
+              <div className="animate-in fade-in slide-in-from-top-1 duration-150">
                 <label className="block text-[11px] font-medium text-[#86868B] mb-1">
                   Name
                 </label>
