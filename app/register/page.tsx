@@ -65,7 +65,15 @@ export default function RegisterPage() {
       });
 
       if (result.error) {
-        setError(result.error.message || 'Registration failed');
+        const rawMsg = result.error.message || '';
+        if (
+          rawMsg.toLowerCase().includes('already exists') ||
+          rawMsg.toLowerCase().includes('already in use')
+        ) {
+          setError('This email is already in use.');
+        } else {
+          setError(rawMsg || 'Registration failed');
+        }
       } else {
         router.push('/');
         router.refresh();
@@ -110,8 +118,13 @@ export default function RegisterPage() {
         {/* Content */}
         <div className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-[#FF3B30]/10 border border-[#FF3B30]/20 text-xs font-medium text-[#FF3B30] leading-relaxed">
-              {error}
+            <div className="p-3 rounded-xl bg-[#FF3B30]/10 border border-[#FF3B30]/20 text-xs font-medium text-[#FF3B30] leading-relaxed flex items-center justify-between gap-2">
+              <span>{error}</span>
+              {error.toLowerCase().includes('already in use') && (
+                <Link href="/login" className="underline hover:opacity-80 shrink-0 font-semibold">
+                  Sign In
+                </Link>
+              )}
             </div>
           )}
 

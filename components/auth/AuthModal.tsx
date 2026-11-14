@@ -75,7 +75,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         });
 
         if (res.error) {
-          setError(res.error.message || 'Failed to create account');
+          const rawMsg = res.error.message || '';
+          if (
+            rawMsg.toLowerCase().includes('already exists') ||
+            rawMsg.toLowerCase().includes('already in use')
+          ) {
+            setError('This email is already in use.');
+          } else {
+            setError(rawMsg || 'Failed to create account');
+          }
         } else {
           onSuccess(email.trim(), name.trim(), 'email');
           onClose();
@@ -190,8 +198,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Content Body */}
         <div className="p-6 space-y-4">
           {error && (
-            <div className="p-2.5 rounded-lg bg-[#FF3B30]/10 border border-[#FF3B30]/20 text-xs font-medium text-[#FF3B30]">
-              {error}
+            <div className="p-2.5 rounded-lg bg-[#FF3B30]/10 border border-[#FF3B30]/20 text-xs font-medium text-[#FF3B30] flex items-center justify-between gap-2">
+              <span>{error}</span>
+              {mode === 'signup' && error.toLowerCase().includes('already in use') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('signin');
+                    setError('');
+                  }}
+                  className="underline hover:opacity-80 shrink-0 font-semibold"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
           )}
 
