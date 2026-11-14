@@ -854,7 +854,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   {isUserSignedIn ? (
                     <button
                       type="button"
-                      onClick={() => authClient.signIn.social({ provider: 'google', callbackURL: '/' })}
+                      onClick={() =>
+                        authClient.signIn.social({
+                          provider: 'google',
+                          callbackURL: '/',
+                          additionalParams: { prompt: 'select_account' },
+                        })
+                      }
                       className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#2C2C2E] hover:bg-[#F5F5F7] dark:hover:bg-[#343438] text-[#1D1D1F] dark:text-[#F5F5F7] transition-colors"
                     >
                       Reconnect
@@ -862,7 +868,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   ) : (
                     <button
                       type="button"
-                      onClick={() => authClient.signIn.social({ provider: 'google', callbackURL: '/' })}
+                      onClick={() =>
+                        authClient.signIn.social({
+                          provider: 'google',
+                          callbackURL: '/',
+                          additionalParams: { prompt: 'select_account' },
+                        })
+                      }
                       className="px-2.5 py-1 text-xs font-medium rounded-lg bg-[#0A84FF] text-white hover:bg-[#0071E3] transition-colors"
                     >
                       Connect

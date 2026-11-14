@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dayli — Personal Calendar & Tasks",
+  title: "Dayli",
   description: "A premium, minimalist personal calendar and task manager.",
   icons: {
     icon: [

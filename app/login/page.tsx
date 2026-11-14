@@ -63,6 +63,9 @@ export default function LoginPage() {
       await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/',
+        additionalParams: {
+          prompt: 'select_account',
+        },
       });
     } catch {
       setError('Google sign-in is not configured yet. Please check your credentials in .env.local.');
