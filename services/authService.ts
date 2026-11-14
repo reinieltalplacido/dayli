@@ -25,6 +25,10 @@ export const authService = {
           const stored = localStorage.getItem(STORAGE_KEY);
           if (stored) {
             cachedUser = JSON.parse(stored);
+            const standaloneBirthday = localStorage.getItem('dayli_birthday');
+            if (standaloneBirthday && cachedUser && !cachedUser.birthday) {
+              cachedUser.birthday = standaloneBirthday;
+            }
           }
         } catch (e) {
           console.error('Failed to load user session from storage', e);
@@ -68,8 +72,16 @@ export const authService = {
   },
 
   setBirthday(birthday: string | null): void {
-    if (cachedUser) {
-      cachedUser = { ...cachedUser, birthday: birthday || undefined };
+    if (typeof window !== 'undefined') {
+      if (birthday) {
+        localStorage.setItem('dayli_birthday', birthday);
+      } else {
+        localStorage.removeItem('dayli_birthday');
+      }
+    }
+    const current = this.getSnapshot();
+    if (current) {
+      cachedUser = { ...current, birthday: birthday || undefined };
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedUser));
       }
