@@ -305,16 +305,24 @@ export const EventModal: React.FC<EventModalProps> = ({
           {/* All Day Toggle */}
           <div className="flex items-center justify-between py-1">
             <span className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">All-Day Event</span>
-            <label className={`relative inline-flex items-center ${isReadOnly ? 'cursor-default' : 'cursor-pointer'}`}>
-              <input
-                type="checkbox"
-                checked={isAllDay}
-                disabled={isReadOnly}
-                onChange={(e) => setIsAllDay(e.target.checked)}
-                className="sr-only peer"
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isAllDay}
+              disabled={isReadOnly}
+              onClick={() => !isReadOnly && setIsAllDay(!isAllDay)}
+              className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/20 ${
+                isReadOnly ? 'cursor-default opacity-85' : 'cursor-pointer'
+              } ${isAllDay ? 'bg-[#0A84FF]' : 'bg-[#E5E5EA] dark:bg-[#38383A]'}`}
+            >
+              <span className="sr-only">Toggle all-day event</span>
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                  isAllDay ? 'translate-x-5' : 'translate-x-0'
+                }`}
               />
-              <div className="w-10 h-6 bg-[#E5E5EA] dark:bg-[#38383A] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0A84FF]"></div>
-            </label>
+            </button>
           </div>
 
           {/* Date & Time Row */}

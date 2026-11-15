@@ -506,6 +506,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
       onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/45 backdrop-blur-[6px] animate-backdrop"
     >

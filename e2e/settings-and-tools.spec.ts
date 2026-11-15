@@ -14,7 +14,9 @@ test.describe('Settings, Search, and Smart Tools', () => {
     await settingsBtn.click();
 
     // Verify modal is open and shows version v1.0.0
-    await expect(page.getByText('Preferences & Settings')).toBeVisible();
+    const modalHeading = page.getByRole('heading', { name: 'Settings' });
+    await expect(modalHeading).toBeVisible();
+    await expect(page.getByText('Preferences & Config')).toBeVisible();
     await expect(page.getByText('v1.0.0').first()).toBeVisible();
 
     // Switch to Regional tab
@@ -34,7 +36,7 @@ test.describe('Settings, Search, and Smart Tools', () => {
     // Close settings modal
     const closeBtn = page.locator('button[title="Close (Esc)"]');
     await closeBtn.click();
-    await expect(page.getByText('Preferences & Settings')).not.toBeVisible();
+    await expect(modalHeading).not.toBeVisible();
   });
 
   test('should open and close the Smart Schedule quick-add modal', async ({ page }) => {
@@ -42,13 +44,14 @@ test.describe('Settings, Search, and Smart Tools', () => {
     await smartScheduleBtn.click();
 
     // Verify modal elements
-    await expect(page.getByText('Smart Schedule')).toBeVisible();
+    const modalHeading = page.getByRole('heading', { name: 'Smart Schedule' });
+    await expect(modalHeading).toBeVisible();
     const promptInput = page.locator('input[placeholder*="Dinner with Alex"]');
     await expect(promptInput).toBeVisible();
 
     // Close modal via Escape or close button
     await page.keyboard.press('Escape');
-    await expect(page.getByText('Smart Schedule')).not.toBeVisible();
+    await expect(modalHeading).not.toBeVisible();
   });
 
   test('should open search modal using search button or shortcut', async ({ page }) => {
