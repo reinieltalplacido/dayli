@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { format, isToday } from 'date-fns';
+import { format, isToday, eachDayOfInterval, parseISO, isValid } from 'date-fns';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 import {
   getWeekDays,
@@ -59,12 +59,32 @@ export const WeekView: React.FC<WeekViewProps> = ({
     return map;
   }, [categories]);
 
-  // Separate all-day events vs timed events
+  // Separate all-day events vs timed events (including multi-day event spans)
   const { allDayEventsByDate, timedEventsByDate } = React.useMemo(() => {
     const allDayMap = new Map<string, CalendarEvent[]>();
     const timedMap = new Map<string, CalendarEvent[]>();
 
     events.forEach((evt) => {
+      const isMultiDay = evt.startDate && evt.endDate && evt.endDate > evt.startDate;
+      if (isMultiDay) {
+        try {
+          const start = parseISO(evt.startDate);
+          const end = parseISO(evt.endDate);
+          if (isValid(start) && isValid(end)) {
+            const spanDays = eachDayOfInterval({ start, end });
+            spanDays.forEach((d) => {
+              const dStr = toInputDateString(d);
+              const list = allDayMap.get(dStr) || [];
+              list.push(evt);
+              allDayMap.set(dStr, list);
+            });
+            return;
+          }
+        } catch {
+          // fallback
+        }
+      }
+
       if (evt.isAllDay) {
         const list = allDayMap.get(evt.startDate) || [];
         list.push(evt);

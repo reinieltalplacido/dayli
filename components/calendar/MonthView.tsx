@@ -9,6 +9,8 @@ import {
   endOfMonth,
   eachDayOfInterval,
   addMonths,
+  parseISO,
+  isValid,
 } from 'date-fns';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 import { toInputDateString } from '@/lib/dateUtils';
@@ -97,10 +99,28 @@ export const MonthView: React.FC<MonthViewProps> = ({
     return map;
   }, [categories]);
 
-  // Group events by YYYY-MM-DD
+  // Group events by YYYY-MM-DD (including multi-day event spans)
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
     events.forEach((evt) => {
+      if (evt.startDate && evt.endDate && evt.endDate > evt.startDate) {
+        try {
+          const start = parseISO(evt.startDate);
+          const end = parseISO(evt.endDate);
+          if (isValid(start) && isValid(end)) {
+            const spanDays = eachDayOfInterval({ start, end });
+            spanDays.forEach((d) => {
+              const dStr = toInputDateString(d);
+              const list = map.get(dStr) || [];
+              list.push(evt);
+              map.set(dStr, list);
+            });
+            return;
+          }
+        } catch {
+          // fallback to single date
+        }
+      }
       const list = map.get(evt.startDate) || [];
       list.push(evt);
       map.set(evt.startDate, list);

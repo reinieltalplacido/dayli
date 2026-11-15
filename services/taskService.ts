@@ -98,6 +98,52 @@ export const taskService = {
     return newTask;
   },
 
+  async update(id: string, updates: Partial<Omit<TaskItem, 'id' | 'createdAt'>>): Promise<TaskItem> {
+    const tasks = this.getAll();
+    const index = tasks.findIndex((t) => t.id === id);
+    if (index === -1) {
+      throw new Error(`Task with id ${id} not found.`);
+    }
+
+    const updatedTask: TaskItem = {
+      ...tasks[index],
+      ...updates,
+      id,
+    };
+
+    const nextTasks = [...tasks];
+    nextTasks[index] = updatedTask;
+    cachedTasks = nextTasks;
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(nextTasks));
+    }
+    notifyListeners();
+
+    try {
+      const res = await fetch(`/api/tasks/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      if (res.ok) {
+        const persisted: TaskItem = await res.json();
+        const current = this.getAll().map((t) => (t.id === id ? persisted : t));
+        cachedTasks = current;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(current));
+        }
+        notifyListeners();
+        return persisted;
+      }
+    } catch {
+      // Fallback preserves optimistic update
+    }
+
+    return updatedTask;
+  },
+
   async toggle(id: string): Promise<TaskItem> {
     const tasks = this.getAll();
     const index = tasks.findIndex((t) => t.id === id);

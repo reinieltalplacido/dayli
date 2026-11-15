@@ -51,9 +51,15 @@ export const DayView: React.FC<DayViewProps> = ({
     return map;
   }, [categories]);
 
-  // Filter events for this specific day
+  // Filter events for this specific day (including multi-day spans)
   const dayEvents = React.useMemo(() => {
-    return events.filter((e) => e.startDate === dateStr);
+    return events.filter((e) => {
+      if (e.startDate === dateStr) return true;
+      if (e.startDate && e.endDate && e.startDate <= dateStr && e.endDate >= dateStr) {
+        return true;
+      }
+      return false;
+    });
   }, [events, dateStr]);
 
   const allDayEvents = dayEvents.filter((e) => e.isAllDay);

@@ -8,6 +8,9 @@ import {
   isToday,
   addMonths,
   subMonths,
+  eachDayOfInterval,
+  parseISO,
+  isValid,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getMonthDays, toInputDateString } from '@/lib/dateUtils';
@@ -39,10 +42,23 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
     return getMonthDays(displayMonth, weekStartsOn);
   }, [displayMonth, weekStartsOn]);
 
-  // Set of dates with events
+  // Set of dates with events (including multi-day event spans)
   const eventDateSet = React.useMemo(() => {
     const set = new Set<string>();
     events.forEach((evt) => {
+      if (evt.startDate && evt.endDate && evt.endDate > evt.startDate) {
+        try {
+          const start = parseISO(evt.startDate);
+          const end = parseISO(evt.endDate);
+          if (isValid(start) && isValid(end)) {
+            const spanDays = eachDayOfInterval({ start, end });
+            spanDays.forEach((d) => set.add(toInputDateString(d)));
+            return;
+          }
+        } catch {
+          // fallback
+        }
+      }
       set.add(evt.startDate);
     });
     return set;

@@ -394,9 +394,18 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
 
                       {m.action.type === 'create_event' && (
                         <div className="text-[11px] text-[#86868B] dark:text-[#98989D] space-y-0.5">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3 shrink-0" />
-                            <span>{m.action.payload.startDate}</span>
+                          <div className="flex items-center gap-1 font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">
+                            <Calendar className="w-3 h-3 shrink-0 text-[#0A84FF]" />
+                            <span>
+                              {m.action.payload.endDate && m.action.payload.endDate !== m.action.payload.startDate
+                                ? `${m.action.payload.startDate} → ${m.action.payload.endDate}`
+                                : m.action.payload.startDate}
+                            </span>
+                            {m.action.payload.isAllDay && (
+                              <span className="text-[9px] font-normal px-1.5 py-0.2 rounded bg-black/5 dark:bg-white/10 text-[#86868B] dark:text-[#98989D] ml-1">
+                                All Day
+                              </span>
+                            )}
                           </div>
                           {!m.action.payload.isAllDay && (
                             <div className="flex items-center gap-1">

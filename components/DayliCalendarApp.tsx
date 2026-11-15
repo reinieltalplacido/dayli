@@ -468,6 +468,18 @@ export function DayliCalendarApp() {
     }
   }, []);
 
+  const handleUpdateTask = useCallback(
+    async (id: string, updates: Partial<TaskItem>) => {
+      try {
+        await taskService.update(id, updates);
+        addToast('Task updated', 'success');
+      } catch {
+        addToast('Failed to update task', 'error');
+      }
+    },
+    [addToast]
+  );
+
   const handleDeleteTask = useCallback(
     async (id: string) => {
       try {
