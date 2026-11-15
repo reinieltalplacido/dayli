@@ -47,6 +47,9 @@ test.describe('Dayli Calendar Navigation & Views', () => {
   });
 
   test('should support keyboard navigation shortcuts (M, W, D)', async ({ page }) => {
+    // Focus the document body
+    await page.locator('body').click();
+
     // Press 'W' for week view
     await page.keyboard.press('w');
     await expect(page.locator('#tour-views button', { hasText: 'Week' })).toHaveClass(/bg-white|dark:bg-\[#2C2C2E\]/);

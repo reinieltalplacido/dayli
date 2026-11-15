@@ -52,6 +52,8 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
       onClick={onClose}
       className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-black/35 backdrop-blur-[4px] animate-backdrop"
     >
@@ -66,6 +68,12 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                e.stopPropagation();
+                onClose();
+              }
+            }}
             placeholder="Search events, notes, locations, tasks..."
             autoFocus
             className="flex-1 text-base sm:text-sm bg-transparent focus:outline-none placeholder:text-[#86868B] dark:placeholder:text-[#98989D] text-[#1D1D1F] dark:text-[#F5F5F7]"

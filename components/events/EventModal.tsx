@@ -48,7 +48,9 @@ export const EventModal: React.FC<EventModalProps> = ({
   const [error, setError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const isReadOnly = Boolean(initialEvent?.isHoliday || initialEvent?.isReadOnly);
+  const isHoliday = Boolean(initialEvent?.isHoliday);
+  const isBirthday = Boolean(initialEvent?.id?.startsWith('user-birthday-'));
+  const isReadOnly = Boolean(isHoliday || isBirthday || initialEvent?.isReadOnly);
 
   // Sync form state when modal opens or initial values change
   useEffect(() => {
@@ -129,7 +131,11 @@ export const EventModal: React.FC<EventModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-[4px] animate-backdrop">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-[4px] animate-backdrop"
+    >
       <div
         className="w-full sm:max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-2xl sm:rounded-2xl shadow-2xl border-t sm:border border-[#E5E5EA] dark:border-[#38383A] overflow-hidden text-[#1D1D1F] dark:text-[#F5F5F7] flex flex-col max-h-[88vh] sm:max-h-[90vh] pb-safe animate-modal"
         onClick={(e) => e.stopPropagation()}
@@ -140,7 +146,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 sm:py-3.5 border-b border-[#E5E5EA] dark:border-[#2C2C2E]">
           <div className="flex items-center gap-2">
-            {isReadOnly ? (
+            {isHoliday ? (
               <>
                 <div className="w-2.5 h-2.5 rounded-full bg-[#FF2D55]" />
                 <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
@@ -150,6 +156,20 @@ export const EventModal: React.FC<EventModalProps> = ({
                   Official
                 </span>
               </>
+            ) : isBirthday ? (
+              <>
+                <span className="text-base leading-none">🎂</span>
+                <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                  Birthday Celebration
+                </h3>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] border border-[#0A84FF]/20">
+                  Annual Event
+                </span>
+              </>
+            ) : isReadOnly ? (
+              <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                Event Details
+              </h3>
             ) : (
               <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                 {initialEvent ? 'Edit Event' : 'New Event'}
@@ -203,13 +223,26 @@ export const EventModal: React.FC<EventModalProps> = ({
         )}
 
         {/* Read-Only Notice Banner for Public Holidays */}
-        {isReadOnly && (
+        {isHoliday && (
           <div className="px-5 py-3 bg-[#FF2D55]/5 border-b border-[#FF2D55]/15 flex items-start gap-2.5">
             <Info className="w-4 h-4 text-[#FF2D55] shrink-0 mt-0.5" />
             <div className="text-xs">
               <p className="font-semibold text-[#FF2D55]">Official National Holiday</p>
               <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5 leading-relaxed">
                 This is a verified public holiday synchronized with your regional calendar. You can show or hide holidays anytime via the sidebar under &ldquo;MY CALENDARS&rdquo;.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Read-Only Notice Banner for Birthday */}
+        {isBirthday && (
+          <div className="px-5 py-3 bg-[#0A84FF]/5 border-b border-[#0A84FF]/15 flex items-start gap-2.5">
+            <span className="text-base leading-none mt-0.5">🎉</span>
+            <div className="text-xs">
+              <p className="font-semibold text-[#0A84FF]">Annual Birthday Celebration</p>
+              <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5 leading-relaxed">
+                Automatically repeats every year based on your profile birthday. You can change your birthday date anytime in Settings &rarr; General.
               </p>
             </div>
           </div>

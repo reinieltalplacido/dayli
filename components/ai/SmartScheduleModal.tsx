@@ -134,6 +134,8 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
       onClick={onClose}
       className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 p-3 sm:p-4 bg-black/45 backdrop-blur-[6px] animate-backdrop"
     >
@@ -168,6 +170,12 @@ export const SmartScheduleModal: React.FC<SmartScheduleModalProps> = ({
                 type="text"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    onClose();
+                  }
+                }}
                 placeholder="e.g. Dinner with Alex tomorrow at 7pm at Italian Bistro..."
                 className="w-full pl-4 pr-11 py-3 text-sm sm:text-base rounded-xl border border-[#E5E5EA] dark:border-[#38383A] bg-[#F5F5F7]/60 dark:bg-[#202022] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/60 dark:placeholder-[#98989D]/60 focus:outline-none focus:ring-2 focus:ring-[#0A84FF]/30 focus:border-[#0A84FF] shadow-xs transition-all"
               />

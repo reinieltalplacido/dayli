@@ -238,6 +238,7 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
                     {/* Circular checkbox */}
                     <button
                       onClick={() => onToggleTask(task.id)}
+                      aria-label="Toggle task completion"
                       className="mt-0.5 text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] transition-colors shrink-0 cursor-pointer"
                     >
                       {task.completed ? (
