@@ -61,7 +61,12 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
   });
 
   const categoryMap = new Map<string, CalendarCategory>();
-  categories.forEach((c) => categoryMap.set(c.id, c));
+  categories.forEach((c) => {
+    categoryMap.set(c.id, c);
+    if (c.id.includes('_')) {
+      categoryMap.set(c.id.split('_').slice(1).join('_'), c);
+    }
+  });
 
   return (
     <>

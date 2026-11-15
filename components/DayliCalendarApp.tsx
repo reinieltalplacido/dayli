@@ -123,6 +123,10 @@ export function DayliCalendarApp() {
     const currentYear = currentDate.getFullYear();
     const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
     const firstName = user?.name ? user.name.split(' ')[0] : 'Reiniel';
+    const personalCat =
+      categories.find((c) => c.id === 'personal' || c.id.endsWith('_personal')) ||
+      categories[0];
+    const personalCatId = personalCat ? personalCat.id : 'personal';
 
     return years.map((y) => {
       const dateStr = `${y}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
@@ -134,14 +138,14 @@ export function DayliCalendarApp() {
         startTime: '00:00',
         endTime: '23:59',
         isAllDay: true,
-        categoryId: 'personal',
+        categoryId: personalCatId,
         description: `Happy Birthday${user?.name ? `, ${user.name}` : ''}! 🎉`,
         isReadOnly: true,
         createdAt: dateStr,
         updatedAt: dateStr,
       } as CalendarEvent;
     });
-  }, [user, userBirthday, currentDate]);
+  }, [user, userBirthday, currentDate, categories]);
 
   // Combine user events with national public holidays and user's birthday
   const allEvents = React.useMemo(() => {
@@ -151,13 +155,23 @@ export function DayliCalendarApp() {
   }, [events, holidays, categories, birthdayEvents]);
 
   // Only events from categories checked/enabled in the sidebar
-  const enabledCategoryIds = React.useMemo(() => {
-    return new Set(categories.filter((c) => c.enabled).map((c) => c.id));
-  }, [categories]);
+  const isCategoryEnabled = React.useCallback(
+    (categoryId?: string) => {
+      if (!categoryId) return true;
+      return categories.some((c) => {
+        if (!c.enabled) return false;
+        if (c.id === categoryId) return true;
+        const normC = c.id.includes('_') ? c.id.split('_').slice(1).join('_') : c.id;
+        const normEvt = categoryId.includes('_') ? categoryId.split('_').slice(1).join('_') : categoryId;
+        return normC === normEvt;
+      });
+    },
+    [categories]
+  );
 
   const visibleEvents = React.useMemo(() => {
-    return allEvents.filter((evt) => enabledCategoryIds.has(evt.categoryId));
-  }, [allEvents, enabledCategoryIds]);
+    return allEvents.filter((evt) => isCategoryEnabled(evt.categoryId));
+  }, [allEvents, isCategoryEnabled]);
 
   const { data: authSession } = authClient.useSession();
 

@@ -234,9 +234,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <div className="space-y-0.5">
               {categories.map((category) => {
-                const categoryEventCount = events.filter(
-                  (e) => e.categoryId === category.id
-                ).length;
+                const normCatId = category.id.includes('_')
+                  ? category.id.split('_').slice(1).join('_')
+                  : category.id;
+                const categoryEventCount = events.filter((e) => {
+                  if (e.categoryId === category.id) return true;
+                  const normEventCat = e.categoryId?.includes('_')
+                    ? e.categoryId.split('_').slice(1).join('_')
+                    : e.categoryId;
+                  return normEventCat === normCatId;
+                }).length;
 
                 return (
                   <button

@@ -65,74 +65,40 @@ interface PatchRelease {
 
 const PATCH_NOTES: PatchRelease[] = [
   {
-    version: 'v1.2.0',
-    tag: 'Latest Update',
+    version: 'v1.0.0',
+    tag: 'Initial Launch',
     date: 'November 2026',
     isLatest: true,
     notes: [
       {
         type: 'feature',
+        title: 'Calendar Workspace',
+        description: 'Flexible Day, Week, and Month views with fluid infinite scrolling, dark mode, and Apple-grade design.',
+      },
+      {
+        type: 'feature',
         title: 'Animated Tasks & Reminders',
-        description: 'Smooth slide-in sidebar to quickly view, add, and check off your daily to-dos alongside your schedule.',
+        description: 'Smooth slide-in drawer to quickly view, add, and check off your daily to-dos alongside your schedule.',
+      },
+      {
+        type: 'feature',
+        title: 'Dayli AI Assistant',
+        description: 'Plan meetings, find free time, and organize your agenda effortlessly using natural language.',
+      },
+      {
+        type: 'feature',
+        title: 'Google Account & Cloud Sync',
+        description: 'One-click Google sign-in with real-time multi-device synchronization and automatic cloud backup.',
       },
       {
         type: 'feature',
         title: 'Birthday Celebrations',
-        description: 'Never miss a special day! Dayli automatically adds your birthday to your calendar with a celebration greeting.',
-      },
-      {
-        type: 'improvement',
-        title: 'Easy Account Switching',
-        description: 'Choose which Google account you want to connect to keep personal and work events organized.',
-      },
-      {
-        type: 'fix',
-        title: 'Faster Cloud Syncing',
-        description: 'Reliably saves your schedule and tasks so your events stay up-to-date across all your devices.',
-      },
-    ],
-  },
-  {
-    version: 'v1.1.0',
-    tag: 'Smart Features',
-    date: 'November 2026',
-    notes: [
-      {
-        type: 'feature',
-        title: 'Dayli AI Assistant',
-        description: 'Type or ask in plain English to automatically plan meetings, find free time, and organize your week.',
+        description: 'Automatic recurring annual birthday events on your calendar with festive greetings and customizable dates.',
       },
       {
         type: 'feature',
-        title: 'Guided Feature Tour',
-        description: 'A helpful interactive walkthrough to help you discover shortcuts, views, and power features.',
-      },
-      {
-        type: 'improvement',
-        title: 'Smooth Infinite Scrolling',
-        description: 'Glide effortlessly between past and future months without page interruptions or waiting.',
-      },
-    ],
-  },
-  {
-    version: 'v1.0.0',
-    tag: 'Initial Launch',
-    date: 'October 2026',
-    notes: [
-      {
-        type: 'feature',
-        title: 'Day, Week & Month Views',
-        description: 'Flexible views designed for effortless planning, complete with dark mode and light mode themes.',
-      },
-      {
-        type: 'feature',
-        title: 'Import & Export Calendars',
-        description: 'Easily bring in or download your events for Apple Calendar, Google Calendar, and Outlook.',
-      },
-      {
-        type: 'feature',
-        title: 'Color Categories & Timezones',
-        description: 'Color-code your activities with custom categories and easily schedule events across world timezones.',
+        title: 'Full Calendar Portability',
+        description: 'Export and import your schedule with standard .ics and JSON files for Apple Calendar, Google Calendar, and Outlook.',
       },
     ],
   },
@@ -622,7 +588,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between text-[11px] text-[#86868B] dark:text-[#98989D]">
                 <span>Dayli Calendar</span>
                 <span className="text-[10px] bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">
-                  v1.2.0
+                  v1.0.0
                 </span>
               </div>
             )}
@@ -815,10 +781,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                     {/* Animated Popover Menu */}
                     {isReleaseDropdownOpen && (
-                      <div className="absolute right-0 top-full mt-1.5 z-50 w-64 bg-white dark:bg-[#1C1C1E] rounded-xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] p-1.5 animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-2 py-1 mb-1 border-b border-[#E5E5EA]/70 dark:border-[#2C2C2E]">
+                      <div className="absolute right-0 top-full mt-1.5 z-50 w-64 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-md rounded-xl shadow-xl border border-[#E5E5EA] dark:border-[#38383A] p-1.5 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-2 py-1 mb-1 border-b border-[#E5E5EA]/70 dark:border-[#2C2C2E] flex items-center justify-between">
                           <span className="text-[10px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider">
                             Release History
+                          </span>
+                          <span className="text-[9px] text-[#86868B] dark:text-[#98989D]">
+                            {PATCH_NOTES.length} {PATCH_NOTES.length === 1 ? 'version' : 'versions'}
                           </span>
                         </div>
                         <div className="space-y-0.5" role="listbox">

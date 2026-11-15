@@ -1,51 +1,5 @@
 import { TaskItem } from '@/types/calendar';
 import { STORAGE_KEYS } from '@/lib/constants';
-import { format, addDays } from 'date-fns';
-
-function generateSampleTasks(): TaskItem[] {
-  const today = new Date();
-  return [
-    {
-      id: 'task-1',
-      title: 'Review CS 401 syllabus and required readings',
-      completed: true,
-      dueDate: format(today, 'yyyy-MM-dd'),
-      categoryId: 'school',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'task-2',
-      title: 'Prepare slides for Dayli product architecture',
-      completed: false,
-      dueDate: format(today, 'yyyy-MM-dd'),
-      categoryId: 'meetings',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'task-3',
-      title: 'Submit quarterly budget expense reports',
-      completed: false,
-      dueDate: format(addDays(today, 1), 'yyyy-MM-dd'),
-      categoryId: 'deadlines',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'task-4',
-      title: 'Pick up organic groceries and coffee beans',
-      completed: false,
-      dueDate: format(addDays(today, 2), 'yyyy-MM-dd'),
-      categoryId: 'personal',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'task-5',
-      title: 'Order replacement running shoes',
-      completed: false,
-      categoryId: 'personal',
-      createdAt: new Date().toISOString(),
-    },
-  ];
-}
 
 const EMPTY_TASKS: TaskItem[] = [];
 let cachedTasks: TaskItem[] | null = null;
@@ -87,10 +41,8 @@ export const taskService = {
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.TASKS);
       if (!stored) {
-        const initial = generateSampleTasks();
-        localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(initial));
-        cachedTasks = initial;
-        return initial;
+        cachedTasks = EMPTY_TASKS;
+        return EMPTY_TASKS;
       }
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed)) {
@@ -203,13 +155,12 @@ export const taskService = {
   },
 
   resetToSample(): TaskItem[] {
-    const samples = generateSampleTasks();
-    cachedTasks = samples;
+    cachedTasks = EMPTY_TASKS;
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(samples));
+      localStorage.removeItem(STORAGE_KEYS.TASKS);
     }
     notifyListeners();
-    return samples;
+    return EMPTY_TASKS;
   },
 
   clearAll(): void {

@@ -88,7 +88,12 @@ export const MonthView: React.FC<MonthViewProps> = ({
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, CalendarCategory>();
-    categories.forEach((cat) => map.set(cat.id, cat));
+    categories.forEach((cat) => {
+      map.set(cat.id, cat);
+      if (cat.id.includes('_')) {
+        map.set(cat.id.split('_').slice(1).join('_'), cat);
+      }
+    });
     return map;
   }, [categories]);
 
