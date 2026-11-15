@@ -142,12 +142,12 @@ export function DayliCalendarApp() {
       const age = birthYear && !isNaN(birthYear) ? y - birthYear : null;
       const noteText =
         age && age > 0
-          ? `🎉 Happy ${getOrdinal(age)} Birthday, ${fullName}! 🎂\n\n🎈 Turning ${age} years old today! Wishing you a fantastic year filled with happiness, good health, and wonderful milestones.`
-          : `🎉 Happy Birthday, ${fullName}! 🎂\n\nWishing you a wonderful celebration and a fantastic year ahead!`;
+          ? `Happy ${getOrdinal(age)} Birthday, ${fullName}!\n\nTurning ${age} years old today. Wishing you a fantastic year filled with happiness, good health, and wonderful milestones.`
+          : `Happy Birthday, ${fullName}!\n\nWishing you a wonderful celebration and a fantastic year ahead.`;
 
       return {
         id: `user-birthday-${y}`,
-        title: `🎂 ${firstName}'s Birthday`,
+        title: `${firstName}'s Birthday`,
         startDate: dateStr,
         endDate: dateStr,
         startTime: '00:00',
@@ -281,7 +281,7 @@ export function DayliCalendarApp() {
         sessionStorage.setItem(yearKey, 'true');
         setTimeout(() => {
           addToast(
-            `🎉 Happy Birthday${user?.name ? `, ${user.name}` : ''}! Wishing you a wonderful year ahead! 🎂✨`,
+            `Happy Birthday${user?.name ? `, ${user.name}` : ''}! Wishing you a wonderful year ahead!`,
             'success'
           );
         }, 0);

@@ -3,7 +3,7 @@
 import React from 'react';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 import { formatTime12h } from '@/lib/dateUtils';
-import { MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock, Cake } from 'lucide-react';
 
 interface EventCardProps {
   event: CalendarEvent;
@@ -20,8 +20,9 @@ export const EventCard: React.FC<EventCardProps> = ({
   onClick,
   style,
 }) => {
-  const catColor = category?.color || (event.isHoliday ? '#FF2D55' : '#0A84FF');
-  const catBg = category?.lightBg || (event.isHoliday ? 'rgba(255, 45, 85, 0.12)' : 'rgba(10, 132, 255, 0.12)');
+  const isBirthday = event.id.startsWith('user-birthday-');
+  const catColor = category?.color || (event.isHoliday ? '#FF2D55' : isBirthday ? '#FF2D55' : '#0A84FF');
+  const catBg = category?.lightBg || (event.isHoliday ? 'rgba(255, 45, 85, 0.12)' : isBirthday ? 'rgba(255, 45, 85, 0.12)' : 'rgba(10, 132, 255, 0.12)');
 
   if (view === 'month') {
     return (
@@ -44,6 +45,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             {formatTime12h(event.startTime)}
           </span>
         )}
+        {isBirthday && <Cake className="w-3 h-3 text-[#FF2D55] shrink-0" />}
         <span className="truncate font-medium">{event.title}</span>
       </button>
     );
@@ -64,8 +66,9 @@ export const EventCard: React.FC<EventCardProps> = ({
           ...style,
         }}
       >
-        <p className="text-[11px] font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] leading-snug truncate">
-          {event.title}
+        <p className="text-[11px] font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] leading-snug truncate flex items-center gap-1">
+          {isBirthday && <Cake className="w-3 h-3 text-[#FF2D55] shrink-0" />}
+          <span>{event.title}</span>
         </p>
         {!event.isAllDay && (
           <p className="text-[10px] text-[#86868B] dark:text-[#98989D] flex items-center gap-1 mt-0.5 tabular-nums">
@@ -100,8 +103,9 @@ export const EventCard: React.FC<EventCardProps> = ({
       }}
     >
       <div className="flex items-start justify-between gap-2">
-        <h4 className="text-xs sm:text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] leading-tight truncate">
-          {event.title}
+        <h4 className="text-xs sm:text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] leading-tight truncate flex items-center gap-1.5">
+          {isBirthday && <Cake className="w-3.5 h-3.5 text-[#FF2D55] shrink-0" />}
+          <span>{event.title}</span>
         </h4>
         <span
           className="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0 text-white"

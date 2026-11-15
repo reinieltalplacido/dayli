@@ -9,6 +9,8 @@ import {
   AlignLeft,
   Trash2,
   Info,
+  Cake,
+  Sparkles,
 } from 'lucide-react';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 import { toInputDateString } from '@/lib/dateUtils';
@@ -159,7 +161,9 @@ export const EventModal: React.FC<EventModalProps> = ({
               </>
             ) : isBirthday ? (
               <>
-                <span className="text-base leading-none">🎂</span>
+                <div className="w-5 h-5 rounded-md bg-[#FF2D55]/10 text-[#FF2D55] flex items-center justify-center shrink-0">
+                  <Cake className="w-3.5 h-3.5" />
+                </div>
                 <h3 className="text-sm font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                   Birthday Celebration
                 </h3>
@@ -417,10 +421,12 @@ export const EventModal: React.FC<EventModalProps> = ({
               <div className="p-3.5 rounded-xl border border-[#0A84FF]/25 bg-gradient-to-br from-[#0A84FF]/5 via-white dark:via-[#202022] to-[#FF2D55]/5 text-xs space-y-2">
                 <div className="flex items-center justify-between border-b border-[#E5E5EA]/70 dark:border-[#38383A]/70 pb-2">
                   <span className="font-semibold text-[#0A84FF] flex items-center gap-1.5 text-xs">
-                    <span>🎂</span> Birthday Celebration
+                    <Cake className="w-3.5 h-3.5 text-[#FF2D55]" />
+                    <span>Birthday Celebration</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] border border-[#0A84FF]/20">
-                    Annual Milestone
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] border border-[#0A84FF]/20 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-[#0A84FF]" />
+                    <span>Annual Milestone</span>
                   </span>
                 </div>
                 <p className="text-xs text-[#1D1D1F] dark:text-[#F5F5F7] whitespace-pre-line leading-relaxed font-medium">
