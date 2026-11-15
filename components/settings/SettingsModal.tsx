@@ -23,6 +23,10 @@ import {
   RefreshCw,
   BookOpen,
   Cake,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  History,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
 import { TimezoneSelect } from './TimezoneSelect';
@@ -46,6 +50,95 @@ interface ActiveSession {
   updatedAt: string;
   expiresAt: string;
 }
+
+interface PatchNoteItem {
+  type: 'feature' | 'improvement' | 'fix';
+  title: string;
+  description: string;
+}
+
+interface PatchRelease {
+  version: string;
+  tag: string;
+  date: string;
+  isLatest?: boolean;
+  notes: PatchNoteItem[];
+}
+
+const PATCH_NOTES: PatchRelease[] = [
+  {
+    version: 'v1.2.0',
+    tag: 'Latest Update',
+    date: 'November 2026',
+    isLatest: true,
+    notes: [
+      {
+        type: 'feature',
+        title: 'Animated Tasks & Reminders Drawer',
+        description: 'Smooth spring slide expansion and fluid workspace resize on desktop and mobile devices.',
+      },
+      {
+        type: 'feature',
+        title: 'Annual Birthday Celebrations & Events',
+        description: 'Automatic recurring birthday calendar events with celebratory greetings and configurable date settings.',
+      },
+      {
+        type: 'improvement',
+        title: 'Hardened Google OAuth Account Selector',
+        description: 'Instant account selection prompt and persistent multi-device session handling.',
+      },
+      {
+        type: 'fix',
+        title: 'PostgreSQL Database Schema Alignment',
+        description: 'Synced Prisma schema and resolved cross-device account data synchronization.',
+      },
+    ],
+  },
+  {
+    version: 'v1.1.0',
+    tag: 'AI & Smart Scheduling',
+    date: 'November 2026',
+    notes: [
+      {
+        type: 'feature',
+        title: 'Dayli AI Scheduling Assistant',
+        description: 'Natural language event creation, instant conflict resolution, and schedule planning.',
+      },
+      {
+        type: 'feature',
+        title: 'Interactive Spotlight Guided Tour',
+        description: 'Step-by-step onboarding walkthrough covering shortcuts, views, and sidebar controls.',
+      },
+      {
+        type: 'improvement',
+        title: 'Continuous Infinite Scrolling',
+        description: 'Fluid continuous navigation across past and future months without page jumps.',
+      },
+    ],
+  },
+  {
+    version: 'v1.0.0',
+    tag: 'Initial Release',
+    date: 'October 2026',
+    notes: [
+      {
+        type: 'feature',
+        title: 'Core Calendar Workspace',
+        description: 'Day, Week, and Month views with responsive layout and Apple-grade micro-interactions.',
+      },
+      {
+        type: 'feature',
+        title: 'Full iCalendar Portability',
+        description: 'Two-way .ics and JSON export/import for Apple Calendar, Google Calendar, and Microsoft Outlook.',
+      },
+      {
+        type: 'feature',
+        title: 'Custom Categories & Global Timezones',
+        description: 'Color-coded event tags, worldwide timezone conversion, and 12h/24h clock modes.',
+      },
+    ],
+  },
+];
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -159,6 +252,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [confirmDeleteAccountOpen, setConfirmDeleteAccountOpen] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [isPatchNotesExpanded, setIsPatchNotesExpanded] = useState(false);
 
   const { data: authSession } = authClient.useSession();
 
@@ -509,7 +603,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between text-[11px] text-[#86868B] dark:text-[#98989D]">
                 <span>Dayli Calendar</span>
                 <span className="text-[10px] bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded font-mono">
-                  v1.0
+                  v1.2.0
                 </span>
               </div>
             )}
@@ -652,20 +746,143 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              {/* Dayli Info Card */}
-              <div className="p-3.5 rounded-xl bg-[#F5F5F7] dark:bg-[#242426] border border-[#E5E5EA] dark:border-[#38383A] space-y-1.5">
+              {/* Dayli Info & Patch Notes Card */}
+              <div className="p-3.5 rounded-xl bg-[#F5F5F7] dark:bg-[#242426] border border-[#E5E5EA] dark:border-[#38383A] space-y-3 transition-all">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <DayliLogo size={18} />
-                    <span className="font-semibold text-xs text-[#1D1D1F] dark:text-[#F5F5F7]">Dayli Calendar</span>
+                    <DayliLogo size={20} />
+                    <div>
+                      <span className="font-semibold text-xs text-[#1D1D1F] dark:text-[#F5F5F7] block leading-tight">
+                        Dayli Calendar
+                      </span>
+                      <span className="text-[10px] text-[#86868B] dark:text-[#98989D]">
+                        What&apos;s New &amp; Release History
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-2 py-0.5 rounded-full">
-                    Production v1.0
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-2 py-0.5 rounded-full border border-[#0A84FF]/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+                      v1.2.0 (Latest)
+                    </span>
+                  </div>
                 </div>
+
                 <p className="text-[11px] text-[#86868B] dark:text-[#98989D] leading-relaxed">
-                  Fast, focused personal calendar & task workspace with continuous scrolling, cloud sync, and full iCalendar portability.
+                  Fast, focused personal calendar &amp; task workspace with continuous scrolling, cloud sync, and full iCalendar portability.
                 </p>
+
+                {/* Latest Release Highlights */}
+                <div className="space-y-1.5 pt-2 border-t border-[#E5E5EA] dark:border-[#38383A]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#0A84FF]" />
+                      <span>Latest Updates in v1.2.0</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsPatchNotesExpanded((prev) => !prev)}
+                      className="text-[11px] font-medium text-[#0A84FF] hover:text-[#0071E3] flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <span>{isPatchNotesExpanded ? 'Collapse' : 'View All Releases'}</span>
+                      {isPatchNotesExpanded ? (
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                    {PATCH_NOTES[0].notes.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2 rounded-lg bg-white dark:bg-[#1C1C1E] border border-[#E5E5EA]/70 dark:border-[#38383A]/70 flex flex-col justify-between"
+                      >
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span
+                            className={`text-[9px] uppercase font-bold px-1.5 py-0.2 rounded ${
+                              item.type === 'feature'
+                                ? 'bg-[#34C759]/10 text-[#34C759]'
+                                : item.type === 'improvement'
+                                ? 'bg-[#0A84FF]/10 text-[#0A84FF]'
+                                : 'bg-[#FF9500]/10 text-[#FF9500]'
+                            }`}
+                          >
+                            {item.type === 'feature' ? 'New' : item.type === 'improvement' ? 'Improved' : 'Fix'}
+                          </span>
+                          <span className="text-[11px] font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate">
+                            {item.title}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-[#86868B] dark:text-[#98989D] line-clamp-2 leading-tight">
+                          {item.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Expanded Full Release History */}
+                {isPatchNotesExpanded && (
+                  <div className="pt-2 border-t border-[#E5E5EA] dark:border-[#38383A] space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider flex items-center gap-1.5">
+                        <History className="w-3.5 h-3.5" />
+                        <span>Changelog History</span>
+                      </span>
+                    </div>
+
+                    <div className="space-y-3">
+                      {PATCH_NOTES.slice(1).map((release) => (
+                        <div
+                          key={release.version}
+                          className="p-2.5 rounded-lg bg-white dark:bg-[#1C1C1E] border border-[#E5E5EA]/70 dark:border-[#38383A]/70 space-y-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
+                                {release.version}
+                              </span>
+                              <span className="text-[10px] text-[#86868B] dark:text-[#98989D]">
+                                {release.tag}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-[#86868B] dark:text-[#98989D]">
+                              {release.date}
+                            </span>
+                          </div>
+
+                          <ul className="space-y-1.5">
+                            {release.notes.map((item, nIdx) => (
+                              <li key={nIdx} className="text-[11px] flex items-start gap-1.5">
+                                <span
+                                  className={`text-[9px] uppercase font-bold px-1.5 py-0.2 rounded shrink-0 mt-0.5 ${
+                                    item.type === 'feature'
+                                      ? 'bg-[#34C759]/10 text-[#34C759]'
+                                      : item.type === 'improvement'
+                                      ? 'bg-[#0A84FF]/10 text-[#0A84FF]'
+                                      : 'bg-[#FF9500]/10 text-[#FF9500]'
+                                  }`}
+                                >
+                                  {item.type === 'feature' ? 'New' : item.type === 'improvement' ? 'Improved' : 'Fix'}
+                                </span>
+                                <div>
+                                  <strong className="font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">
+                                    {item.title}:{' '}
+                                  </strong>
+                                  <span className="text-[#86868B] dark:text-[#98989D]">
+                                    {item.description}
+                                  </span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
