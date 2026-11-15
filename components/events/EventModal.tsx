@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { CalendarCategory, CalendarEvent } from '@/types/calendar';
 import { toInputDateString } from '@/lib/dateUtils';
+import { DatePickerPopover } from '../ui/DatePickerPopover';
 
 interface EventModalProps {
   isOpen: boolean;
@@ -334,17 +335,18 @@ export const EventModal: React.FC<EventModalProps> = ({
                   <Calendar className="w-3 h-3" />
                   <span>Start Date</span>
                 </label>
-                <input
-                  type="date"
+                <DatePickerPopover
                   value={startDate}
                   disabled={isReadOnly}
-                  onChange={(e) => {
-                    setStartDate(e.target.value);
-                    if (endDate < e.target.value) {
-                      setEndDate(e.target.value);
+                  onChange={(val) => {
+                    if (!val) return;
+                    setStartDate(val);
+                    if (endDate < val) {
+                      setEndDate(val);
                     }
                   }}
-                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF] disabled:opacity-85"
+                  accentColor="blue"
+                  fullWidth
                 />
               </div>
 
@@ -372,13 +374,15 @@ export const EventModal: React.FC<EventModalProps> = ({
                   <Calendar className="w-3 h-3" />
                   <span>End Date</span>
                 </label>
-                <input
-                  type="date"
+                <DatePickerPopover
                   value={endDate}
                   disabled={isReadOnly}
-                  min={startDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full text-base sm:text-xs px-2.5 py-1.5 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none focus:ring-1 focus:ring-[#0A84FF] disabled:opacity-85"
+                  onChange={(val) => {
+                    if (!val) return;
+                    setEndDate(val);
+                  }}
+                  accentColor="blue"
+                  fullWidth
                 />
               </div>
 

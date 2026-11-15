@@ -27,6 +27,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
+import { DatePickerPopover } from '../ui/DatePickerPopover';
 import { TimezoneSelect } from './TimezoneSelect';
 import { useSettings, settingsService, DateFormat, ClockFormat, SUPPORTED_HOLIDAY_COUNTRIES } from '@/services/settingsService';
 import { exportToICS, parseICS, downloadFile } from '@/lib/icsUtils';
@@ -1170,23 +1171,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <input
-                      type="date"
+                    <DatePickerPopover
                       value={userBirthday}
-                      onChange={(e) => handleSaveBirthday(e.target.value)}
+                      onChange={handleSaveBirthday}
                       disabled={isSavingBirthday}
-                      className="px-2.5 py-1 text-xs rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#2C2C2E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden focus:ring-2 focus:ring-[#0A84FF] transition-all cursor-pointer"
+                      accentColor="pink"
+                      icon={<Cake className="w-3.5 h-3.5 text-[#FF2D55]" />}
+                      placeholder="Set your birthday..."
                     />
-                    {userBirthday && (
-                      <button
-                        type="button"
-                        onClick={() => handleSaveBirthday('')}
-                        title="Clear birthday"
-                        className="p-1 rounded-md text-[#86868B] hover:text-[#FF3B30] hover:bg-white dark:hover:bg-[#2C2C2E] border border-transparent hover:border-[#E5E5EA] dark:hover:border-[#38383A] transition-colors"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
