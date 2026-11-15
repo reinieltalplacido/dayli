@@ -236,19 +236,6 @@ export const EventModal: React.FC<EventModalProps> = ({
           </div>
         )}
 
-        {/* Read-Only Notice Banner for Birthday */}
-        {isBirthday && (
-          <div className="px-5 py-3 bg-[#0A84FF]/5 border-b border-[#0A84FF]/15 flex items-start gap-2.5">
-            <span className="text-base leading-none mt-0.5">🎉</span>
-            <div className="text-xs">
-              <p className="font-semibold text-[#0A84FF]">Annual Birthday Celebration</p>
-              <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5 leading-relaxed">
-                Automatically repeats every year based on your profile birthday. You can change your birthday date anytime in Settings &rarr; General.
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
           {error && (
@@ -426,14 +413,30 @@ export const EventModal: React.FC<EventModalProps> = ({
               <AlignLeft className="w-3.5 h-3.5" />
               <span>Notes</span>
             </label>
-            <textarea
-              value={description}
-              disabled={isReadOnly}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add details, agenda items, or notes..."
-              rows={3}
-              className="w-full text-base sm:text-xs px-3 py-2 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] resize-none disabled:opacity-85"
-            />
+            {isBirthday ? (
+              <div className="p-3.5 rounded-xl border border-[#0A84FF]/25 bg-gradient-to-br from-[#0A84FF]/5 via-white dark:via-[#202022] to-[#FF2D55]/5 text-xs space-y-2">
+                <div className="flex items-center justify-between border-b border-[#E5E5EA]/70 dark:border-[#38383A]/70 pb-2">
+                  <span className="font-semibold text-[#0A84FF] flex items-center gap-1.5 text-xs">
+                    <span>🎂</span> Birthday Celebration
+                  </span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#0A84FF]/10 text-[#0A84FF] border border-[#0A84FF]/20">
+                    Annual Milestone
+                  </span>
+                </div>
+                <p className="text-xs text-[#1D1D1F] dark:text-[#F5F5F7] whitespace-pre-line leading-relaxed font-medium">
+                  {description}
+                </p>
+              </div>
+            ) : (
+              <textarea
+                value={description}
+                disabled={isReadOnly}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Add details, agenda items, or notes..."
+                rows={3}
+                className="w-full text-base sm:text-xs px-3 py-2 rounded-md border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#28282A] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/50 dark:placeholder-[#98989D]/50 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] resize-none disabled:opacity-85"
+              />
+            )}
           </div>
 
           {/* Footer Actions */}

@@ -109,9 +109,11 @@ export function DayliCalendarApp() {
 
     if (!bday) return [];
     const parts = bday.split('-');
+    let birthYear: number | null = null;
     let month = '';
     let day = '';
     if (parts.length >= 3) {
+      birthYear = parseInt(parts[0], 10);
       month = parts[1];
       day = parts[2];
     } else if (parts.length === 2) {
@@ -123,13 +125,26 @@ export function DayliCalendarApp() {
     const currentYear = currentDate.getFullYear();
     const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
     const firstName = user?.name ? user.name.split(' ')[0] : 'Reiniel';
+    const fullName = user?.name || firstName;
     const personalCat =
       categories.find((c) => c.id === 'personal' || c.id.endsWith('_personal')) ||
       categories[0];
     const personalCatId = personalCat ? personalCat.id : 'personal';
 
+    const getOrdinal = (n: number) => {
+      const s = ['th', 'st', 'nd', 'rd'];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+
     return years.map((y) => {
       const dateStr = `${y}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      const age = birthYear && !isNaN(birthYear) ? y - birthYear : null;
+      const noteText =
+        age && age > 0
+          ? `🎉 Happy ${getOrdinal(age)} Birthday, ${fullName}! 🎂\n\n🎈 Turning ${age} years old today! Wishing you a fantastic year filled with happiness, good health, and wonderful milestones.`
+          : `🎉 Happy Birthday, ${fullName}! 🎂\n\nWishing you a wonderful celebration and a fantastic year ahead!`;
+
       return {
         id: `user-birthday-${y}`,
         title: `🎂 ${firstName}'s Birthday`,
@@ -139,7 +154,7 @@ export function DayliCalendarApp() {
         endTime: '23:59',
         isAllDay: true,
         categoryId: personalCatId,
-        description: `Happy Birthday${user?.name ? `, ${user.name}` : ''}! 🎉`,
+        description: noteText,
         isReadOnly: true,
         createdAt: dateStr,
         updatedAt: dateStr,
