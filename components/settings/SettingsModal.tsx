@@ -71,67 +71,67 @@ const PATCH_NOTES: PatchRelease[] = [
     notes: [
       {
         type: 'feature',
-        title: 'Animated Tasks & Reminders Drawer',
-        description: 'Smooth spring slide expansion and fluid workspace resize on desktop and mobile devices.',
+        title: 'Animated Tasks & Reminders',
+        description: 'Smooth slide-in sidebar to quickly view, add, and check off your daily to-dos alongside your schedule.',
       },
       {
         type: 'feature',
-        title: 'Annual Birthday Celebrations & Events',
-        description: 'Automatic recurring birthday calendar events with celebratory greetings and configurable date settings.',
+        title: 'Birthday Celebrations',
+        description: 'Never miss a special day! Dayli automatically adds your birthday to your calendar with a celebration greeting.',
       },
       {
         type: 'improvement',
-        title: 'Hardened Google OAuth Account Selector',
-        description: 'Instant account selection prompt and persistent multi-device session handling.',
+        title: 'Easy Account Switching',
+        description: 'Choose which Google account you want to connect to keep personal and work events organized.',
       },
       {
         type: 'fix',
-        title: 'PostgreSQL Database Schema Alignment',
-        description: 'Synced Prisma schema and resolved cross-device account data synchronization.',
+        title: 'Faster Cloud Syncing',
+        description: 'Reliably saves your schedule and tasks so your events stay up-to-date across all your devices.',
       },
     ],
   },
   {
     version: 'v1.1.0',
-    tag: 'AI & Smart Scheduling',
+    tag: 'Smart Features',
     date: 'November 2026',
     notes: [
       {
         type: 'feature',
-        title: 'Dayli AI Scheduling Assistant',
-        description: 'Natural language event creation, instant conflict resolution, and schedule planning.',
+        title: 'Dayli AI Assistant',
+        description: 'Type or ask in plain English to automatically plan meetings, find free time, and organize your week.',
       },
       {
         type: 'feature',
-        title: 'Interactive Spotlight Guided Tour',
-        description: 'Step-by-step onboarding walkthrough covering shortcuts, views, and sidebar controls.',
+        title: 'Guided Feature Tour',
+        description: 'A helpful interactive walkthrough to help you discover shortcuts, views, and power features.',
       },
       {
         type: 'improvement',
-        title: 'Continuous Infinite Scrolling',
-        description: 'Fluid continuous navigation across past and future months without page jumps.',
+        title: 'Smooth Infinite Scrolling',
+        description: 'Glide effortlessly between past and future months without page interruptions or waiting.',
       },
     ],
   },
   {
     version: 'v1.0.0',
-    tag: 'Initial Release',
+    tag: 'Initial Launch',
     date: 'October 2026',
     notes: [
       {
         type: 'feature',
-        title: 'Core Calendar Workspace',
-        description: 'Day, Week, and Month views with responsive layout and Apple-grade micro-interactions.',
+        title: 'Day, Week & Month Views',
+        description: 'Flexible views designed for effortless planning, complete with dark mode and light mode themes.',
       },
       {
         type: 'feature',
-        title: 'Full iCalendar Portability',
-        description: 'Two-way .ics and JSON export/import for Apple Calendar, Google Calendar, and Microsoft Outlook.',
+        title: 'Import & Export Calendars',
+        description: 'Easily bring in or download your events for Apple Calendar, Google Calendar, and Outlook.',
       },
       {
         type: 'feature',
-        title: 'Custom Categories & Global Timezones',
-        description: 'Color-coded event tags, worldwide timezone conversion, and 12h/24h clock modes.',
+        title: 'Color Categories & Timezones',
+        description: 'Color-code your activities with custom categories and easily schedule events across world timezones.',
       },
     ],
   },
@@ -800,10 +800,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               ? 'bg-[#34C759]/10 text-[#34C759]'
                               : item.type === 'improvement'
                               ? 'bg-[#0A84FF]/10 text-[#0A84FF]'
-                              : 'bg-[#FF9500]/10 text-[#FF9500]'
+                              : 'bg-[#5856D6]/10 text-[#5856D6]'
                           }`}
                         >
-                          {item.type === 'feature' ? 'New' : item.type === 'improvement' ? 'Improved' : 'Fix'}
+                          {item.type === 'feature' ? 'New' : item.type === 'improvement' ? 'Improved' : 'Update'}
                         </span>
                         <span className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate">
                           {item.title}
