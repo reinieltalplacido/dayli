@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   X,
   Download,
@@ -24,6 +24,7 @@ import {
   BookOpen,
   Cake,
   History,
+  ChevronDown,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
 import { TimezoneSelect } from './TimezoneSelect';
@@ -250,7 +251,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [selectedReleaseVersion, setSelectedReleaseVersion] = useState<string>(PATCH_NOTES[0].version);
+  const [isReleaseDropdownOpen, setIsReleaseDropdownOpen] = useState(false);
+  const releaseDropdownRef = useRef<HTMLDivElement>(null);
   const activeRelease = PATCH_NOTES.find((r) => r.version === selectedReleaseVersion) || PATCH_NOTES[0];
+
+  // Close release history dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        releaseDropdownRef.current &&
+        !releaseDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsReleaseDropdownOpen(false);
+      }
+    };
+    if (isReleaseDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isReleaseDropdownOpen]);
 
   const { data: authSession } = authClient.useSession();
 
@@ -768,21 +789,79 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Dropdown for history of releases */}
-                  <div className="flex items-center gap-1.5">
-                    <History className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] shrink-0" />
-                    <select
-                      value={selectedReleaseVersion}
-                      onChange={(e) => setSelectedReleaseVersion(e.target.value)}
-                      className="text-xs font-medium px-2.5 py-1 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden focus:ring-1 focus:ring-[#0A84FF] transition-all cursor-pointer shadow-xs"
-                      aria-label="Release history"
+                  {/* Custom Styled Dropdown for Release History */}
+                  <div className="relative" ref={releaseDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsReleaseDropdownOpen((prev) => !prev)}
+                      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer shadow-xs ${
+                        isReleaseDropdownOpen
+                          ? 'border-[#0A84FF] bg-[#0A84FF]/5 dark:bg-[#0A84FF]/10 text-[#0A84FF]'
+                          : 'border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A]'
+                      }`}
+                      aria-haspopup="listbox"
+                      aria-expanded={isReleaseDropdownOpen}
+                      aria-label="Select Release Version"
                     >
-                      {PATCH_NOTES.map((r) => (
-                        <option key={r.version} value={r.version}>
-                          {r.version} {r.isLatest ? '(Latest)' : ''} — {r.tag}
-                        </option>
-                      ))}
-                    </select>
+                      <History className="w-3.5 h-3.5 text-[#0A84FF]" />
+                      <span className="font-mono font-semibold">{activeRelease.version}</span>
+                      <span className="text-[#86868B] dark:text-[#98989D] hidden sm:inline">• {activeRelease.tag}</span>
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] transition-transform duration-200 ${
+                          isReleaseDropdownOpen ? 'rotate-180 text-[#0A84FF]' : ''
+                        }`}
+                      />
+                    </button>
+
+                    {/* Animated Popover Menu */}
+                    {isReleaseDropdownOpen && (
+                      <div className="absolute right-0 top-full mt-1.5 z-50 w-64 bg-white dark:bg-[#1C1C1E] rounded-xl shadow-2xl border border-[#E5E5EA] dark:border-[#38383A] p-1.5 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-2 py-1 mb-1 border-b border-[#E5E5EA]/70 dark:border-[#2C2C2E]">
+                          <span className="text-[10px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider">
+                            Release History
+                          </span>
+                        </div>
+                        <div className="space-y-0.5" role="listbox">
+                          {PATCH_NOTES.map((r) => {
+                            const isSelected = r.version === selectedReleaseVersion;
+                            return (
+                              <button
+                                key={r.version}
+                                type="button"
+                                role="option"
+                                aria-selected={isSelected}
+                                onClick={() => {
+                                  setSelectedReleaseVersion(r.version);
+                                  setIsReleaseDropdownOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-[#0A84FF]/10 text-[#0A84FF] font-medium'
+                                    : 'text-[#1D1D1F] dark:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A]'
+                                }`}
+                              >
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-mono text-xs font-semibold">{r.version}</span>
+                                    {r.isLatest && (
+                                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-[#34C759]/15 text-[#34C759]">
+                                        Latest
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] text-[#86868B] dark:text-[#98989D] truncate mt-0.5">
+                                    {r.tag} • {r.date}
+                                  </p>
+                                </div>
+                                {isSelected && (
+                                  <Check className="w-3.5 h-3.5 text-[#0A84FF] shrink-0 ml-2" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
