@@ -23,9 +23,6 @@ import {
   RefreshCw,
   BookOpen,
   Cake,
-  Sparkles,
-  ChevronDown,
-  ChevronUp,
   History,
 } from 'lucide-react';
 import { DayliLogo } from '../ui/DayliLogo';
@@ -252,7 +249,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [confirmDeleteAccountOpen, setConfirmDeleteAccountOpen] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const [isPatchNotesExpanded, setIsPatchNotesExpanded] = useState(false);
+  const [selectedReleaseVersion, setSelectedReleaseVersion] = useState<string>(PATCH_NOTES[0].version);
+  const activeRelease = PATCH_NOTES.find((r) => r.version === selectedReleaseVersion) || PATCH_NOTES[0];
 
   const { data: authSession } = authClient.useSession();
 
@@ -746,143 +744,77 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              {/* Dayli Info & Patch Notes Card */}
-              <div className="p-3.5 rounded-xl bg-[#F5F5F7] dark:bg-[#242426] border border-[#E5E5EA] dark:border-[#38383A] space-y-3 transition-all">
-                <div className="flex items-center justify-between">
+              {/* Release Notes & Patch History */}
+              <div className="p-3.5 rounded-xl bg-[#F5F5F7] dark:bg-[#242426] border border-[#E5E5EA] dark:border-[#38383A] space-y-3">
+                {/* Header with Title & Dropdown for History */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-[#E5E5EA] dark:border-[#38383A]">
                   <div className="flex items-center gap-2">
                     <DayliLogo size={20} />
                     <div>
-                      <span className="font-semibold text-xs text-[#1D1D1F] dark:text-[#F5F5F7] block leading-tight">
-                        Dayli Calendar
-                      </span>
-                      <span className="text-[10px] text-[#86868B] dark:text-[#98989D]">
-                        What&apos;s New &amp; Release History
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-2 py-0.5 rounded-full border border-[#0A84FF]/20">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
-                      v1.2.0 (Latest)
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] leading-relaxed">
-                  Fast, focused personal calendar &amp; task workspace with continuous scrolling, cloud sync, and full iCalendar portability.
-                </p>
-
-                {/* Latest Release Highlights */}
-                <div className="space-y-1.5 pt-2 border-t border-[#E5E5EA] dark:border-[#38383A]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#0A84FF]" />
-                      <span>Latest Updates in v1.2.0</span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsPatchNotesExpanded((prev) => !prev)}
-                      className="text-[11px] font-medium text-[#0A84FF] hover:text-[#0071E3] flex items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      <span>{isPatchNotesExpanded ? 'Collapse' : 'View All Releases'}</span>
-                      {isPatchNotesExpanded ? (
-                        <ChevronUp className="w-3.5 h-3.5" />
-                      ) : (
-                        <ChevronDown className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
-                    {PATCH_NOTES[0].notes.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="p-2 rounded-lg bg-white dark:bg-[#1C1C1E] border border-[#E5E5EA]/70 dark:border-[#38383A]/70 flex flex-col justify-between"
-                      >
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span
-                            className={`text-[9px] uppercase font-bold px-1.5 py-0.2 rounded ${
-                              item.type === 'feature'
-                                ? 'bg-[#34C759]/10 text-[#34C759]'
-                                : item.type === 'improvement'
-                                ? 'bg-[#0A84FF]/10 text-[#0A84FF]'
-                                : 'bg-[#FF9500]/10 text-[#FF9500]'
-                            }`}
-                          >
-                            {item.type === 'feature' ? 'New' : item.type === 'improvement' ? 'Improved' : 'Fix'}
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-xs text-[#1D1D1F] dark:text-[#F5F5F7]">
+                          Dayli Updates
+                        </span>
+                        {activeRelease.isLatest && (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-[#0A84FF] bg-[#0A84FF]/10 px-1.5 py-0.2 rounded-full border border-[#0A84FF]/20">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+                            Latest
                           </span>
-                          <span className="text-[11px] font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate">
-                            {item.title}
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-[#86868B] dark:text-[#98989D] line-clamp-2 leading-tight">
-                          {item.description}
-                        </p>
+                        )}
                       </div>
-                    ))}
+                      <p className="text-[10px] text-[#86868B] dark:text-[#98989D]">
+                        {activeRelease.tag} • Released {activeRelease.date}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Dropdown for history of releases */}
+                  <div className="flex items-center gap-1.5">
+                    <History className="w-3.5 h-3.5 text-[#86868B] dark:text-[#98989D] shrink-0" />
+                    <select
+                      value={selectedReleaseVersion}
+                      onChange={(e) => setSelectedReleaseVersion(e.target.value)}
+                      className="text-xs font-medium px-2.5 py-1 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#1C1C1E] text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-hidden focus:ring-1 focus:ring-[#0A84FF] transition-all cursor-pointer shadow-xs"
+                      aria-label="Release history"
+                    >
+                      {PATCH_NOTES.map((r) => (
+                        <option key={r.version} value={r.version}>
+                          {r.version} {r.isLatest ? '(Latest)' : ''} — {r.tag}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                {/* Expanded Full Release History */}
-                {isPatchNotesExpanded && (
-                  <div className="pt-2 border-t border-[#E5E5EA] dark:border-[#38383A] space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-[#86868B] dark:text-[#98989D] uppercase tracking-wider flex items-center gap-1.5">
-                        <History className="w-3.5 h-3.5" />
-                        <span>Changelog History</span>
-                      </span>
-                    </div>
-
-                    <div className="space-y-3">
-                      {PATCH_NOTES.slice(1).map((release) => (
-                        <div
-                          key={release.version}
-                          className="p-2.5 rounded-lg bg-white dark:bg-[#1C1C1E] border border-[#E5E5EA]/70 dark:border-[#38383A]/70 space-y-2"
+                {/* Release Notes Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {activeRelease.notes.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="p-2.5 rounded-lg bg-white dark:bg-[#1C1C1E] border border-[#E5E5EA]/70 dark:border-[#38383A]/70 flex flex-col justify-between shadow-2xs"
+                    >
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <span
+                          className={`text-[9px] uppercase font-bold px-1.5 py-0.2 rounded shrink-0 ${
+                            item.type === 'feature'
+                              ? 'bg-[#34C759]/10 text-[#34C759]'
+                              : item.type === 'improvement'
+                              ? 'bg-[#0A84FF]/10 text-[#0A84FF]'
+                              : 'bg-[#FF9500]/10 text-[#FF9500]'
+                          }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
-                                {release.version}
-                              </span>
-                              <span className="text-[10px] text-[#86868B] dark:text-[#98989D]">
-                                {release.tag}
-                              </span>
-                            </div>
-                            <span className="text-[10px] text-[#86868B] dark:text-[#98989D]">
-                              {release.date}
-                            </span>
-                          </div>
-
-                          <ul className="space-y-1.5">
-                            {release.notes.map((item, nIdx) => (
-                              <li key={nIdx} className="text-[11px] flex items-start gap-1.5">
-                                <span
-                                  className={`text-[9px] uppercase font-bold px-1.5 py-0.2 rounded shrink-0 mt-0.5 ${
-                                    item.type === 'feature'
-                                      ? 'bg-[#34C759]/10 text-[#34C759]'
-                                      : item.type === 'improvement'
-                                      ? 'bg-[#0A84FF]/10 text-[#0A84FF]'
-                                      : 'bg-[#FF9500]/10 text-[#FF9500]'
-                                  }`}
-                                >
-                                  {item.type === 'feature' ? 'New' : item.type === 'improvement' ? 'Improved' : 'Fix'}
-                                </span>
-                                <div>
-                                  <strong className="font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">
-                                    {item.title}:{' '}
-                                  </strong>
-                                  <span className="text-[#86868B] dark:text-[#98989D]">
-                                    {item.description}
-                                  </span>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
+                          {item.type === 'feature' ? 'New' : item.type === 'improvement' ? 'Improved' : 'Fix'}
+                        </span>
+                        <span className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] truncate">
+                          {item.title}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#86868B] dark:text-[#98989D] leading-snug">
+                        {item.description}
+                      </p>
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
             </div>
           )}
