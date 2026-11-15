@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { format, isToday, isBefore, startOfToday } from 'date-fns';
 import { TaskItem, CalendarCategory } from '@/types/calendar';
-import { toInputDateString, parseDateString } from '@/lib/dateUtils';
+import { parseDateString } from '@/lib/dateUtils';
+import { TaskModal } from './TaskModal';
 
 interface TasksPanelProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface TasksPanelProps {
   tasks: TaskItem[];
   categories: CalendarCategory[];
   onAddTask: (title: string, dueDate?: string, categoryId?: string) => void;
+  onUpdateTask?: (id: string, updates: Partial<TaskItem>) => void;
   onToggleTask: (id: string) => void;
   onDeleteTask: (id: string) => void;
 }
@@ -29,6 +31,7 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
   tasks,
   categories,
   onAddTask,
+  onUpdateTask,
   onToggleTask,
   onDeleteTask,
 }) => {
@@ -36,7 +39,8 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newDueDate, setNewDueDate] = useState('');
   const [newCategoryId, setNewCategoryId] = useState('');
-  const [isAddingDue, setIsAddingDue] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +55,18 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
     setNewTaskTitle('');
     setNewDueDate('');
     setNewCategoryId('');
-    setIsAddingDue(false);
+  };
+
+  const handleOpenCreateModal = (prefillTitle?: string, prefillDate?: string) => {
+    setSelectedTask(null);
+    if (prefillTitle) setNewTaskTitle(prefillTitle);
+    if (prefillDate) setNewDueDate(prefillDate);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleOpenEditModal = (task: TaskItem) => {
+    setSelectedTask(task);
+    setIsTaskModalOpen(true);
   };
 
   const filteredTasks = tasks.filter((task) => {
@@ -107,13 +122,24 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
                 {tasks.filter((t) => !t.completed).length}
               </span>
             </div>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors cursor-pointer"
-              title="Close tasks"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => handleOpenCreateModal()}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-white bg-[#0A84FF] hover:bg-[#0071E3] rounded-md transition-colors shadow-xs cursor-pointer"
+                title="New Task with Due Date"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>New</span>
+              </button>
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#F5F5F7] dark:hover:bg-[#28282A] transition-colors cursor-pointer"
+                title="Close tasks"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Filter Tabs */}
@@ -147,59 +173,47 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
                 type="submit"
                 disabled={!newTaskTitle.trim()}
                 className="absolute right-1.5 top-1.5 p-1 rounded text-white bg-[#0A84FF] disabled:opacity-40 disabled:hover:bg-[#0A84FF] hover:bg-[#0071E3] transition-colors cursor-pointer"
+                title="Add task"
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
 
             {/* Due Date & Category toggles for quick add */}
-            <div className="flex items-center gap-2 mt-2">
-              {!isAddingDue ? (
+            <div className="flex items-center justify-between gap-2 mt-2">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsAddingDue(true);
-                    setNewDueDate(toInputDateString(new Date()));
-                  }}
+                  onClick={() => handleOpenCreateModal(newTaskTitle, newDueDate)}
                   className="flex items-center gap-1 text-[11px] text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] px-2 py-0.5 rounded border border-dashed border-[#E5E5EA] dark:border-[#38383A] hover:border-[#0A84FF]/40 transition-colors cursor-pointer"
+                  title="Open task modal to set due date and category"
                 >
-                  <Calendar className="w-3 h-3" />
-                  <span>Add Due Date</span>
+                  <Calendar className="w-3 h-3 text-[#0A84FF]" />
+                  <span>{newDueDate ? format(parseDateString(newDueDate), 'MMM d') : 'Add Due Date'}</span>
                 </button>
-              ) : (
-                <div className="flex items-center gap-1">
-                  <input
-                    type="date"
-                    value={newDueDate}
-                    onChange={(e) => setNewDueDate(e.target.value)}
-                    className="text-[11px] px-1.5 py-0.5 rounded border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-[#1D1D1F] dark:text-[#F5F5F7]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAddingDue(false);
-                      setNewDueDate('');
-                    }}
-                    className="text-[#86868B] dark:text-[#98989D] hover:text-[#FF3B30] p-0.5 cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
 
-              {/* Category selection */}
-              <select
-                value={newCategoryId}
-                onChange={(e) => setNewCategoryId(e.target.value)}
-                className="text-[11px] px-1.5 py-0.5 rounded border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-[#86868B] dark:text-[#98989D] focus:outline-none cursor-pointer"
+                {/* Category selection */}
+                <select
+                  value={newCategoryId}
+                  onChange={(e) => setNewCategoryId(e.target.value)}
+                  className="text-[11px] px-1.5 py-0.5 rounded border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-[#86868B] dark:text-[#98989D] focus:outline-none cursor-pointer"
+                >
+                  <option value="">No list</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleOpenCreateModal(newTaskTitle, newDueDate)}
+                className="text-[11px] text-[#0A84FF] hover:underline font-medium cursor-pointer"
               >
-                <option value="">No list</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                More options
+              </button>
             </div>
           </form>
 
@@ -237,7 +251,10 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
                   >
                     {/* Circular checkbox */}
                     <button
-                      onClick={() => onToggleTask(task.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleTask(task.id);
+                      }}
                       aria-label="Toggle task completion"
                       className="mt-0.5 text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] transition-colors shrink-0 cursor-pointer"
                     >
@@ -248,10 +265,13 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
                       )}
                     </button>
 
-                    {/* Details */}
-                    <div className="flex-1 min-w-0">
+                    {/* Details - clicking opens TaskModal in edit mode */}
+                    <div
+                      onClick={() => handleOpenEditModal(task)}
+                      className="flex-1 min-w-0 cursor-pointer"
+                    >
                       <p
-                        className={`text-xs leading-snug break-words ${
+                        className={`text-xs leading-snug break-words group-hover:text-[#0A84FF] transition-colors ${
                           task.completed
                             ? 'line-through text-[#86868B] dark:text-[#98989D]'
                             : 'text-[#1D1D1F] dark:text-[#F5F5F7] font-medium'
@@ -300,7 +320,10 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
 
                     {/* Delete action button */}
                     <button
-                      onClick={() => onDeleteTask(task.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteTask(task.id);
+                      }}
                       className="opacity-0 group-hover:opacity-100 p-1 rounded text-[#86868B] dark:text-[#98989D] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 transition-all shrink-0 cursor-pointer"
                       title="Delete task"
                     >
@@ -313,6 +336,23 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
           </div>
         </div>
       </aside>
+
+      {/* Task Modal for creating and editing tasks with due date & category */}
+      <TaskModal
+        isOpen={isTaskModalOpen}
+        onClose={() => {
+          setIsTaskModalOpen(false);
+          setSelectedTask(null);
+        }}
+        onSave={(data) => {
+          onAddTask(data.title, data.dueDate, data.categoryId);
+        }}
+        onUpdate={onUpdateTask}
+        onDelete={onDeleteTask}
+        categories={categories}
+        initialTask={selectedTask}
+        defaultDate={newDueDate || undefined}
+      />
     </>
   );
 };

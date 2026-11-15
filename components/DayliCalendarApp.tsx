@@ -13,6 +13,7 @@ import {
   CalendarEvent,
   CalendarView,
   ToastNotification,
+  TaskItem,
 } from '@/types/calendar';
 import { Calendar, CalendarDays, Columns, CheckSquare, Plus } from 'lucide-react';
 import { eventService } from '@/services/eventService';
@@ -690,6 +691,7 @@ export function DayliCalendarApp() {
             tasks={tasks}
             categories={categories}
             onAddTask={handleAddTask}
+            onUpdateTask={handleUpdateTask}
             onToggleTask={handleToggleTask}
             onDeleteTask={handleDeleteTask}
           />

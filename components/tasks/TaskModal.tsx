@@ -9,11 +9,10 @@ import {
   Trash2,
   CheckCircle2,
   Circle,
-  Clock,
 } from 'lucide-react';
-import { addDays, format } from 'date-fns';
+import { addDays } from 'date-fns';
 import { TaskItem, CalendarCategory } from '@/types/calendar';
-import { toInputDateString, parseDateString } from '@/lib/dateUtils';
+import { toInputDateString } from '@/lib/dateUtils';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -44,21 +43,25 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      if (initialTask) {
-        setTitle(initialTask.title);
-        setDueDate(initialTask.dueDate || '');
-        setCategoryId(initialTask.categoryId || '');
-        setCompleted(initialTask.completed);
-      } else {
-        setTitle('');
-        setDueDate(defaultDate || '');
-        setCategoryId('');
-        setCompleted(false);
+    const timer = setTimeout(() => {
+      if (isOpen) {
+        if (initialTask) {
+          setTitle(initialTask.title);
+          setDueDate(initialTask.dueDate || '');
+          setCategoryId(initialTask.categoryId || '');
+          setCompleted(initialTask.completed);
+        } else {
+          setTitle('');
+          setDueDate(defaultDate || '');
+          setCategoryId('');
+          setCompleted(false);
+        }
+        setError('');
+        setShowDeleteConfirm(false);
       }
-      setError('');
-      setShowDeleteConfirm(false);
-    }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [isOpen, initialTask, defaultDate]);
 
   useEffect(() => {

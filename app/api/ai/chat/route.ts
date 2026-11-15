@@ -55,25 +55,40 @@ export async function POST(req: NextRequest) {
     const dayOfWeek = format(now, 'EEEE');
     const userTimezone = body.userTimezone || 'UTC';
 
-    // Format events for context
-    const eventsList = (body.events || [])
+    // Focus context window to nearby events (30 days past to 45 days future) to save tokens
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const fortyFiveDaysAhead = new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    const relevantEvents = (body.events || [])
+      .filter((e) => {
+        const start = e.startDate || '';
+        const end = e.endDate || e.startDate || '';
+        return (
+          (start >= thirtyDaysAgo && start <= fortyFiveDaysAhead) ||
+          (end >= thirtyDaysAgo && start <= fortyFiveDaysAhead)
+        );
+      })
+      .slice(0, 35);
+
+    const eventsList = relevantEvents
       .map((e) => {
         const timeStr = e.isAllDay ? 'All Day' : `${e.startTime} - ${e.endTime}`;
         const locStr = e.location ? ` at ${e.location}` : '';
         const catStr = e.categoryName ? ` [${e.categoryName}]` : '';
-        return `• "${e.title}" on ${e.startDate} (${timeStr})${locStr}${catStr}`;
+        const dateRange =
+          e.endDate && e.endDate !== e.startDate ? `${e.startDate} to ${e.endDate}` : e.startDate;
+        return `• "${e.title}" on ${dateRange} (${timeStr})${locStr}${catStr}`;
       })
-      .slice(0, 50)
       .join('\n');
 
-    // Format tasks for context
+    // Format tasks for context (up to 25 tasks)
     const tasksList = (body.tasks || [])
+      .slice(0, 25)
       .map((t) => {
         const status = t.completed ? '✓ Completed' : '○ Pending';
         const due = t.dueDate ? ` (Due: ${t.dueDate})` : '';
         return `• [${status}] ${t.title}${due}`;
       })
-      .slice(0, 40)
       .join('\n');
 
     const categoriesList = (body.categories || [])
@@ -130,9 +145,9 @@ Style Guidelines:
 - Use bullet points for schedules.`;
 
     if (apiKey) {
-      // Build conversation contents for Gemini
+      // Build conversation contents for Gemini (capped to last 6 messages to preserve context and save tokens)
       const contents = [
-        ...messages.slice(-8).map((m) => ({
+        ...messages.slice(-6).map((m) => ({
           role: m.role === 'assistant' ? 'model' : 'user',
           parts: [{ text: m.content }],
         })),
@@ -151,10 +166,20 @@ Style Guidelines:
             contents,
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 2500,
+              maxOutputTokens: 800,
             },
           }),
         });
+
+        if (geminiRes.status === 429) {
+          return NextResponse.json(
+            {
+              reply: 'AI rate limit reached for the moment. Please wait a minute before sending another message.',
+              source: 'rate_limited',
+            },
+            { status: 429 }
+          );
+        }
 
         if (geminiRes.ok) {
           const geminiData = await geminiRes.json();
@@ -169,6 +194,22 @@ Style Guidelines:
               reply: text,
               source: 'gemini',
             });
+          }
+        } else {
+          const errorBody = await geminiRes.text();
+          console.warn(`Gemini API returned status ${geminiRes.status}:`, errorBody);
+          if (
+            geminiRes.status === 429 ||
+            errorBody.includes('RESOURCE_EXHAUSTED') ||
+            errorBody.includes('Quota exceeded')
+          ) {
+            return NextResponse.json(
+              {
+                reply: 'AI rate limit reached for the moment. Please wait a minute before sending another message.',
+                source: 'rate_limited',
+              },
+              { status: 429 }
+            );
           }
         }
       } catch (err) {

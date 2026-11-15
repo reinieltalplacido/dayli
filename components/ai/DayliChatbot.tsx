@@ -211,8 +211,19 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
         }),
       });
 
-      const data = await res.json();
-      if (res.ok && data.reply) {
+      const data = await res.json().catch(() => null);
+
+      if (res.status === 429 || data?.source === 'rate_limited') {
+        const assistantMessage: ChatMessage = {
+          id: generateMsgId('rate_limit'),
+          role: 'assistant',
+          content: data?.reply || 'AI rate limit reached for the moment. Please wait a minute before sending another message.',
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+        return;
+      }
+
+      if (res.ok && data?.reply) {
         const { cleanReply, actionData } = parseActionFromReply(data.reply);
         const assistantMessage: ChatMessage = {
           id: generateMsgId('assistant'),
@@ -227,7 +238,7 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
           {
             id: generateMsgId('err'),
             role: 'assistant',
-            content: "Sorry, I ran into an issue connecting to the AI assistant. Please try again.",
+            content: data?.reply || "Sorry, I ran into an issue connecting to the AI assistant. Please try again.",
           },
         ]);
       }

@@ -74,4 +74,62 @@ test.describe('Tasks & Reminders Workflow', () => {
     await tasksPanel.locator('button[title="Close tasks"]').click();
     await expect(tasksPanel).not.toBeVisible();
   });
+
+  test('should open TaskModal via New button, set due date, and create task', async ({ page }) => {
+    await page.locator('#tour-tasks-header').click();
+    const tasksPanel = page.locator('aside[aria-label="Tasks and Reminders"]');
+
+    // Click "New" button in drawer header
+    await tasksPanel.getByRole('button', { name: 'New' }).click();
+
+    // Verify Task Modal opened
+    const modal = page.locator('div[role="dialog"]');
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('heading', { name: 'New Task' })).toBeVisible();
+
+    const taskTitle = `Modal Task with Due Date ${Date.now()}`;
+    await modal.locator('input[placeholder="What needs to be done?..."]').fill(taskTitle);
+
+    // Click "Tomorrow" quick date preset
+    await modal.getByRole('button', { name: 'Tomorrow' }).click();
+
+    // Submit form
+    await modal.getByRole('button', { name: 'Create Task' }).click();
+    await expect(modal).not.toBeVisible();
+
+    // Verify task is displayed with due date badge
+    const createdTask = tasksPanel.locator('div.group', { hasText: taskTitle }).first();
+    await expect(createdTask).toBeVisible();
+    await expect(createdTask.getByText(/Today|Tomorrow|Nov|Dec/i).first()).toBeVisible();
+  });
+
+  test('should open TaskModal by clicking an existing task and allow editing', async ({ page }) => {
+    await page.locator('#tour-tasks-header').click();
+    const tasksPanel = page.locator('aside[aria-label="Tasks and Reminders"]');
+
+    // Create a task
+    const taskTitle = `Editable Task ${Date.now()}`;
+    const taskInput = tasksPanel.locator('input[placeholder="Add new task..."]');
+    await taskInput.fill(taskTitle);
+    await taskInput.press('Enter');
+    await expect(tasksPanel.getByText(taskTitle)).toBeVisible();
+
+    // Click the task text to open edit modal
+    const taskRow = tasksPanel.locator('div.group', { hasText: taskTitle }).first();
+    await taskRow.locator('p').click();
+
+    // Modal should be open in Edit mode
+    const modal = page.locator('div[role="dialog"]');
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('heading', { name: 'Edit Task' })).toBeVisible();
+
+    // Change title
+    const updatedTitle = `${taskTitle} (Updated)`;
+    await modal.locator('input[placeholder="What needs to be done?..."]').fill(updatedTitle);
+    await modal.getByRole('button', { name: 'Today' }).click();
+    await modal.getByRole('button', { name: 'Save Changes' }).click();
+
+    await expect(modal).not.toBeVisible();
+    await expect(tasksPanel.getByText(updatedTitle)).toBeVisible();
+  });
 });
