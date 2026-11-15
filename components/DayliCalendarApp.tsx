@@ -149,7 +149,9 @@ export function DayliCalendarApp() {
 
   // Combine user events with national public holidays and user's birthday
   const allEvents = React.useMemo(() => {
-    const isHolidaysEnabled = categories.some((c) => c.id === 'holidays' && c.enabled);
+    const isHolidaysEnabled = categories.some(
+      (c) => (c.id === 'holidays' || c.id.endsWith('_holidays')) && c.enabled
+    );
     const base = isHolidaysEnabled ? [...events, ...holidays] : events;
     return birthdayEvents.length > 0 ? [...base, ...birthdayEvents] : base;
   }, [events, holidays, categories, birthdayEvents]);

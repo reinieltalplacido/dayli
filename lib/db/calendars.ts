@@ -37,6 +37,43 @@ export async function getUserCalendars(userId: string): Promise<CalendarCategory
     }));
   }
 
+  // Ensure built-in categories like 'holidays' exist even for existing user accounts
+  const existingCategoryIds = new Set(
+    calendars.map((c) => (c.id.includes('_') ? c.id.split('_').slice(1).join('_') : c.id))
+  );
+
+  const missingDefaults = DEFAULT_CATEGORIES.filter(
+    (cat) => !existingCategoryIds.has(cat.id)
+  );
+
+  if (missingDefaults.length > 0) {
+    await prisma.calendar.createMany({
+      data: missingDefaults.map((cat) => ({
+        id: `${userId}_${cat.id}`,
+        name: cat.name,
+        color: cat.color,
+        lightBg: cat.lightBg,
+        isDefault: cat.isDefault ?? false,
+        enabled: cat.enabled,
+        userId,
+      })),
+    });
+
+    const updated = await prisma.calendar.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return updated.map((c) => ({
+      id: c.id,
+      name: c.name,
+      color: c.color,
+      lightBg: c.lightBg,
+      isDefault: c.isDefault,
+      enabled: c.enabled,
+    }));
+  }
+
   return calendars.map((c) => ({
     id: c.id,
     name: c.name,

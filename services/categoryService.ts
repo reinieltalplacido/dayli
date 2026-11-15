@@ -28,9 +28,13 @@ export const categoryService = {
   },
 
   setCategories(categories: CalendarCategory[]): void {
-    cachedCategories = categories;
+    const hasHolidays = categories.some((c) => c.id === 'holidays' || c.id.endsWith('_holidays'));
+    const holidayDefault = DEFAULT_CATEGORIES.find((c) => c.id === 'holidays');
+    const finalCategories = !hasHolidays && holidayDefault ? [...categories, holidayDefault] : categories;
+
+    cachedCategories = finalCategories;
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+      localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(finalCategories));
     }
     notifyListeners();
   },
@@ -48,7 +52,7 @@ export const categoryService = {
       if (Array.isArray(parsed) && parsed.length > 0) {
         // Ensure built-in categories like 'holidays' exist even for existing user profiles
         const holidayDefault = DEFAULT_CATEGORIES.find((c) => c.id === 'holidays');
-        const hasHolidays = parsed.some((c) => c.id === 'holidays');
+        const hasHolidays = parsed.some((c) => c.id === 'holidays' || c.id.endsWith('_holidays'));
         if (holidayDefault && !hasHolidays) {
           const updatedWithHolidays = [...parsed, holidayDefault];
           localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(updatedWithHolidays));
