@@ -54,7 +54,7 @@ export function startDayliTour(options?: { onComplete?: () => void }) {
       },
     },
     {
-      element: '#tour-chatbot',
+      element: isMobile ? '#tour-chatbot-mobile' : '#tour-chatbot',
       popover: {
         title: 'Dayli AI Assistant',
         description: 'Your personal calendar assistant. Ask questions about your day, check for free time, or schedule meetings with a single tap.',

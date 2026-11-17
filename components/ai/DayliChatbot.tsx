@@ -53,6 +53,9 @@ interface DayliChatbotProps {
   userTimezone?: string;
   onSaveEvent: (event: Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onAddTask: (title: string, dueDate?: string, categoryId?: string) => void;
+  isOpenControlled?: boolean;
+  onToggleControlled?: (open: boolean) => void;
+  hideFloatingTrigger?: boolean;
 }
 
 const QUICK_PROMPTS = [
@@ -106,8 +109,17 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
   userTimezone,
   onSaveEvent,
   onAddTask,
+  isOpenControlled,
+  onToggleControlled,
+  hideFloatingTrigger = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = isOpenControlled !== undefined ? isOpenControlled : internalIsOpen;
+
+  const handleSetOpen = (open: boolean) => {
+    setInternalIsOpen(open);
+    onToggleControlled?.(open);
+  };
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: 'welcome',
@@ -301,24 +313,24 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
 
   return (
     <>
-      {/* Floating Trigger Button */}
-      {!isOpen && (
+      {/* Floating Trigger Button (Desktop only; on mobile, accessed via bottom navigation bar) */}
+      {!isOpen && !hideFloatingTrigger && (
         <button
           id="tour-chatbot"
           type="button"
-          onClick={() => setIsOpen(true)}
-          className="fixed right-4 sm:right-6 bottom-20 md:bottom-6 z-40 h-11 px-3.5 rounded-full bg-[#0A84FF] hover:bg-[#0071E3] active:scale-95 text-white shadow-[0_4px_16px_rgba(10,132,255,0.4)] flex items-center gap-2 transition-all duration-150 group"
+          onClick={() => handleSetOpen(true)}
+          className="hidden md:flex fixed right-6 bottom-6 z-40 h-11 px-3.5 rounded-full bg-[#0A84FF] hover:bg-[#0071E3] active:scale-95 text-white shadow-[0_4px_16px_rgba(10,132,255,0.4)] items-center gap-2 transition-all duration-150 group cursor-pointer"
           title="Open Dayli Assistant"
           aria-label="Dayli AI Assistant"
         >
           <Bot className="w-4 h-4 stroke-[2.3] group-hover:scale-110 transition-transform" />
-          <span className="text-xs font-semibold tracking-tight hidden sm:inline">Ask Assistant</span>
+          <span className="text-xs font-semibold tracking-tight">Ask Assistant</span>
         </button>
       )}
 
       {/* Floating Chat Modal Popover */}
       {isOpen && (
-        <div className="fixed inset-x-2 bottom-20 md:inset-auto md:right-6 md:bottom-6 z-50 w-auto md:w-[380px] h-[520px] max-h-[80vh] bg-white dark:bg-[#18181A] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed inset-x-2 bottom-18 md:inset-auto md:right-6 md:bottom-6 z-50 w-auto md:w-[380px] h-[520px] max-h-[78vh] bg-white dark:bg-[#18181A] rounded-2xl shadow-2xl border border-[#E5E5EA] dark:border-[#2C2C2E] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
           {/* Header */}
           <div className="px-4 py-3 border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/60 dark:bg-[#151518]/60 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
@@ -347,7 +359,7 @@ export const DayliChatbot: React.FC<DayliChatbotProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => handleSetOpen(false)}
                 className="p-1.5 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-[#E5E5EA] dark:hover:bg-[#28282A] transition-colors"
                 title="Close chat"
               >

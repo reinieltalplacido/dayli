@@ -24,6 +24,7 @@ interface MonthViewProps {
   onSelectEvent: (event: CalendarEvent) => void;
   onCreateEventOnDate: (date: Date) => void;
   onVisibleMonthChange?: (date: Date) => void;
+  onMobileAgendaChange?: (isOpen: boolean) => void;
   weekStartsOn?: 0 | 1;
 }
 
@@ -41,6 +42,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
   onSelectEvent,
   onCreateEventOnDate,
   onVisibleMonthChange,
+  onMobileAgendaChange,
   weekStartsOn = 0,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,6 +53,11 @@ export const MonthView: React.FC<MonthViewProps> = ({
   const [range, setRange] = useState({ pastMonths: 3, futureMonths: 8 });
   const [overflowDate, setOverflowDate] = useState<Date | null>(null);
   const [mobileSelectedDate, setMobileSelectedDate] = useState<Date | null>(null);
+
+  const handleSelectMobileDate = (day: Date | null) => {
+    setMobileSelectedDate(day);
+    onMobileAgendaChange?.(Boolean(day));
+  };
 
   // Base anchor date for range calculation
   const anchorDate = useMemo(() => new Date(2026, 9, 1), []);
@@ -307,9 +314,8 @@ export const MonthView: React.FC<MonthViewProps> = ({
                     data-date={dateStr}
                     onClick={() => {
                       if (typeof window !== 'undefined' && window.innerWidth < 640) {
-                        setMobileSelectedDate((prev) =>
-                          prev && isSameDay(prev, day) ? null : day
-                        );
+                        const nextDate = mobileSelectedDate && isSameDay(mobileSelectedDate, day) ? null : day;
+                        handleSelectMobileDate(nextDate);
                       } else {
                         onCreateEventOnDate(day);
                       }
@@ -398,9 +404,17 @@ export const MonthView: React.FC<MonthViewProps> = ({
         ))}
       </div>
 
+      {/* Mobile Agenda Sheet Backdrop */}
+      {mobileSelectedDate && (
+        <div
+          onClick={() => handleSelectMobileDate(null)}
+          className="sm:hidden fixed inset-0 z-35 bg-black/20 backdrop-blur-2xs"
+        />
+      )}
+
       {/* Mobile Agenda Sheet (When a day is selected on mobile) */}
       {mobileSelectedDate && (
-        <div className="sm:hidden fixed inset-x-0 bottom-14 z-30 bg-white dark:bg-[#1C1C1E] border-t border-[#E5E5EA] dark:border-[#2C2C2E] shadow-[0_-8px_30px_rgba(0,0,0,0.15)] rounded-t-2xl max-h-[46vh] flex flex-col animate-modal">
+        <div className="sm:hidden fixed inset-x-0 bottom-14 z-40 bg-white dark:bg-[#1C1C1E] border-t border-[#E5E5EA] dark:border-[#2C2C2E] shadow-[0_-8px_30px_rgba(0,0,0,0.15)] rounded-t-2xl max-h-[46vh] flex flex-col animate-modal">
           {/* Handle bar & Header */}
           <div className="px-4 py-2.5 border-b border-[#E5E5EA] dark:border-[#28282A] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
@@ -428,7 +442,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => setMobileSelectedDate(null)}
+                onClick={() => handleSelectMobileDate(null)}
                 className="p-1 rounded-md text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]"
               >
                 <X className="w-4 h-4" />

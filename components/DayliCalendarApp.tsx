@@ -15,7 +15,7 @@ import {
   ToastNotification,
   TaskItem,
 } from '@/types/calendar';
-import { Calendar, CalendarDays, Columns, CheckSquare, Plus } from 'lucide-react';
+import { Calendar, CalendarDays, Columns, CheckSquare, Plus, Bot } from 'lucide-react';
 import { eventService } from '@/services/eventService';
 import { taskService } from '@/services/taskService';
 import { categoryService } from '@/services/categoryService';
@@ -241,7 +241,21 @@ export function DayliCalendarApp() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSmartScheduleOpen, setIsSmartScheduleOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isMobileAgendaOpen, setIsMobileAgendaOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
+
+  const isAnyModalOpen =
+    isEventModalOpen ||
+    isSmartScheduleOpen ||
+    isSearchOpen ||
+    isSettingsOpen ||
+    isAuthModalOpen ||
+    isTutorialOpen ||
+    isTasksOpen ||
+    isSidebarMobileOpen ||
+    isChatbotOpen ||
+    isMobileAgendaOpen;
 
   // Toast feedback helper
   const addToast = useCallback((message: string, type: 'success' | 'info' | 'error' = 'success') => {
@@ -617,6 +631,7 @@ export function DayliCalendarApp() {
         setIsSearchOpen(false);
         setIsSettingsOpen(false);
         setIsAuthModalOpen(false);
+        setIsChatbotOpen(false);
       }
     };
 
@@ -681,6 +696,7 @@ export function DayliCalendarApp() {
             onCreateEventOnDate={handleCreateOnDate}
             onCreateEventOnDateTime={handleCreateOnDateTime}
             onVisibleMonthChange={handleVisibleMonthChange}
+            onMobileAgendaChange={setIsMobileAgendaOpen}
             weekStartsOn={settings.weekStartsOn}
           />
 
@@ -697,16 +713,18 @@ export function DayliCalendarApp() {
           />
         </div>
 
-        {/* Mobile Floating Action Button (FAB) for Instant Event Creation */}
-        <button
-          id="tour-fab-new"
-          type="button"
-          onClick={handleOpenCreateEvent}
-          className="md:hidden fixed right-4 bottom-18 z-40 w-13 h-13 rounded-full bg-[#0A84FF] hover:bg-[#0071E3] active:scale-90 text-white shadow-[0_4px_16px_rgba(10,132,255,0.45)] flex items-center justify-center transition-transform duration-150"
-          aria-label="New Event"
-        >
-          <Plus className="w-6 h-6 stroke-[2.4]" />
-        </button>
+        {/* Mobile Floating Action Button (FAB) for Instant Event Creation (hidden when any modal or drawer is open) */}
+        {!isAnyModalOpen && (
+          <button
+            id="tour-fab-new"
+            type="button"
+            onClick={handleOpenCreateEvent}
+            className="md:hidden fixed right-4 bottom-18 z-30 w-12 h-12 rounded-full bg-[#0A84FF] hover:bg-[#0071E3] active:scale-90 text-white shadow-[0_4px_16px_rgba(10,132,255,0.45)] flex items-center justify-center transition-transform duration-150"
+            aria-label="New Event"
+          >
+            <Plus className="w-6 h-6 stroke-[2.4]" />
+          </button>
+        )}
 
         {/* Mobile Bottom Navigation Bar */}
         <nav
@@ -718,9 +736,10 @@ export function DayliCalendarApp() {
             onClick={() => {
               setView('day');
               setIsTasksOpen(false);
+              setIsChatbotOpen(false);
             }}
             className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] transition-colors ${
-              view === 'day' && !isTasksOpen
+              view === 'day' && !isTasksOpen && !isChatbotOpen
                 ? 'text-[#0A84FF]'
                 : 'text-[#86868B] dark:text-[#98989D]'
             }`}
@@ -734,9 +753,10 @@ export function DayliCalendarApp() {
             onClick={() => {
               setView('week');
               setIsTasksOpen(false);
+              setIsChatbotOpen(false);
             }}
             className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] transition-colors ${
-              view === 'week' && !isTasksOpen
+              view === 'week' && !isTasksOpen && !isChatbotOpen
                 ? 'text-[#0A84FF]'
                 : 'text-[#86868B] dark:text-[#98989D]'
             }`}
@@ -750,9 +770,10 @@ export function DayliCalendarApp() {
             onClick={() => {
               setView('month');
               setIsTasksOpen(false);
+              setIsChatbotOpen(false);
             }}
             className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] transition-colors ${
-              view === 'month' && !isTasksOpen
+              view === 'month' && !isTasksOpen && !isChatbotOpen
                 ? 'text-[#0A84FF]'
                 : 'text-[#86868B] dark:text-[#98989D]'
             }`}
@@ -764,7 +785,10 @@ export function DayliCalendarApp() {
           <button
             id="tour-tasks-mobile"
             type="button"
-            onClick={() => setIsTasksOpen((prev) => !prev)}
+            onClick={() => {
+              setIsTasksOpen((prev) => !prev);
+              setIsChatbotOpen(false);
+            }}
             className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] relative transition-colors ${
               isTasksOpen
                 ? 'text-[#0A84FF]'
@@ -780,6 +804,24 @@ export function DayliCalendarApp() {
               )}
             </div>
             <span className="text-[10px] font-medium mt-0.5">Tasks</span>
+          </button>
+
+          {/* Dayli AI Assistant Tab in Mobile Bottom Bar */}
+          <button
+            id="tour-chatbot-mobile"
+            type="button"
+            onClick={() => {
+              setIsChatbotOpen((prev) => !prev);
+              setIsTasksOpen(false);
+            }}
+            className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg min-w-[56px] transition-colors ${
+              isChatbotOpen
+                ? 'text-[#0A84FF]'
+                : 'text-[#86868B] dark:text-[#98989D]'
+            }`}
+          >
+            <Bot className="w-5 h-5" />
+            <span className="text-[10px] font-medium mt-0.5">Assistant</span>
           </button>
         </nav>
       </div>
@@ -867,6 +909,9 @@ export function DayliCalendarApp() {
         userTimezone={settings.timeZone}
         onSaveEvent={handleSaveEvent}
         onAddTask={handleAddTask}
+        isOpenControlled={isChatbotOpen}
+        onToggleControlled={setIsChatbotOpen}
+        hideFloatingTrigger={isAnyModalOpen}
       />
     </div>
   );
