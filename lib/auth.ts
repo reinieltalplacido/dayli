@@ -11,6 +11,9 @@ const getBaseURL = () => {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://daylicalendar.vercel.app';
+  }
   return 'http://localhost:3000';
 };
 
@@ -20,6 +23,10 @@ export const auth = betterAuth({
   }),
   secret: process.env.BETTER_AUTH_SECRET || 'dev_secret_must_be_at_least_32_characters_long_12345',
   baseURL: getBaseURL(),
+  trustedOrigins: [
+    'https://daylicalendar.vercel.app',
+    'http://localhost:3000',
+  ],
   emailAndPassword: {
     enabled: true,
   },
