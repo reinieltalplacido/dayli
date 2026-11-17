@@ -36,31 +36,11 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
   onDeleteTask,
 }) => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all');
-  const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [newDueDate, setNewDueDate] = useState('');
-  const [newCategoryId, setNewCategoryId] = useState('');
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTaskTitle.trim()) return;
-
-    onAddTask(
-      newTaskTitle.trim(),
-      newDueDate || undefined,
-      newCategoryId || undefined
-    );
-
-    setNewTaskTitle('');
-    setNewDueDate('');
-    setNewCategoryId('');
-  };
-
-  const handleOpenCreateModal = (prefillTitle?: string, prefillDate?: string) => {
+  const handleOpenCreateModal = () => {
     setSelectedTask(null);
-    if (prefillTitle) setNewTaskTitle(prefillTitle);
-    if (prefillDate) setNewDueDate(prefillDate);
     setIsTaskModalOpen(true);
   };
 
@@ -143,93 +123,49 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex items-center gap-1 p-2 bg-[#F5F5F7]/40 dark:bg-[#1C1C1E]/60 border-b border-[#E5E5EA] dark:border-[#28282A] shrink-0">
-            {(['all', 'pending', 'completed'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab)}
-                className={`flex-1 py-1 text-xs font-medium capitalize rounded-md transition-all cursor-pointer ${
-                  filter === tab
-                    ? 'bg-white dark:bg-[#2C2C2E] text-[#1D1D1F] dark:text-[#F5F5F7] shadow-xs'
-                    : 'text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7]'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Quick Add Form */}
-          <form onSubmit={handleCreate} className="p-3 border-b border-[#E5E5EA] dark:border-[#28282A] bg-[#F5F5F7]/20 dark:bg-[#1A1A1C]/50 shrink-0">
-            <div className="relative">
-              <input
-                type="text"
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-                placeholder="Add new task..."
-                className="w-full text-base sm:text-xs pl-3 pr-8 py-2 rounded-lg border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-[#1D1D1F] dark:text-[#F5F5F7] placeholder-[#86868B]/60 dark:placeholder-[#98989D]/60 focus:outline-none focus:ring-1 focus:ring-[#0A84FF] shadow-xs"
-              />
-              <button
-                type="submit"
-                disabled={!newTaskTitle.trim()}
-                className="absolute right-1.5 top-1.5 p-1 rounded text-white bg-[#0A84FF] disabled:opacity-40 disabled:hover:bg-[#0A84FF] hover:bg-[#0071E3] transition-colors cursor-pointer"
-                title="Add task"
-              >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Due Date & Category toggles for quick add */}
-            <div className="flex items-center justify-between gap-2 mt-2">
-              <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 p-2 bg-[#F5F5F7] dark:bg-[#1A1A1C] border-b border-[#E5E5EA] dark:border-[#28282A] shrink-0">
+            {(['all', 'pending', 'completed'] as const).map((tab) => {
+              const isActive = filter === tab;
+              return (
                 <button
+                  key={tab}
                   type="button"
-                  onClick={() => handleOpenCreateModal(newTaskTitle, newDueDate)}
-                  className="flex items-center gap-1 text-[11px] text-[#86868B] dark:text-[#98989D] hover:text-[#0A84FF] px-2 py-0.5 rounded border border-dashed border-[#E5E5EA] dark:border-[#38383A] hover:border-[#0A84FF]/40 transition-colors cursor-pointer"
-                  title="Open task modal to set due date and category"
+                  onClick={() => setFilter(tab)}
+                  className={`flex-1 py-1.5 text-xs capitalize rounded-lg transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#0A84FF] text-white shadow-xs font-semibold'
+                      : 'text-[#86868B] dark:text-[#98989D] hover:text-[#1D1D1F] dark:hover:text-[#F5F5F7] hover:bg-black/5 dark:hover:bg-white/5 font-medium'
+                  }`}
                 >
-                  <Calendar className="w-3 h-3 text-[#0A84FF]" />
-                  <span>{newDueDate ? format(parseDateString(newDueDate), 'MMM d') : 'Add Due Date'}</span>
+                  {tab}
                 </button>
-
-                {/* Category selection */}
-                <select
-                  value={newCategoryId}
-                  onChange={(e) => setNewCategoryId(e.target.value)}
-                  className="text-[11px] px-1.5 py-0.5 rounded border border-[#E5E5EA] dark:border-[#38383A] bg-white dark:bg-[#202022] text-[#86868B] dark:text-[#98989D] focus:outline-none cursor-pointer"
-                >
-                  <option value="">No list</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleOpenCreateModal(newTaskTitle, newDueDate)}
-                className="text-[11px] text-[#0A84FF] hover:underline font-medium cursor-pointer"
-              >
-                More options
-              </button>
-            </div>
-          </form>
+              );
+            })}
+          </div>
 
           {/* Task Items List */}
           <div className="flex-1 overflow-y-auto p-3 space-y-1">
             {filteredTasks.length === 0 ? (
-              <div className="h-40 flex flex-col items-center justify-center text-center p-4">
+              <div className="h-48 flex flex-col items-center justify-center text-center p-4">
                 <CheckCircle2 className="w-8 h-8 text-[#86868B]/30 dark:text-[#98989D]/30 mb-2 stroke-[1.5]" />
-                <p className="text-xs font-medium text-[#1D1D1F] dark:text-[#F5F5F7]">
+                <p className="text-xs font-semibold text-[#1D1D1F] dark:text-[#F5F5F7]">
                   {filter === 'completed' ? 'No completed tasks' : 'All clear!'}
                 </p>
-                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5">
+                <p className="text-[11px] text-[#86868B] dark:text-[#98989D] mt-0.5 max-w-[200px]">
                   {filter === 'completed'
                     ? 'Tasks you check off will appear here.'
                     : 'No pending reminders for your schedule.'}
                 </p>
+                {filter !== 'completed' && (
+                  <button
+                    type="button"
+                    onClick={handleOpenCreateModal}
+                    className="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#0A84FF] hover:bg-[#0071E3] transition-colors shadow-xs cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Create a Task</span>
+                  </button>
+                )}
               </div>
             ) : (
               filteredTasks.map((task) => {
@@ -351,7 +287,6 @@ export const TasksPanel: React.FC<TasksPanelProps> = ({
         onDelete={onDeleteTask}
         categories={categories}
         initialTask={selectedTask}
-        defaultDate={newDueDate || undefined}
       />
     </>
   );

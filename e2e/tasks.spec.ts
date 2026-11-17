@@ -16,11 +16,16 @@ test.describe('Tasks & Reminders Workflow', () => {
     const tasksPanel = page.locator('aside[aria-label="Tasks and Reminders"]');
     await expect(tasksPanel).toBeVisible();
 
+    // Click "New" button in drawer header
+    await tasksPanel.getByRole('button', { name: 'New' }).click();
+    const modal = page.locator('div[role="dialog"]');
+    await expect(modal).toBeVisible();
+
     // Add a new task
     const taskTitle = `Complete Playwright setup ${Date.now()}`;
-    const taskInput = tasksPanel.locator('input[placeholder="Add new task..."]');
-    await taskInput.fill(taskTitle);
-    await taskInput.press('Enter');
+    await modal.locator('input[placeholder="What needs to be done?..."]').fill(taskTitle);
+    await modal.getByRole('button', { name: 'Create Task' }).click();
+    await expect(modal).not.toBeVisible();
 
     // Verify task is added to list
     await expect(tasksPanel.getByText(taskTitle)).toBeVisible();
@@ -31,9 +36,11 @@ test.describe('Tasks & Reminders Workflow', () => {
     const tasksPanel = page.locator('aside[aria-label="Tasks and Reminders"]');
 
     const taskTitle = `Review PR ${Date.now()}`;
-    const taskInput = tasksPanel.locator('input[placeholder="Add new task..."]');
-    await taskInput.fill(taskTitle);
-    await taskInput.press('Enter');
+    await tasksPanel.getByRole('button', { name: 'New' }).click();
+    const modal = page.locator('div[role="dialog"]');
+    await modal.locator('input[placeholder="What needs to be done?..."]').fill(taskTitle);
+    await modal.getByRole('button', { name: 'Create Task' }).click();
+    await expect(modal).not.toBeVisible();
 
     const taskRow = tasksPanel.locator('div.group', { hasText: taskTitle }).first();
     // Toggle completion by clicking the circle/check icon button
@@ -58,9 +65,11 @@ test.describe('Tasks & Reminders Workflow', () => {
     const tasksPanel = page.locator('aside[aria-label="Tasks and Reminders"]');
 
     const taskTitle = `Delete me ${Date.now()}`;
-    const taskInput = tasksPanel.locator('input[placeholder="Add new task..."]');
-    await taskInput.fill(taskTitle);
-    await taskInput.press('Enter');
+    await tasksPanel.getByRole('button', { name: 'New' }).click();
+    const modal = page.locator('div[role="dialog"]');
+    await modal.locator('input[placeholder="What needs to be done?..."]').fill(taskTitle);
+    await modal.getByRole('button', { name: 'Create Task' }).click();
+    await expect(modal).not.toBeVisible();
     await expect(tasksPanel.getByText(taskTitle)).toBeVisible();
 
     // Hover or find delete button
@@ -109,9 +118,11 @@ test.describe('Tasks & Reminders Workflow', () => {
 
     // Create a task
     const taskTitle = `Editable Task ${Date.now()}`;
-    const taskInput = tasksPanel.locator('input[placeholder="Add new task..."]');
-    await taskInput.fill(taskTitle);
-    await taskInput.press('Enter');
+    await tasksPanel.getByRole('button', { name: 'New' }).click();
+    const createModal = page.locator('div[role="dialog"]');
+    await createModal.locator('input[placeholder="What needs to be done?..."]').fill(taskTitle);
+    await createModal.getByRole('button', { name: 'Create Task' }).click();
+    await expect(createModal).not.toBeVisible();
     await expect(tasksPanel.getByText(taskTitle)).toBeVisible();
 
     // Click the task text to open edit modal
