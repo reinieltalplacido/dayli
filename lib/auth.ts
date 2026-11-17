@@ -3,15 +3,22 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { prisma } from '@/lib/prisma';
 
 const getBaseURL = () => {
-  if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  const isProd = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
+
+  // In production, never allow 'localhost' from misconfigured environment variables
+  if (process.env.BETTER_AUTH_URL && (!isProd || !process.env.BETTER_AUTH_URL.includes('localhost'))) {
+    return process.env.BETTER_AUTH_URL;
+  }
+  if (process.env.NEXT_PUBLIC_APP_URL && (!isProd || !process.env.NEXT_PUBLIC_APP_URL.includes('localhost'))) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  if (process.env.NODE_ENV === 'production') {
+  if (isProd) {
     return 'https://daylicalendar.vercel.app';
   }
   return 'http://localhost:3000';
